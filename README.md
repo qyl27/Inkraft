@@ -1,2 +1,2 @@
 # Inkraft
-Use ink language write your story in Minecraft.
+Use ink language to write your story in Minecraft.

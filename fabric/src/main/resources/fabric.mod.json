@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "id": "inkraft",
+  "version": "${version}",
+  "name": "Inkraft",
+  "description": "Use ink language to write your story in Minecraft.",
+  "authors": [
+    "qyl27"
+  ],
+  "contact": {
+    "sources": "https://github.com/qyl27/inkraft"
+  },
+  "license": "MIT",
+  "icon": "assets/inkraft/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "cx.rain.mc.inkraft.fabric.InkraftFabric"
+    ]
+  },
+  "mixins": [
+    "inkraft.mixins.json",
+    "inkraft-common.mixins.json"
+  ],
+  "depends": {
+    "fabric": "*",
+    "minecraft": ">=1.19.4",
+    "architectury": ">=8.1.79"
+  }
+}

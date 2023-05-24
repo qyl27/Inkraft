@@ -1,0 +1,35 @@
+modLoader = "javafml"
+loaderVersion = "[45,)"
+issueTrackerURL = "https://github.com/qyl27/Inkraft/issues"
+license = "MIT"
+
+[[mods]]
+modId = "inkraft"
+version = "${version}"
+displayName = "Inkraft"
+authors = "qyl27"
+description = '''
+Use ink language to write your story in Minecraft.
+'''
+#logoFile = ""
+
+[[dependencies.inkraft]]
+modId = "forge"
+mandatory = true
+versionRange = "[45,)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.inkraft]]
+modId = "minecraft"
+mandatory = true
+versionRange = "[1.19.4,)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.inkraft]]
+modId = "architectury"
+mandatory = true
+versionRange = "[8.1.79,)"
+ordering = "AFTER"
+side = "BOTH"

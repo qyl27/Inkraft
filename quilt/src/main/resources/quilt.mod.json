@@ -1,0 +1,45 @@
+{
+  "schema_version": 1,
+  "mixin": [
+    "inkraft.mixins.json",
+    "inkraft-common.mixins.json"
+  ],
+  "quilt_loader": {
+    "group": "${group}",
+    "id": "inkraft",
+    "version": "${version}",
+    "name": "Inkraft",
+    "description": "Use ink language to write your story in Minecraft.",
+    "authors": ["qyl27"],
+    "contact": {
+      "sources": "https://github.com/qyl27/inkraft"
+    },
+    "license": "MIT",
+    "icon": "assets/inkraft/icon.png",
+    "intermediate_mappings": "net.fabricmc:intermediary",
+    "environment": "*",
+    "entrypoints": {
+      "init": [
+        "cx.rain.mc.inkraft.qulit.InkraftQulit"
+      ]
+    },
+    "depends": [
+      {
+        "id": "quilt_loader",
+        "version": "*"
+      },
+      {
+        "id": "quilt_base",
+        "version": "*"
+      },
+      {
+        "id": "minecraft",
+        "version": ">=1.19.4"
+      },
+      {
+        "id": "architectury",
+        "version": ">=8.1.79"
+      }
+    ]
+  }
+}
