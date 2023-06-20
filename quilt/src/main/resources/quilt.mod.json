@@ -20,7 +20,7 @@
     "environment": "*",
     "entrypoints": {
       "init": [
-        "cx.rain.mc.inkraft.qulit.InkraftQulit"
+        "cx.rain.mc.inkraft.quilt.InkraftQuilt"
       ]
     },
     "depends": [
@@ -34,11 +34,11 @@
       },
       {
         "id": "minecraft",
-        "version": ">=1.19.4"
+        "version": ">=1.20.1"
       },
       {
         "id": "architectury",
-        "version": ">=8.1.79"
+        "version": ">=9.0.8"
       }
     ]
   }
