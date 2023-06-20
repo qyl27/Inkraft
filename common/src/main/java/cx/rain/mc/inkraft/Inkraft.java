@@ -1,5 +1,9 @@
 package cx.rain.mc.inkraft;
 
+import cx.rain.mc.inkraft.data.InkReloadListener;
+import cx.rain.mc.inkraft.data.StoriesManager;
+import dev.architectury.registry.ReloadListenerRegistry;
+import net.minecraft.server.packs.PackType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -9,14 +13,16 @@ public class Inkraft {
 
     private static Inkraft INSTANCE;
 
+    private StoriesManager storiesManager;
+
     private Logger logger = LoggerFactory.getLogger(MODID);
 
     public Inkraft() {
         INSTANCE = this;
 
+        storiesManager = new StoriesManager();
+
         logger.info("Initializing Inkraft. Ver: " + VERSION);
-
-
     }
 
     public static Inkraft getInstance() {
@@ -28,6 +34,10 @@ public class Inkraft {
     }
 
     public void init() {
+        ReloadListenerRegistry.register(PackType.SERVER_DATA, new InkReloadListener(), InkReloadListener.INKRAFT_STORY);
+    }
 
+    public StoriesManager getStoriesManager() {
+        return storiesManager;
     }
 }
