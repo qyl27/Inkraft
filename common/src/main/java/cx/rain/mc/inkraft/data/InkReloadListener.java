@@ -13,8 +13,8 @@ import java.util.concurrent.Executor;
 
 public class InkReloadListener implements PreparableReloadListener {
 
-    public static final ResourceLocation INKRAFT_STORY = new ResourceLocation(Inkraft.MODID, "stories");
     public static final String STORY_PATH = "stories";
+    public static final ResourceLocation INKRAFT_STORY = new ResourceLocation(Inkraft.MODID, STORY_PATH);
 
     @Override
     public CompletableFuture<Void> reload(PreparationBarrier preparationBarrier, ResourceManager resourceManager,
