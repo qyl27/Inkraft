@@ -1,0 +1,7 @@
+package cx.rain.mc.inkraft.command;
+
+import net.minecraft.commands.CommandSourceStack;
+
+public interface IInkPermissionManager {
+    boolean hasStartPermission(CommandSourceStack source);
+}

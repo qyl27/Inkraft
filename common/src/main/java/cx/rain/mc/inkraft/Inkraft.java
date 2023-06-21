@@ -13,13 +13,15 @@ public class Inkraft {
 
     private static Inkraft INSTANCE;
 
-    private StoriesManager storiesManager;
+    private final InkraftPlatform platform;
+    private final StoriesManager storiesManager;
 
     private Logger logger = LoggerFactory.getLogger(MODID);
 
     public Inkraft() {
         INSTANCE = this;
 
+        platform = new InkraftPlatform();
         storiesManager = new StoriesManager();
 
         logger.info("Initializing Inkraft. Ver: " + VERSION);
@@ -35,6 +37,10 @@ public class Inkraft {
 
     public void init() {
         ReloadListenerRegistry.register(PackType.SERVER_DATA, new InkReloadListener(), InkReloadListener.INKRAFT_STORY);
+    }
+
+    public InkraftPlatform getPlatform() {
+        return platform;
     }
 
     public StoriesManager getStoriesManager() {
