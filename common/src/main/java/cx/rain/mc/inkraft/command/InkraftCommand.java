@@ -110,6 +110,10 @@ public class InkraftCommand {
             var story = storiesManager.getStory(player);
 
             story.continueStoryWithChoice(player, stateHolder, choice);
+        } else {
+            player.sendSystemMessage(Component.translatable(CommandConstants.MESSAGE_STORY_BAD_TOKEN).withStyle(ChatFormatting.RED));
+
+            return 1;
         }
 
         return 1;

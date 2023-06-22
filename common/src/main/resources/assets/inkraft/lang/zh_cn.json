@@ -4,5 +4,6 @@
   "message.story.continue": "【继续】",
   "message.story.continue.choice":  "【选项】 %1$s",
   "message.story.hint.continue": "点击继续",
-  "message.story.hint.continue.choice":  "点击选择该项"
+  "message.story.hint.continue.choice":  "点击选择该项",
+  "message.story.bad_token": "错误，请选择系统最后提示的选项。"
 }

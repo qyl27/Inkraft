@@ -29,7 +29,7 @@ public class StoryWrapper {
     private boolean continueStory(ServerPlayer player, IInkStoryStateHolder holder) {
         try {
             if (story.canContinue()) {
-                var message = story.Continue();
+                var message = story.Continue().trim();
                 player.sendSystemMessage(Component.literal(message).withStyle(ChatFormatting.GREEN));
                 var choices = story.getCurrentChoices();
 

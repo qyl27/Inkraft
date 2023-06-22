@@ -8,4 +8,5 @@ public class CommandConstants {
     public static final String MESSAGE_STORY_CONTINUE_CHOICE = "message.story.continue.choice";
     public static final String MESSAGE_STORY_HINT_CONTINUE = "message.story.hint.continue";
     public static final String MESSAGE_STORY_HINT_CONTINUE_CHOICE = "message.story.hint.continue.choice";
+    public static final String MESSAGE_STORY_BAD_TOKEN = "message.story.bad_token";
 }
