@@ -32,7 +32,26 @@ public class InkraftCommand {
                     .then(argument("token", UuidArgument.uuid())
                             .executes(InkraftCommand::onSimpleContinue)
                             .then(argument("choice", IntegerArgumentType.integer())
-                                    .executes(InkraftCommand::onChoiceContinue))));
+                                    .executes(InkraftCommand::onChoiceContinue))))
+            .then(literal("clear")
+                    .requires(Inkraft.getInstance().getPlatform().getPermissionManager()::hasClearPermission)
+                    .executes(InkraftCommand::onClearState));
+
+    private static int onClearState(CommandContext<CommandSourceStack> context) {
+        if (!ensurePlayer(context)) {
+            return 0;
+        }
+
+        var player = context.getSource().getPlayer();
+        var stateHolder = Inkraft.getInstance().getPlatform().getPlayerStoryStateHolder(player);
+
+        stateHolder.setState("");
+        Inkraft.getInstance().getStoriesManager().refreshStory(player);
+
+        player.sendSystemMessage(Component.translatable(CommandConstants.MESSAGE_COMMAND_SUCCESS)
+                .withStyle(ChatFormatting.LIGHT_PURPLE));
+        return 1;
+    }
 
     private static int onVersion(final CommandContext<CommandSourceStack> context) {
         context.getSource().sendSuccess(() ->
@@ -51,9 +70,9 @@ public class InkraftCommand {
         var stateHolder = Inkraft.getInstance().getPlatform().getPlayerStoryStateHolder(player);
 
         var storiesManager = Inkraft.getInstance().getStoriesManager();
-        var story = storiesManager.getStory(player, path);
+        var story = storiesManager.getOrCreateStory(player, path);
 
-        story.continueStory(player, stateHolder);
+        story.startStory(player, stateHolder);
 
         return 1;
     }
@@ -63,15 +82,37 @@ public class InkraftCommand {
             return 0;
         }
 
-        return 0;
+        var player = context.getSource().getPlayer();
+        var token = UuidArgument.getUuid(context, "token");
+        var stateHolder = Inkraft.getInstance().getPlatform().getPlayerStoryStateHolder(player);
+
+        if (stateHolder.getContinueToken().equals(token)) {
+            var storiesManager = Inkraft.getInstance().getStoriesManager();
+            var story = storiesManager.getStory(player);
+
+            story.continueStoryWithoutChoice(player, stateHolder);
+        }
+
+        return 1;
     }
 
     private static int onChoiceContinue(final CommandContext<CommandSourceStack> context) {
         if (!ensurePlayer(context)) {
             return 0;
         }
+        var player = context.getSource().getPlayer();
+        var token = UuidArgument.getUuid(context, "token");
+        var choice = IntegerArgumentType.getInteger(context, "choice");
+        var stateHolder = Inkraft.getInstance().getPlatform().getPlayerStoryStateHolder(player);
 
-        return 0;
+        if (stateHolder.getContinueToken().equals(token)) {
+            var storiesManager = Inkraft.getInstance().getStoriesManager();
+            var story = storiesManager.getStory(player);
+
+            story.continueStoryWithChoice(player, stateHolder, choice);
+        }
+
+        return 1;
     }
 
     private static CompletableFuture<Suggestions> suggestStart(final CommandContext<CommandSourceStack> context,

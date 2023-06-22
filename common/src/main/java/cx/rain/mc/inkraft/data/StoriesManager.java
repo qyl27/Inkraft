@@ -29,18 +29,27 @@ public class StoriesManager {
         return stories.keySet();
     }
 
-    public StoryWrapper getStory(ServerPlayer player, ResourceLocation path) {
+    public StoryWrapper getOrCreateStory(ServerPlayer player, ResourceLocation path) {
         try {
             var uuid = player.getUUID();
             if (cachedStories.containsKey(uuid)) {
                 return cachedStories.get(uuid);
             }
 
-            var story = new StoryWrapper(new Story(stories.get(path)));
-            cachedStories.put(uuid, story);
-            return story;
+            var story = new Story(stories.get(path));
+            var storyWrapper = new StoryWrapper(story);
+            cachedStories.put(uuid, storyWrapper);
+            return storyWrapper;
         } catch (Exception ex) {
             throw new RuntimeException(ex);
         }
+    }
+
+    public void refreshStory(ServerPlayer player) {
+        cachedStories.remove(player.getUUID());
+    }
+
+    public StoryWrapper getStory(ServerPlayer player) {
+        return cachedStories.get(player.getUUID());
     }
 }

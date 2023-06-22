@@ -35,6 +35,7 @@ dependencies {
     common(project(path: ":common", configuration: "namedElements")) { transitive = false }
     shadowCommon(project(path: ":common", configuration: "transformProductionForge")) { transitive = false }
 
+    forgeRuntimeLibrary 'com.bladecoder.ink:blade-ink:1.1.1'
     shadowCommon 'com.bladecoder.ink:blade-ink:1.1.1'
 }
 

@@ -15,6 +15,7 @@ import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
 import java.io.Reader;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -31,23 +32,46 @@ public class InkReloadListener implements PreparableReloadListener {
     public CompletableFuture<Void> reload(PreparationBarrier preparationBarrier, ResourceManager resourceManager,
                                           ProfilerFiller preparationsProfiler, ProfilerFiller reloadProfiler,
                                           Executor backgroundExecutor, Executor gameExecutor) {
-        backgroundExecutor.execute(() -> scan(resourceManager, STORY_PATH));
-        return preparationBarrier.wait(null);
+        preparationsProfiler.startTick();
+        preparationsProfiler.endTick();
+        return prepare(resourceManager, backgroundExecutor)
+                .thenCompose(preparationBarrier::wait)
+                .thenAcceptAsync(results -> apply(results, reloadProfiler), gameExecutor);
     }
 
-    public void scan(ResourceManager resourceManager, String dir) {
-        FileToIdConverter fileToIdConverter = FileToIdConverter.json(dir);
+    private CompletableFuture<Map<ResourceLocation, String>> prepare(ResourceManager resourceManager,
+                                                                     Executor backgroundExecutor) {
+        var stories = new HashMap<ResourceLocation, String>();
+        return CompletableFuture
+                .runAsync(() -> scan(resourceManager, stories), backgroundExecutor)
+                .thenApply(__ -> stories);
+    }
+
+    private void scan(ResourceManager resourceManager, Map<ResourceLocation, String> stories) {
+        FileToIdConverter fileToIdConverter = FileToIdConverter.json(STORY_PATH);
 
         for (Entry<ResourceLocation, Resource> entry : fileToIdConverter.listMatchingResources(resourceManager).entrySet()) {
             ResourceLocation resourceLocation = entry.getKey();
             ResourceLocation id = fileToIdConverter.fileToId(resourceLocation);
 
             try {
-                Inkraft.getInstance().getStoriesManager().addStory(id, IOUtils.toString(entry.getValue().open()));
+                stories.put(id, IOUtils.toString(entry.getValue().open()));
             } catch (IOException ex) {
                 ex.printStackTrace();
             }
         }
+    }
+
+    private void apply(Map<ResourceLocation, String> stories, ProfilerFiller reloadProfiler) {
+        reloadProfiler.startTick();
+        reloadProfiler.push("stories");
+
+        for (var story : stories.entrySet()) {
+            Inkraft.getInstance().getStoriesManager().addStory(story.getKey(), story.getValue());
+        }
+
+        reloadProfiler.pop();
+        reloadProfiler.endTick();
     }
 
     @Override

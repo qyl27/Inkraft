@@ -16,6 +16,7 @@ public class InkPermissionManagerForge implements IInkPermissionManager {
 
     public static final PermissionNode<Boolean> PERMISSION_START = bool("start", 2);
     public static final PermissionNode<Boolean> PERMISSION_CONTINUE = bool("continue", 0);
+    public static final PermissionNode<Boolean> PERMISSION_CLEAR = bool("clear", 2);
 
     private static PermissionNode<Boolean> bool(String name, int defaultLevel) {
         return new PermissionNode<>(Inkraft.MODID, name, PermissionTypes.BOOLEAN,
@@ -26,6 +27,7 @@ public class InkPermissionManagerForge implements IInkPermissionManager {
     public static void registerPermission(PermissionGatherEvent.Nodes event) {
         event.addNodes(PERMISSION_START);
         event.addNodes(PERMISSION_CONTINUE);
+        event.addNodes(PERMISSION_CLEAR);
     }
 
     private boolean check(CommandSourceStack source, PermissionNode<Boolean> node) {
@@ -44,5 +46,10 @@ public class InkPermissionManagerForge implements IInkPermissionManager {
     @Override
     public boolean hasContinuePermission(CommandSourceStack source) {
         return check(source, PERMISSION_CONTINUE);
+    }
+
+    @Override
+    public boolean hasClearPermission(CommandSourceStack source) {
+        return check(source, PERMISSION_CLEAR);
     }
 }
