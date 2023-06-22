@@ -1,0 +1,5 @@
+{
+  "message.command.not_a_player": "请使用玩家身份操作！",
+  "message.story.continue": "【继续】",
+  "message.story.continue.choice":  "【选项】 %1$s"
+}

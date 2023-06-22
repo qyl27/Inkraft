@@ -7,12 +7,12 @@ import net.minecraft.server.level.ServerPlayer;
 
 public class InkraftPlatform {
     @ExpectPlatform
-    public IInkStoryStateHolder getPlayerStoryStateHolder(ServerPlayer player) {
+    public static IInkStoryStateHolder getPlayerStoryStateHolder(ServerPlayer player) {
         throw new RuntimeException();
     }
 
     @ExpectPlatform
-    public IInkPermissionManager getPermissionManager() {
+    public static IInkPermissionManager getPermissionManager() {
         throw new RuntimeException();
     }
 }

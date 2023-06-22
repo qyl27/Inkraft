@@ -1,18 +1,17 @@
 package cx.rain.mc.inkraft.command;
 
+import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import com.mojang.brigadier.suggestion.Suggestion;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import cx.rain.mc.inkraft.Inkraft;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.arguments.ResourceLocationArgument;
+import net.minecraft.commands.arguments.UuidArgument;
 import net.minecraft.network.chat.Component;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.player.Player;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -27,7 +26,13 @@ public class InkraftCommand {
                     .requires(Inkraft.getInstance().getPlatform().getPermissionManager()::hasStartPermission)
                     .then(argument("path", ResourceLocationArgument.id())
                             .suggests(InkraftCommand::suggestStart)
-                            .executes(InkraftCommand::onStart)));
+                            .executes(InkraftCommand::onStart)))
+            .then(literal("continue")
+                    .requires(Inkraft.getInstance().getPlatform().getPermissionManager()::hasContinuePermission)
+                    .then(argument("token", UuidArgument.uuid())
+                            .executes(InkraftCommand::onSimpleContinue)
+                            .then(argument("choice", IntegerArgumentType.integer())
+                                    .executes(InkraftCommand::onChoiceContinue))));
 
     private static int onVersion(final CommandContext<CommandSourceStack> context) {
         context.getSource().sendSuccess(() ->
@@ -35,7 +40,7 @@ public class InkraftCommand {
         return 1;
     }
 
-    private static int onStart(CommandContext<CommandSourceStack> context) {
+    private static int onStart(final CommandContext<CommandSourceStack> context) {
         if (!ensurePlayer(context)) {
             return 0;
         }
@@ -44,12 +49,29 @@ public class InkraftCommand {
         var path = ResourceLocationArgument.getId(context, "path");
 
         var stateHolder = Inkraft.getInstance().getPlatform().getPlayerStoryStateHolder(player);
-        var storiesManager = Inkraft.getInstance().getStoriesManager();
 
+        var storiesManager = Inkraft.getInstance().getStoriesManager();
         var story = storiesManager.getStory(player, path);
 
+        story.continueStory(player, stateHolder);
 
         return 1;
+    }
+
+    private static int onSimpleContinue(final CommandContext<CommandSourceStack> context) {
+        if (!ensurePlayer(context)) {
+            return 0;
+        }
+
+        return 0;
+    }
+
+    private static int onChoiceContinue(final CommandContext<CommandSourceStack> context) {
+        if (!ensurePlayer(context)) {
+            return 0;
+        }
+
+        return 0;
     }
 
     private static CompletableFuture<Suggestions> suggestStart(final CommandContext<CommandSourceStack> context,
@@ -67,7 +89,7 @@ public class InkraftCommand {
         if (source.getPlayer() != null) {
             return true;
         } else {
-            source.sendFailure(Component.translatable(CommandConstants.MESSAGE_NOT_PLAYER).withStyle(ChatFormatting.RED));
+            source.sendFailure(Component.translatable(CommandConstants.MESSAGE_COMMAND_NOT_PLAYER).withStyle(ChatFormatting.RED));
             return false;
         }
     }
