@@ -48,7 +48,7 @@ public class InkReloadListener implements PreparableReloadListener {
     }
 
     private void scan(ResourceManager resourceManager, Map<ResourceLocation, String> stories) {
-        FileToIdConverter fileToIdConverter = FileToIdConverter.json(STORY_PATH);
+        FileToIdConverter fileToIdConverter = new FileToIdConverter(STORY_PATH, ".ink.json");
 
         for (Entry<ResourceLocation, Resource> entry : fileToIdConverter.listMatchingResources(resourceManager).entrySet()) {
             ResourceLocation resourceLocation = entry.getKey();
@@ -65,6 +65,8 @@ public class InkReloadListener implements PreparableReloadListener {
     private void apply(Map<ResourceLocation, String> stories, ProfilerFiller reloadProfiler) {
         reloadProfiler.startTick();
         reloadProfiler.push("stories");
+
+        Inkraft.getInstance().getStoriesManager().clearStories();
 
         for (var story : stories.entrySet()) {
             Inkraft.getInstance().getStoriesManager().addStory(story.getKey(), story.getValue());

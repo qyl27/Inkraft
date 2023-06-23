@@ -25,17 +25,17 @@ public class StoriesManager {
         }
     }
 
+    public void clearStories() {
+        stories.clear();
+    }
+
     public Set<ResourceLocation> getStories() {
         return stories.keySet();
     }
 
-    public StoryWrapper getOrCreateStory(ServerPlayer player, ResourceLocation path) {
+    public StoryWrapper createStory(ServerPlayer player, ResourceLocation path) {
         try {
             var uuid = player.getUUID();
-            if (cachedStories.containsKey(uuid)) {
-                return cachedStories.get(uuid);
-            }
-
             var story = new Story(stories.get(path));
             var storyWrapper = new StoryWrapper(story);
             cachedStories.put(uuid, storyWrapper);

@@ -23,7 +23,7 @@ public class StoryWrapper {
 //
 //        }
         // Todo: qyl27: flow support!
-        return continueStoryWithoutChoice(player, holder);
+        return continueStory(player, holder);
     }
 
     private boolean continueStory(ServerPlayer player, IInkStoryStateHolder holder) {

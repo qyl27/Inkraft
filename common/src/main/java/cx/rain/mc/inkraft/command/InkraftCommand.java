@@ -72,7 +72,7 @@ public class InkraftCommand {
         var stateHolder = Inkraft.getInstance().getPlatform().getPlayerStoryStateHolder(player);
 
         var storiesManager = Inkraft.getInstance().getStoriesManager();
-        var story = storiesManager.getOrCreateStory(player, path);
+        var story = storiesManager.createStory(player, path);
 
         story.startStory(player, stateHolder);
 
@@ -93,6 +93,10 @@ public class InkraftCommand {
             var story = storiesManager.getStory(player);
 
             story.continueStoryWithoutChoice(player, stateHolder);
+        } else {
+            player.sendSystemMessage(Component.translatable(CommandConstants.MESSAGE_STORY_BAD_TOKEN).withStyle(ChatFormatting.RED));
+
+            return 1;
         }
 
         return 1;
