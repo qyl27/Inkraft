@@ -2,6 +2,7 @@ package cx.rain.mc.inkraft.story;
 
 import com.bladecoder.ink.runtime.Story;
 import cx.rain.mc.inkraft.command.CommandConstants;
+import cx.rain.mc.inkraft.utility.InkTagHelper;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
@@ -29,11 +30,14 @@ public class StoryWrapper {
     private boolean continueStory(ServerPlayer player, IInkStoryStateHolder holder) {
         try {
             if (story.canContinue()) {
-                // Todo: qyl27: Control tags here.
-                var tags = story.getCurrentTags();
-
                 var message = story.Continue().trim();
                 player.sendSystemMessage(Component.literal(message).withStyle(ChatFormatting.GREEN));
+
+                // Todo: qyl27: Control tags here.
+                var tags = story.getCurrentTags();
+                var ops = InkTagHelper.parseTag(tags);
+                InkTagHelper.runTagCommands(ops, player.getServer(), player);
+
                 var choices = story.getCurrentChoices();
 
                 var token = UUID.randomUUID();

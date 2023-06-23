@@ -27,6 +27,7 @@ public class StoriesManager {
 
     public void clearStories() {
         stories.clear();
+        refreshStories();
     }
 
     public Set<ResourceLocation> getStories() {
@@ -47,6 +48,10 @@ public class StoriesManager {
 
     public void refreshStory(ServerPlayer player) {
         cachedStories.remove(player.getUUID());
+    }
+
+    public void refreshStories() {
+        cachedStories.clear();
     }
 
     public StoryWrapper getStory(ServerPlayer player) {
