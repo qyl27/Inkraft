@@ -1,7 +1,7 @@
 package cx.rain.mc.inkraft.utility;
 
 import cx.rain.mc.inkraft.story.command.StoryCommand;
-import cx.rain.mc.inkraft.story.command.StoryCommandsRegistry;
+import cx.rain.mc.inkraft.story.command.StoryCommands;
 import net.minecraft.server.level.ServerPlayer;
 
 import java.util.ArrayList;
@@ -13,7 +13,7 @@ public class InkTagCommandHelper {
     private static final Map<String, StoryCommand> COMMANDS_CACHE = new HashMap<>();
 
     static {
-        for (var commandSupplier : StoryCommandsRegistry.COMMANDS) {
+        for (var commandSupplier : StoryCommands.COMMANDS) {
             var command = commandSupplier.get();
 
             var commandName = command.getName().isBlank() ? commandSupplier.getId().getPath() : command.getName();

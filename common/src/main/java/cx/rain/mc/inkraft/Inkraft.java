@@ -2,8 +2,8 @@ package cx.rain.mc.inkraft;
 
 import cx.rain.mc.inkraft.data.InkReloadListener;
 import cx.rain.mc.inkraft.data.StoriesManager;
-import cx.rain.mc.inkraft.story.command.StoryCommandsRegistry;
-import cx.rain.mc.inkraft.story.function.StoryFunctionsRegistry;
+import cx.rain.mc.inkraft.story.command.StoryCommands;
+import cx.rain.mc.inkraft.story.function.StoryFunctions;
 import dev.architectury.registry.ReloadListenerRegistry;
 import net.minecraft.server.packs.PackType;
 import org.slf4j.Logger;
@@ -40,8 +40,8 @@ public class Inkraft {
     public void init() {
         ReloadListenerRegistry.register(PackType.SERVER_DATA, new InkReloadListener(), InkReloadListener.INKRAFT_STORY);
 
-        StoryCommandsRegistry.register();
-        StoryFunctionsRegistry.register();
+        StoryCommands.register();
+        StoryFunctions.register();
     }
 
     public InkraftPlatform getPlatform() {

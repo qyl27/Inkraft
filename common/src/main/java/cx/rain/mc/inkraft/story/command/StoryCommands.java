@@ -9,7 +9,7 @@ import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 
-public class StoryCommandsRegistry {
+public class StoryCommands {
     public static final ResourceLocation REGISTRY_NAME = new ResourceLocation(Inkraft.MODID, "story_commands");
     public static final ResourceKey<Registry<StoryCommand>> REGISTRY_KEY = ResourceKey.createRegistryKey(REGISTRY_NAME);
     public static final Registrar<StoryCommand> REGISTRAR = RegistrarManager.get(Inkraft.MODID).<StoryCommand>builder(REGISTRY_NAME).build();

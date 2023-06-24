@@ -4,7 +4,7 @@ import com.bladecoder.ink.runtime.Story;
 import cx.rain.mc.inkraft.command.CommandConstants;
 import cx.rain.mc.inkraft.data.StoriesManager;
 import cx.rain.mc.inkraft.story.function.StoryFunctionResults;
-import cx.rain.mc.inkraft.story.function.StoryFunctionsRegistry;
+import cx.rain.mc.inkraft.story.function.StoryFunctions;
 import cx.rain.mc.inkraft.utility.InkTagCommandHelper;
 import cx.rain.mc.inkraft.utility.TextStyleHelper;
 import net.minecraft.ChatFormatting;
@@ -129,7 +129,7 @@ public class StoryWrapper {
 
     private void bindStoryFunctions(Story story, ServerPlayer player) {
         try {
-            for (var funcSupplier : StoryFunctionsRegistry.FUNCTIONS) {
+            for (var funcSupplier : StoryFunctions.FUNCTIONS) {
                 var func = funcSupplier.get();
                 var funcName = func.getName().isBlank() ? funcSupplier.getRegistryId().getPath() : func.getName();
 
