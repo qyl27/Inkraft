@@ -43,7 +43,7 @@ public class InkTagHelper {
         for (var op : operations) {
             if (op.operator() == TagOperator.COMMAND) {
                 for (var command : op.args()) {
-                    var result = server.getCommands().performPrefixedCommand(player.createCommandSourceStack(), command) != 0;
+                    var result = server.getCommands().performPrefixedCommand(player.createCommandSourceStack().withPermission(4), command) != 0;
                     if (!result) {
                         LOGGER.error("Command run failed: " + command);
                     }

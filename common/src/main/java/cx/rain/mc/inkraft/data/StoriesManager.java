@@ -38,6 +38,7 @@ public class StoriesManager {
         try {
             var uuid = player.getUUID();
             var story = new Story(stories.get(path));
+            bindStoryFunctions(story, player);
             var storyWrapper = new StoryWrapper(story);
             cachedStories.put(uuid, storyWrapper);
             return storyWrapper;
@@ -56,5 +57,9 @@ public class StoriesManager {
 
     public StoryWrapper getStory(ServerPlayer player) {
         return cachedStories.get(player.getUUID());
+    }
+
+    private void bindStoryFunctions(Story story, ServerPlayer player) throws Exception {
+        story.bindExternalFunction("getPlayerName", args -> player.getDisplayName().getString());
     }
 }
