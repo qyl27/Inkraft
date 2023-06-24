@@ -3,6 +3,7 @@ package cx.rain.mc.inkraft.story;
 import com.bladecoder.ink.runtime.Story;
 import cx.rain.mc.inkraft.command.CommandConstants;
 import cx.rain.mc.inkraft.utility.InkTagHelper;
+import cx.rain.mc.inkraft.utility.TextStyleHelper;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
@@ -31,7 +32,8 @@ public class StoryWrapper {
         try {
             if (story.canContinue()) {
                 var message = story.Continue().trim();
-                player.sendSystemMessage(Component.literal(message).withStyle(ChatFormatting.GREEN));
+
+                player.sendSystemMessage(TextStyleHelper.parseStyle(message));
 
                 // Todo: qyl27: Control tags here.
                 var tags = story.getCurrentTags();
