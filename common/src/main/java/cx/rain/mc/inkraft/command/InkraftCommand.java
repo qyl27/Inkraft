@@ -7,6 +7,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import cx.rain.mc.inkraft.Inkraft;
+import cx.rain.mc.inkraft.story.StoryWrapper;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.arguments.ResourceLocationArgument;
@@ -72,9 +73,15 @@ public class InkraftCommand {
         var stateHolder = Inkraft.getInstance().getPlatform().getPlayerStoryStateHolder(player);
 
         var storiesManager = Inkraft.getInstance().getStoriesManager();
-        var story = storiesManager.createStory(player, path);
 
-        story.startStory(player, stateHolder);
+        StoryWrapper story;
+        if (!storiesManager.hasCachedStory(player)) {
+            story = storiesManager.createStory(player);
+            story.startStory(player, stateHolder, path);
+        } else {
+            story = storiesManager.getStory(player);
+            story.startStory(player, stateHolder, path);
+        }
 
         return 1;
     }

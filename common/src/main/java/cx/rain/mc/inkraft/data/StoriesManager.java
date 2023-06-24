@@ -34,13 +34,14 @@ public class StoriesManager {
         return stories.keySet();
     }
 
-    public StoryWrapper createStory(ServerPlayer player, ResourceLocation path) {
+    public boolean hasCachedStory(ServerPlayer player) {
+        return cachedStories.containsKey(player.getUUID());
+    }
+
+    public StoryWrapper createStory(ServerPlayer player) {
         try {
-            var uuid = player.getUUID();
-            var story = new Story(stories.get(path));
-            bindStoryFunctions(story, player);
-            var storyWrapper = new StoryWrapper(story);
-            cachedStories.put(uuid, storyWrapper);
+            var storyWrapper = new StoryWrapper(this);
+            cachedStories.put(player.getUUID(), storyWrapper);
             return storyWrapper;
         } catch (Exception ex) {
             throw new RuntimeException(ex);
@@ -59,7 +60,7 @@ public class StoriesManager {
         return cachedStories.get(player.getUUID());
     }
 
-    private void bindStoryFunctions(Story story, ServerPlayer player) throws Exception {
-        story.bindExternalFunction("getPlayerName", args -> player.getDisplayName().getString());
+    public String getStoryString(ResourceLocation path) {
+        return stories.get(path);
     }
 }

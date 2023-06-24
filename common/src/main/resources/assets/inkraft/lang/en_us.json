@@ -1,0 +1,9 @@
+{
+  "message.command.not_a_player": "Please use this command as a player.",
+  "message.command.success": "Command ran successful.",
+  "message.story.continue": "[Continue]",
+  "message.story.continue.choice":  "[Choice] %1$s",
+  "message.story.hint.continue": "Click to continue",
+  "message.story.hint.continue.choice":  "Clock to choose",
+  "message.story.bad_token": "Error, please press the latest buttons."
+}
