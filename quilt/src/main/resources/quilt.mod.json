@@ -8,16 +8,19 @@
     "group": "${group}",
     "id": "inkraft",
     "version": "${version}",
-    "name": "Inkraft",
-    "description": "Use ink language to write your story in Minecraft.",
-    "authors": ["qyl27"],
-    "contact": {
-      "sources": "https://github.com/qyl27/inkraft"
+    "metadata": {
+      "name": "Inkraft",
+      "description": "Use ink language to write your story in Minecraft.",
+      "contributors": {
+        "qyl27": "Owner"
+      },
+      "contact": {
+        "sources": "https://github.com/qyl27/inkraft"
+      },
+      "icon": "assets/inkraft/icon.png",
+      "license": "Apache-2.0"
     },
-    "license": "MIT",
-    "icon": "assets/inkraft/icon.png",
     "intermediate_mappings": "net.fabricmc:intermediary",
-    "environment": "*",
     "entrypoints": {
       "init": [
         "cx.rain.mc.inkraft.quilt.InkraftQuilt"

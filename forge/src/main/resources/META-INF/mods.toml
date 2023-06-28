@@ -1,7 +1,7 @@
 modLoader = "javafml"
 loaderVersion = "[47,)"
 issueTrackerURL = "https://github.com/qyl27/Inkraft/issues"
-license = "MIT"
+license = "Apache-2.0"
 
 [[mods]]
 modId = "inkraft"

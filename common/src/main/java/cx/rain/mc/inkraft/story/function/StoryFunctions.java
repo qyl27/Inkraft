@@ -21,4 +21,6 @@ public class StoryFunctions {
     }
 
     public static final RegistrySupplier<StoryFunction> GET_PLAYER_NAME = FUNCTIONS.register("get_player_name", GetPlayerNameFunction::new);
+    public static final RegistrySupplier<StoryFunction> RUN_COMMAND = FUNCTIONS.register("run_command", RunCommandFunction::new);
+    public static final RegistrySupplier<StoryFunction> IS_DEBUG = FUNCTIONS.register("is_debug", IsDebugFunction::new);
 }

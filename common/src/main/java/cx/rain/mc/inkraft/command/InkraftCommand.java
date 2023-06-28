@@ -1,5 +1,6 @@
 package cx.rain.mc.inkraft.command;
 
+import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
@@ -7,12 +8,17 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import cx.rain.mc.inkraft.Inkraft;
+import cx.rain.mc.inkraft.InkraftPlatform;
+import cx.rain.mc.inkraft.story.IInkStoryStateHolder;
 import cx.rain.mc.inkraft.story.StoryWrapper;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.commands.arguments.ResourceLocationArgument;
 import net.minecraft.commands.arguments.UuidArgument;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerPlayer;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -26,41 +32,93 @@ public class InkraftCommand {
             .then(literal("version")
                     .executes(InkraftCommand::onVersion))
             .then(literal("start")
-                    .requires(Inkraft.getInstance().getPlatform().getPermissionManager()::hasStartPermission)
+                    .requires(InkraftPlatform.getPermissionManager()::hasStartPermission)
                     .then(argument("path", ResourceLocationArgument.id())
                             .suggests(InkraftCommand::suggestStart)
+                            .then(argument("debug", BoolArgumentType.bool())
+                                    .executes(InkraftCommand::onStartDebug))
+                            .then(argument("player", EntityArgument.player())
+                                    .then(argument("debug", BoolArgumentType.bool())
+                                            .executes(InkraftCommand::onStartForOtherDebug))
+                                    .executes(InkraftCommand::onStartForOther))
                             .executes(InkraftCommand::onStart)))
             .then(literal("continue")
-                    .requires(Inkraft.getInstance().getPlatform().getPermissionManager()::hasContinuePermission)
+                    .requires(InkraftPlatform.getPermissionManager()::hasContinuePermission)
                     .then(argument("token", UuidArgument.uuid())
-                            .executes(InkraftCommand::onSimpleContinue)
                             .then(argument("choice", IntegerArgumentType.integer())
-                                    .executes(InkraftCommand::onChoiceContinue))))
+                                    .executes(InkraftCommand::onChoiceContinue))
+                            .executes(InkraftCommand::onSimpleContinue))
+                    .then(argument("player", EntityArgument.player())
+                            .requires(InkraftPlatform.getPermissionManager()::hasContinueForOtherPermission)
+                            .then(argument("choice", IntegerArgumentType.integer())
+                                    .executes(InkraftCommand::onChoiceContinueForOther))
+                            .executes(InkraftCommand::onSimpleContinueForOther)))
             .then(literal("clear")
-                    .requires(Inkraft.getInstance().getPlatform().getPermissionManager()::hasClearPermission)
+                    .requires(InkraftPlatform.getPermissionManager()::hasClearPermission)
+                    .then(argument("player", EntityArgument.player())
+                            .executes(InkraftCommand::onClearStateForOther))
                     .executes(InkraftCommand::onClearState));
-
-    private static int onClearState(CommandContext<CommandSourceStack> context) {
-        if (!ensurePlayer(context)) {
-            return 0;
-        }
-
-        var player = context.getSource().getPlayer();
-        var stateHolder = Inkraft.getInstance().getPlatform().getPlayerStoryStateHolder(player);
-
-        stateHolder.setState("");
-        Inkraft.getInstance().getStoriesManager().refreshStory(player);
-
-        player.sendSystemMessage(Component.translatable(CommandConstants.MESSAGE_COMMAND_SUCCESS)
-                .withStyle(ChatFormatting.LIGHT_PURPLE));
-        return 1;
-    }
 
     private static int onVersion(final CommandContext<CommandSourceStack> context) {
         context.getSource().sendSuccess(() ->
                 Component.literal("Inkraft ver: " + Inkraft.VERSION).withStyle(ChatFormatting.AQUA), true);
         return 1;
     }
+
+    /// <editor-fold desc="For other.">
+
+    private static int onStartForOther(final CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+        var player = EntityArgument.getPlayer(context, "player");
+        var path = ResourceLocationArgument.getId(context, "path");
+        var stateHolder = InkraftPlatform.getPlayerStoryStateHolder(player);
+
+        startStory(player, path, stateHolder, false);
+
+        return 1;
+    }
+
+    private static int onStartForOtherDebug(final CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+        var player = EntityArgument.getPlayer(context, "player");
+        var path = ResourceLocationArgument.getId(context, "path");
+        var debug = BoolArgumentType.getBool(context, "debug");
+        var stateHolder = InkraftPlatform.getPlayerStoryStateHolder(player);
+
+        startStory(player, path, stateHolder, debug);
+        return 1;
+    }
+
+    private static int onSimpleContinueForOther(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+        var player = EntityArgument.getPlayer(context, "player");
+        var stateHolder = InkraftPlatform.getPlayerStoryStateHolder(player);
+
+        continueStory(player, stateHolder, -1);
+        return 1;
+    }
+
+    private static int onChoiceContinueForOther(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+        var player = EntityArgument.getPlayer(context, "player");
+        var stateHolder = InkraftPlatform.getPlayerStoryStateHolder(player);
+        var choice = IntegerArgumentType.getInteger(context, "choice");
+
+        continueStory(player, stateHolder, choice);
+        return 1;
+    }
+
+    private static int onClearStateForOther(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+        var player = EntityArgument.getPlayer(context, "player");
+        var stateHolder = InkraftPlatform.getPlayerStoryStateHolder(player);
+
+        stateHolder.setState("");
+        Inkraft.getInstance().getStoriesManager().refreshStory(player);
+
+        context.getSource().sendSystemMessage(Component.translatable(CommandConstants.MESSAGE_COMMAND_SUCCESS)
+                .withStyle(ChatFormatting.LIGHT_PURPLE));
+        return 1;
+    }
+
+    /// </editor-fold>
+
+    /// <editor-fold desc="For oneself.">
 
     private static int onStart(final CommandContext<CommandSourceStack> context) {
         if (!ensurePlayer(context)) {
@@ -69,19 +127,24 @@ public class InkraftCommand {
 
         var player = context.getSource().getPlayer();
         var path = ResourceLocationArgument.getId(context, "path");
+        var stateHolder = InkraftPlatform.getPlayerStoryStateHolder(player);
 
-        var stateHolder = Inkraft.getInstance().getPlatform().getPlayerStoryStateHolder(player);
+        startStory(player, path, stateHolder, false);
 
-        var storiesManager = Inkraft.getInstance().getStoriesManager();
+        return 1;
+    }
 
-        StoryWrapper story;
-        if (!storiesManager.hasCachedStory(player)) {
-            story = storiesManager.createStory(player);
-            story.startStory(player, stateHolder, path);
-        } else {
-            story = storiesManager.getStory(player);
-            story.startStory(player, stateHolder, path);
+    private static int onStartDebug(final CommandContext<CommandSourceStack> context) {
+        if (!ensurePlayer(context)) {
+            return 0;
         }
+
+        var player = context.getSource().getPlayer();
+        var path = ResourceLocationArgument.getId(context, "path");
+        var debug = BoolArgumentType.getBool(context, "debug");
+        var stateHolder = InkraftPlatform.getPlayerStoryStateHolder(player);
+
+        startStory(player, path, stateHolder, debug);
 
         return 1;
     }
@@ -93,13 +156,10 @@ public class InkraftCommand {
 
         var player = context.getSource().getPlayer();
         var token = UuidArgument.getUuid(context, "token");
-        var stateHolder = Inkraft.getInstance().getPlatform().getPlayerStoryStateHolder(player);
+        var stateHolder = InkraftPlatform.getPlayerStoryStateHolder(player);
 
         if (stateHolder.getContinueToken().equals(token)) {
-            var storiesManager = Inkraft.getInstance().getStoriesManager();
-            var story = storiesManager.getStory(player);
-
-            story.continueStoryWithoutChoice(player, stateHolder);
+            continueStory(player, stateHolder, -1);
         } else {
             player.sendSystemMessage(Component.translatable(CommandConstants.MESSAGE_STORY_BAD_TOKEN).withStyle(ChatFormatting.RED));
 
@@ -116,13 +176,10 @@ public class InkraftCommand {
         var player = context.getSource().getPlayer();
         var token = UuidArgument.getUuid(context, "token");
         var choice = IntegerArgumentType.getInteger(context, "choice");
-        var stateHolder = Inkraft.getInstance().getPlatform().getPlayerStoryStateHolder(player);
+        var stateHolder = InkraftPlatform.getPlayerStoryStateHolder(player);
 
         if (stateHolder.getContinueToken().equals(token)) {
-            var storiesManager = Inkraft.getInstance().getStoriesManager();
-            var story = storiesManager.getStory(player);
-
-            story.continueStoryWithChoice(player, stateHolder, choice);
+            continueStory(player, stateHolder, choice);
         } else {
             player.sendSystemMessage(Component.translatable(CommandConstants.MESSAGE_STORY_BAD_TOKEN).withStyle(ChatFormatting.RED));
 
@@ -132,6 +189,50 @@ public class InkraftCommand {
         return 1;
     }
 
+    private static int onClearState(CommandContext<CommandSourceStack> context) {
+        if (!ensurePlayer(context)) {
+            return 0;
+        }
+
+        var player = context.getSource().getPlayer();
+        var stateHolder = InkraftPlatform.getPlayerStoryStateHolder(player);
+
+        stateHolder.setState("");
+        Inkraft.getInstance().getStoriesManager().refreshStory(player);
+
+        player.sendSystemMessage(Component.translatable(CommandConstants.MESSAGE_COMMAND_SUCCESS)
+                .withStyle(ChatFormatting.LIGHT_PURPLE));
+        return 1;
+    }
+
+    /// </editor-fold>
+
+    /// <editor-fold desc="Utility methods.">
+
+    private static void startStory(ServerPlayer player, ResourceLocation path, IInkStoryStateHolder stateHolder, boolean isDebug) {
+        var storiesManager = Inkraft.getInstance().getStoriesManager();
+
+        StoryWrapper story;
+        if (!storiesManager.hasCachedStory(player)) {
+            story = storiesManager.createStory(player);
+        } else {
+            story = storiesManager.getStory(player);
+        }
+
+        story.startStory(player, stateHolder, path, isDebug);
+    }
+
+    private static void continueStory(ServerPlayer player, IInkStoryStateHolder holder, int choice) {
+        var storiesManager = Inkraft.getInstance().getStoriesManager();
+        var story = storiesManager.getStory(player);
+
+        if (choice == -1) {
+            story.continueStoryWithoutChoice(player, holder);
+        } else {
+            story.continueStoryWithChoice(player, holder, choice);
+        }
+    }
+
     private static CompletableFuture<Suggestions> suggestStart(final CommandContext<CommandSourceStack> context,
                                                                final SuggestionsBuilder builder) throws CommandSyntaxException {
         for (var story : Inkraft.getInstance().getStoriesManager().getStories()) {
@@ -139,8 +240,6 @@ public class InkraftCommand {
         }
         return builder.buildFuture();
     }
-
-    /// <editor-fold desc="Utility methods.">
 
     private static boolean ensurePlayer(final CommandContext<CommandSourceStack> context) {
         var source = context.getSource();

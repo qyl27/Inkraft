@@ -8,4 +8,8 @@ public interface IInkPermissionManager {
     boolean hasContinuePermission(CommandSourceStack source);
 
     boolean hasClearPermission(CommandSourceStack source);
+
+    boolean hasStartForOtherPermission(CommandSourceStack source);
+
+    boolean hasContinueForOtherPermission(CommandSourceStack source);
 }

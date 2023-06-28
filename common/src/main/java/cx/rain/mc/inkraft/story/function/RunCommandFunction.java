@@ -11,7 +11,7 @@ public class RunCommandFunction implements StoryFunction {
     }
 
     @Override
-    public BiFunction<Object[], ServerPlayer, StoryFunctionResults.IStoryFunctionResult> func() {
+    public BiFunction<Object[], ServerPlayer, StoryFunctionResults.IStoryFunctionResult> func(boolean isDebug) {
         return (args, player) -> {
             if (args.length != 1) {
                 return new StoryFunctionResults.BoolResult(false);

@@ -1,4 +1,4 @@
-package cx.rain.mc.inkraft.quilt;
+package cx.rain.mc.inkraft.fabric;
 
 import cx.rain.mc.inkraft.command.IInkPermissionManager;
 import cx.rain.mc.inkraft.quilt.platform.InkPermissionManagerQuilt;

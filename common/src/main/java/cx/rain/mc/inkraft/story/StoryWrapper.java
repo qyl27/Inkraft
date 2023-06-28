@@ -26,9 +26,9 @@ public class StoryWrapper {
         this.manager = manager;
     }
 
-    public boolean startStory(ServerPlayer player, IInkStoryStateHolder holder, ResourceLocation path) {
+    public boolean startStory(ServerPlayer player, IInkStoryStateHolder holder, ResourceLocation path, boolean debug) {
         flowTo(path);
-        bindStoryFunctions(story, player);
+        bindStoryFunctions(story, player, debug);
         return continueStory(player, holder);
     }
 
@@ -103,7 +103,8 @@ public class StoryWrapper {
         try {
             stateHolder.setState(story.getState().toJson());
         } catch (Exception ex) {
-            ex.printStackTrace();
+//            ex.printStackTrace();
+            // qyl27: silent is gold.
         }
     }
 
@@ -127,14 +128,14 @@ public class StoryWrapper {
         }
     }
 
-    private void bindStoryFunctions(Story story, ServerPlayer player) {
+    private void bindStoryFunctions(Story story, ServerPlayer player, boolean debug) {
         try {
             for (var funcSupplier : StoryFunctions.FUNCTIONS) {
                 var func = funcSupplier.get();
                 var funcName = func.getName().isBlank() ? funcSupplier.getRegistryId().getPath() : func.getName();
 
                 story.bindExternalFunction(funcName, args -> {
-                    var result = func.func().apply(args, player);
+                    var result = func.func(debug).apply(args, player);
                     if (result instanceof StoryFunctionResults.StringResult stringResult) {
                         return stringResult.stringResult();
                     } else if (result instanceof StoryFunctionResults.IntResult intResult) {

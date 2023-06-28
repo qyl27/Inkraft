@@ -10,5 +10,5 @@ public interface StoryFunction {
         return "";
     }
 
-    BiFunction<Object[], ServerPlayer, StoryFunctionResults.IStoryFunctionResult> func();
+    BiFunction<Object[], ServerPlayer, StoryFunctionResults.IStoryFunctionResult> func(boolean isDebug);
 }

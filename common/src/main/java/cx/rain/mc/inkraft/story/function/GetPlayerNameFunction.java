@@ -6,7 +6,7 @@ import java.util.function.BiFunction;
 
 public class GetPlayerNameFunction implements StoryFunction {
     @Override
-    public BiFunction<Object[], ServerPlayer, StoryFunctionResults.IStoryFunctionResult> func() {
+    public BiFunction<Object[], ServerPlayer, StoryFunctionResults.IStoryFunctionResult> func(boolean isDebug) {
         return (args, player) -> new StoryFunctionResults.StringResult(player.getName().getString());
     }
 
