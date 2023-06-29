@@ -2,6 +2,7 @@ package cx.rain.mc.inkraft;
 
 import cx.rain.mc.inkraft.data.InkReloadListener;
 import cx.rain.mc.inkraft.data.StoriesManager;
+import cx.rain.mc.inkraft.data.loot.predicate.InkraftPredicates;
 import cx.rain.mc.inkraft.story.command.StoryCommands;
 import cx.rain.mc.inkraft.story.function.StoryFunctions;
 import dev.architectury.registry.ReloadListenerRegistry;
@@ -42,6 +43,8 @@ public class Inkraft {
 
         StoryCommands.register();
         StoryFunctions.register();
+
+        InkraftPredicates.register();
     }
 
     public InkraftPlatform getPlatform() {

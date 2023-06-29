@@ -65,10 +65,15 @@ public class StoryWrapper {
                     }
                 }
 
-                save(holder);
+                save(holder, false);
                 return true;
             } else {
-                save(holder);
+                if (story.getCurrentChoices().size() == 0) {
+                    save(holder, true);
+                } else {
+                    save(holder, false);
+                }
+
                 return false;
             }
         } catch (Exception ex) {
@@ -91,7 +96,6 @@ public class StoryWrapper {
         try {
             load(holder);
             story.chooseChoiceIndex(choice);
-            save(holder);
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -99,9 +103,10 @@ public class StoryWrapper {
         return continueStory(player, holder);
     }
 
-    public void save(IInkStoryStateHolder stateHolder) {
+    public void save(IInkStoryStateHolder stateHolder, boolean isStoryEnd) {
         try {
             stateHolder.setState(story.getState().toJson());
+            stateHolder.setInStory(!isStoryEnd);
         } catch (Exception ex) {
 //            ex.printStackTrace();
             // qyl27: silent is gold.

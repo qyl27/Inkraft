@@ -8,4 +8,7 @@ public interface IPlayerMixin {
 
     UUID inkraft$getContinueToken();
     void inkraft$setContinueToken(UUID token);
+
+    boolean inkraft$isInStory();
+    void inkraft$setInStory(boolean inStory);
 }

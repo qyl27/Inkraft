@@ -10,6 +10,7 @@ public class InkStoryStateHolderFabric implements IInkStoryStateHolder {
     public static final String TAG_INKRAFT_NAME = "inkraft";
     public static final String TAG_STATE_NAME = "state";
     public static final String TAG_TOKEN_NAME = "token";
+    public static final String TAG_IN_STORY_NAME = "inStory";
 
     private Player player;
 
@@ -35,5 +36,21 @@ public class InkStoryStateHolderFabric implements IInkStoryStateHolder {
     @Override
     public void setContinueToken(UUID token) {
         ((IPlayerMixin) player).inkraft$setContinueToken(token);
+    }
+
+    @Override
+    public boolean isInStory() {
+        return ((IPlayerMixin) player).inkraft$isInStory();
+    }
+
+    @Override
+    public void setInStory(boolean inStory) {
+        ((IPlayerMixin) player).inkraft$setInStory(inStory);
+    }
+
+    @Override
+    public void clearState() {
+        setState("");
+        setInStory(false);
     }
 }

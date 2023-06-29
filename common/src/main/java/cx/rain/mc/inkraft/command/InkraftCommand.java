@@ -108,7 +108,7 @@ public class InkraftCommand {
         var player = EntityArgument.getPlayer(context, "player");
         var stateHolder = InkraftPlatform.getPlayerStoryStateHolder(player);
 
-        stateHolder.setState("");
+        stateHolder.clearState();
         Inkraft.getInstance().getStoriesManager().refreshStory(player);
 
         context.getSource().sendSystemMessage(Component.translatable(CommandConstants.MESSAGE_COMMAND_SUCCESS)
@@ -197,7 +197,7 @@ public class InkraftCommand {
         var player = context.getSource().getPlayer();
         var stateHolder = InkraftPlatform.getPlayerStoryStateHolder(player);
 
-        stateHolder.setState("");
+        stateHolder.clearState();
         Inkraft.getInstance().getStoriesManager().refreshStory(player);
 
         player.sendSystemMessage(Component.translatable(CommandConstants.MESSAGE_COMMAND_SUCCESS)
