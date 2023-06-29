@@ -54,6 +54,12 @@ public class StoryWrapper {
                         component.setStyle(component.getStyle().withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/inkraft continue " + token)));
                         component.setStyle(component.getStyle().withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.translatable(CommandConstants.MESSAGE_STORY_HINT_CONTINUE).withStyle(ChatFormatting.GREEN))));
                         player.sendSystemMessage(component);
+
+                        save(holder, false);
+                        return true;
+                    } else {
+                        save(holder, true);
+                        return true;
                     }
                 } else {
                     for (int i = 0; i < choices.size(); i++) {
@@ -63,10 +69,10 @@ public class StoryWrapper {
                         component.setStyle(component.getStyle().withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.translatable(CommandConstants.MESSAGE_STORY_HINT_CONTINUE_CHOICE).withStyle(ChatFormatting.GREEN))));
                         player.sendSystemMessage(component);
                     }
-                }
 
-                save(holder, false);
-                return true;
+                    save(holder, false);
+                    return true;
+                }
             } else {
                 if (story.getCurrentChoices().size() == 0) {
                     save(holder, true);
@@ -74,7 +80,7 @@ public class StoryWrapper {
                     save(holder, false);
                 }
 
-                return false;
+                return true;
             }
         } catch (Exception ex) {
             ex.printStackTrace();
