@@ -1,5 +1,7 @@
-package cx.rain.mc.inkraft.story.function;
+package cx.rain.mc.inkraft.story.function.game;
 
+import cx.rain.mc.inkraft.story.function.StoryFunction;
+import cx.rain.mc.inkraft.story.function.StoryFunctionResults;
 import net.minecraft.server.level.ServerPlayer;
 
 import java.util.function.BiFunction;
