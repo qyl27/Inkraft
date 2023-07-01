@@ -27,6 +27,11 @@ public class GiveItemFunction implements StoryFunction {
             try {
                 var id = args[0].toString();
                 var count = Byte.parseByte(args[1].toString());
+
+                if (count < 1 || count > 64) {
+                    return new StoryFunctionResults.BoolResult(false);
+                }
+
                 var tag = new CompoundTag();
                 tag.putString("id", id);
                 tag.putByte("count", count);

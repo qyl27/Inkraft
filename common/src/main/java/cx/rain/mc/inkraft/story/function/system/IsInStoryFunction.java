@@ -15,6 +15,7 @@ public class IsInStoryFunction implements StoryFunction {
 
     @Override
     public BiFunction<Object[], ServerPlayer, StoryFunctionResults.IStoryFunctionResult> func(boolean isDebug) {
+        // Todo: qyl27: flow support.
         return (args, player) ->
                 new StoryFunctionResults.BoolResult(InkraftPlatform.getPlayerStoryStateHolder(player).isInStory());
     }

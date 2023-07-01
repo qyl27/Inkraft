@@ -27,7 +27,6 @@ import static net.minecraft.commands.Commands.literal;
 
 public class InkraftCommand {
 
-    // Todo: qyl27: force start/continue for other players.
     public static final LiteralArgumentBuilder<CommandSourceStack> INKRAFT = literal("inkraft")
             .then(literal("version")
                     .executes(InkraftCommand::onVersion))

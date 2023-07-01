@@ -23,7 +23,7 @@ public class RunCommandFunction implements StoryFunction {
             var result = player.getServer()
                     .getCommands()
                     .performPrefixedCommand(player.createCommandSourceStack()
-                            .withPermission(4), command) != 0;
+                            .withPermission(4), command) == 1;
             return new StoryFunctionResults.BoolResult(result);
         };
     }
