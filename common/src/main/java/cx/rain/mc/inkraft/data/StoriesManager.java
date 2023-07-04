@@ -1,7 +1,6 @@
 package cx.rain.mc.inkraft.data;
 
-import com.bladecoder.ink.runtime.Story;
-import cx.rain.mc.inkraft.story.StoryWrapper;
+import cx.rain.mc.inkraft.story.StoryEngine;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 
@@ -12,7 +11,7 @@ import java.util.UUID;
 
 public class StoriesManager {
     private final Map<ResourceLocation, String> stories = new HashMap<>();
-    private final Map<UUID, StoryWrapper> cachedStories = new HashMap<>();
+    private final Map<UUID, StoryEngine> cachedStories = new HashMap<>();
 
     public StoriesManager() {
     }
@@ -38,9 +37,9 @@ public class StoriesManager {
         return cachedStories.containsKey(player.getUUID());
     }
 
-    public StoryWrapper createStory(ServerPlayer player) {
+    public StoryEngine createStory(ServerPlayer player) {
         try {
-            var storyWrapper = new StoryWrapper(this);
+            var storyWrapper = new StoryEngine(this);
             cachedStories.put(player.getUUID(), storyWrapper);
             return storyWrapper;
         } catch (Exception ex) {
@@ -56,7 +55,7 @@ public class StoriesManager {
         cachedStories.clear();
     }
 
-    public StoryWrapper getStory(ServerPlayer player) {
+    public StoryEngine getStory(ServerPlayer player) {
         return cachedStories.get(player.getUUID());
     }
 

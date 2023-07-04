@@ -5,6 +5,8 @@ import cx.rain.mc.inkraft.data.StoriesManager;
 import cx.rain.mc.inkraft.data.loot.predicate.InkraftPredicates;
 import cx.rain.mc.inkraft.story.command.StoryCommands;
 import cx.rain.mc.inkraft.story.function.StoryFunctions;
+import cx.rain.mc.inkraft.timer.IInkTimerManager;
+import cx.rain.mc.inkraft.timer.InkTimerManager;
 import dev.architectury.registry.ReloadListenerRegistry;
 import net.minecraft.server.packs.PackType;
 import org.slf4j.Logger;
@@ -18,6 +20,7 @@ public class Inkraft {
 
     private final InkraftPlatform platform;
     private final StoriesManager storiesManager;
+    private final IInkTimerManager timerManager;
 
     private Logger logger = LoggerFactory.getLogger(MODID);
 
@@ -26,6 +29,7 @@ public class Inkraft {
 
         platform = new InkraftPlatform();
         storiesManager = new StoriesManager();
+        timerManager = new InkTimerManager();
 
         logger.info("Initializing Inkraft. Ver: " + VERSION);
     }
@@ -53,5 +57,9 @@ public class Inkraft {
 
     public StoriesManager getStoriesManager() {
         return storiesManager;
+    }
+
+    public IInkTimerManager getTimerManager() {
+        return timerManager;
     }
 }

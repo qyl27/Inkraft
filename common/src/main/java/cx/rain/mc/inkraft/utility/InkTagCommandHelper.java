@@ -1,5 +1,6 @@
 package cx.rain.mc.inkraft.utility;
 
+import cx.rain.mc.inkraft.story.StoryEngine;
 import cx.rain.mc.inkraft.story.command.StoryCommand;
 import cx.rain.mc.inkraft.story.command.StoryCommands;
 import net.minecraft.server.level.ServerPlayer;
@@ -44,10 +45,10 @@ public class InkTagCommandHelper {
         return operations;
     }
 
-    public static void runTagCommands(List<TagOperation> operations, ServerPlayer player) {
+    public static void runTagCommands(StoryEngine story, List<TagOperation> operations, ServerPlayer player) {
         for (var op : operations) {
             var command = COMMANDS_CACHE.get(op.operator());
-            command.getConsumer().accept(op.args().toArray(new String[0]), player);
+            command.getConsumer(story).accept(op.args().toArray(new String[0]), player);
         }
     }
 

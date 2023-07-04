@@ -1,5 +1,6 @@
 package cx.rain.mc.inkraft.story.command;
 
+import cx.rain.mc.inkraft.story.StoryEngine;
 import net.minecraft.server.level.ServerPlayer;
 
 import java.util.function.BiConsumer;
@@ -14,5 +15,5 @@ public interface StoryCommand {
         return 0;
     }
 
-    BiConsumer<String[], ServerPlayer> getConsumer();
+    BiConsumer<String[], ServerPlayer> getConsumer(StoryEngine story);
 }

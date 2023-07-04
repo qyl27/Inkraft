@@ -1,6 +1,8 @@
 package cx.rain.mc.inkraft.story;
 
 import com.bladecoder.ink.runtime.Story;
+import cx.rain.mc.inkraft.Inkraft;
+import cx.rain.mc.inkraft.InkraftPlatform;
 import cx.rain.mc.inkraft.command.CommandConstants;
 import cx.rain.mc.inkraft.data.StoriesManager;
 import cx.rain.mc.inkraft.story.function.StoryFunctionResults;
@@ -16,32 +18,32 @@ import net.minecraft.server.level.ServerPlayer;
 
 import java.util.UUID;
 
-public class StoryWrapper {
+public class StoryEngine {
 
     private final StoriesManager manager;
 
     private Story story;
 
-    public StoryWrapper(StoriesManager manager) {
+    public StoryEngine(StoriesManager manager) {
         this.manager = manager;
     }
 
     public boolean startStory(ServerPlayer player, IInkStoryStateHolder holder, ResourceLocation path, boolean debug) {
         flowTo(path);
         bindStoryFunctions(story, player, debug);
-        return continueStory(player, holder);
+        return continueStory(player, holder, new AsyncToken());
     }
 
-    private boolean continueStory(ServerPlayer player, IInkStoryStateHolder holder) {
+    private boolean continueStory(ServerPlayer player, IInkStoryStateHolder holder, AsyncToken asyncToken) {
         try {
             if (story.canContinue()) {
                 var message = story.Continue().trim();
 
-                player.sendSystemMessage(TextStyleHelper.parseStyle(message));
-
                 var tags = story.getCurrentTags();
                 var ops = InkTagCommandHelper.parseTag(tags);
-                InkTagCommandHelper.runTagCommands(ops, player);
+                InkTagCommandHelper.runTagCommands(this, ops, player);
+
+                player.sendSystemMessage(TextStyleHelper.parseStyle(message));
 
                 var choices = story.getCurrentChoices();
 
@@ -50,6 +52,27 @@ public class StoryWrapper {
 
                 if (choices.size() == 0) {
                     if (story.canContinue()) {
+                        if (autoContinue) {
+                            if (!asyncToken.isAsync()) {
+                                Inkraft.getInstance().getTimerManager().addTimer(player, () -> {
+                                    if (asyncToken.isCanceled()) {
+                                        Inkraft.getInstance().getTimerManager().removeTimers(player);
+                                        return;
+                                    }
+
+                                    var story = Inkraft.getInstance().getStoriesManager().getStory(player);
+                                    var storyHolder = InkraftPlatform.getPlayerStoryStateHolder(player);
+                                    var result = story.continueStory(player, storyHolder, asyncToken.async());
+                                    if (!result || !story.canAutoContinue()) {
+                                        asyncToken.cancel();
+                                    }
+                                }, 0, continueSpeed);
+                            }
+
+                            save(holder, false);
+                            return true;
+                        }
+
                         var component = Component.translatable(CommandConstants.MESSAGE_STORY_CONTINUE).withStyle(ChatFormatting.YELLOW);
                         component.setStyle(component.getStyle().withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/inkraft continue " + token)));
                         component.setStyle(component.getStyle().withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.translatable(CommandConstants.MESSAGE_STORY_HINT_CONTINUE).withStyle(ChatFormatting.GREEN))));
@@ -95,7 +118,7 @@ public class StoryWrapper {
             // Silent is gold.
         }
 
-        return continueStory(player, holder);
+        return continueStory(player, holder, new AsyncToken());
     }
 
     public boolean continueStoryWithChoice(ServerPlayer player, IInkStoryStateHolder holder, int choice) {
@@ -106,7 +129,7 @@ public class StoryWrapper {
             ex.printStackTrace();
         }
 
-        return continueStory(player, holder);
+        return continueStory(player, holder, new AsyncToken());
     }
 
     public void save(IInkStoryStateHolder stateHolder, boolean isStoryEnd) {
@@ -131,6 +154,9 @@ public class StoryWrapper {
         try {
             // Todo: qyl27: flow support!
             story = new Story(manager.getStoryString(path));
+
+            autoContinue = false;
+            continueSpeed = -1;
 //            if (story.currentFlowIsDefaultFlow()) {
 //                story.switchFlow(path.toString());
 //            }
@@ -159,6 +185,55 @@ public class StoryWrapper {
             }
         } catch (Exception ex) {
             ex.printStackTrace();
+        }
+    }
+
+    public boolean canAutoContinue() {
+        return story.canContinue();
+    }
+
+    private boolean autoContinue = false;
+
+    private long continueSpeed = -1;
+
+    public void setAutoContinue(ServerPlayer player, boolean value) {
+        autoContinue = value;
+
+        if (autoContinue && continueSpeed <= 0) {
+            continueSpeed = 20;
+        }
+
+        if (!value) {
+            Inkraft.getInstance().getTimerManager().removeTimers(player);
+        }
+    }
+
+    public void setContinueSpeed(long value) {
+        if (value > 0) {
+            continueSpeed = value;
+        }
+    }
+
+    private static class AsyncToken {
+        private boolean isCanceled = false;
+        private boolean isAsync = false;
+
+        public boolean isCanceled() {
+            return isCanceled;
+        }
+
+        public boolean isAsync() {
+            return isAsync;
+        }
+
+        public AsyncToken async() {
+            isAsync = true;
+            return this;
+        }
+
+        public AsyncToken cancel() {
+            isCanceled = true;
+            return this;
         }
     }
 }

@@ -1,6 +1,7 @@
 package cx.rain.mc.inkraft.story.command;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import cx.rain.mc.inkraft.story.StoryEngine;
 import net.minecraft.nbt.TagParser;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
@@ -19,7 +20,7 @@ public class GiveItemCommand implements StoryCommand {
     }
 
     @Override
-    public BiConsumer<String[], ServerPlayer> getConsumer() {
+    public BiConsumer<String[], ServerPlayer> getConsumer(StoryEngine story) {
         return (args, player) -> {
             if (args.length != 1) {
                 return;

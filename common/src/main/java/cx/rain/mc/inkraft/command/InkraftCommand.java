@@ -10,7 +10,7 @@ import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import cx.rain.mc.inkraft.Inkraft;
 import cx.rain.mc.inkraft.InkraftPlatform;
 import cx.rain.mc.inkraft.story.IInkStoryStateHolder;
-import cx.rain.mc.inkraft.story.StoryWrapper;
+import cx.rain.mc.inkraft.story.StoryEngine;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.arguments.EntityArgument;
@@ -211,7 +211,7 @@ public class InkraftCommand {
     private static void startStory(ServerPlayer player, ResourceLocation path, IInkStoryStateHolder stateHolder, boolean isDebug) {
         var storiesManager = Inkraft.getInstance().getStoriesManager();
 
-        StoryWrapper story;
+        StoryEngine story;
         if (!storiesManager.hasCachedStory(player)) {
             story = storiesManager.createStory(player);
         } else {

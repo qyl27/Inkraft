@@ -5,15 +5,15 @@ import net.minecraft.server.level.ServerPlayer;
 
 import java.util.function.BiConsumer;
 
-public class CommandCommand implements StoryCommand {
-    @Override
-    public String getName() {
-        return "COMMAND";
-    }
-
+public class AutoContinueSpeedCommand implements StoryCommand {
     @Override
     public int getArgumentsCount() {
         return 1;
+    }
+
+    @Override
+    public String getName() {
+        return "AUTO_CONTINUE_SPEED";
     }
 
     @Override
@@ -23,12 +23,12 @@ public class CommandCommand implements StoryCommand {
                 return;
             }
 
-            var command = args[0];
-
-            player.getServer()
-                    .getCommands()
-                    .performPrefixedCommand(player.createCommandSourceStack()
-                            .withPermission(4), command);
+            try {
+                var speed = Long.parseLong(args[0]);
+                story.setContinueSpeed(speed);
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
         };
     }
 }
