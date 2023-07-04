@@ -24,6 +24,7 @@ public class StoryEngine {
 
     private Story story;
 
+    // XXX: qyl27: Save ServerPlayer and IInkStoryStateHolder references in class.
     public StoryEngine(StoriesManager manager) {
         this.manager = manager;
     }

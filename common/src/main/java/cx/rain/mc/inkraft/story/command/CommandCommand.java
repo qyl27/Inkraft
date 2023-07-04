@@ -27,8 +27,7 @@ public class CommandCommand implements StoryCommand {
 
             player.getServer()
                     .getCommands()
-                    .performPrefixedCommand(player.createCommandSourceStack()
-                            .withPermission(4), command);
+                    .performPrefixedCommand(player.getServer().createCommandSourceStack(), command);
         };
     }
 }
