@@ -10,6 +10,7 @@ import net.minecraft.util.profiling.ProfilerFiller;
 import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -48,7 +49,7 @@ public class InkReloadListener implements PreparableReloadListener {
             ResourceLocation id = fileToIdConverter.fileToId(resourceLocation);
 
             try {
-                stories.put(id, IOUtils.toString(entry.getValue().open()));
+                stories.put(id, IOUtils.toString(entry.getValue().open(), StandardCharsets.UTF_8));
             } catch (IOException ex) {
                 ex.printStackTrace();
             }
