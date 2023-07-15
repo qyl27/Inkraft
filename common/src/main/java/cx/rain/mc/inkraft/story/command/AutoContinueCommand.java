@@ -24,7 +24,7 @@ public class AutoContinueCommand implements StoryCommand {
             }
 
             var arg = args[0];
-            story.setAutoContinue(player, arg.equalsIgnoreCase("true"));
+            story.setAutoContinue(arg.equalsIgnoreCase("true"));
         };
     }
 }

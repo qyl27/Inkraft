@@ -1,5 +1,6 @@
 package cx.rain.mc.inkraft.data;
 
+import cx.rain.mc.inkraft.InkraftPlatform;
 import cx.rain.mc.inkraft.story.StoryEngine;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
@@ -39,7 +40,8 @@ public class StoriesManager {
 
     public StoryEngine createStory(ServerPlayer player) {
         try {
-            var storyWrapper = new StoryEngine(this);
+            var holder = InkraftPlatform.getPlayerStoryStateHolder(player);
+            var storyWrapper = new StoryEngine(this, player, holder);
             cachedStories.put(player.getUUID(), storyWrapper);
             return storyWrapper;
         } catch (Exception ex) {

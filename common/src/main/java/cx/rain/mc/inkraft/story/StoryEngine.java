@@ -23,19 +23,22 @@ public class StoryEngine {
     private final StoriesManager manager;
 
     private Story story;
+    private ServerPlayer player;
+    private IInkStoryStateHolder holder;
 
-    // XXX: qyl27: Save ServerPlayer and IInkStoryStateHolder references in class.
-    public StoryEngine(StoriesManager manager) {
+    public StoryEngine(StoriesManager manager, ServerPlayer player, IInkStoryStateHolder holder) {
         this.manager = manager;
+        this.player = player;
+        this.holder = holder;
     }
 
-    public boolean startStory(ServerPlayer player, IInkStoryStateHolder holder, ResourceLocation path, boolean debug) {
+    public boolean startStory(ResourceLocation path, boolean debug) {
         flowTo(path);
-        bindStoryFunctions(story, player, debug);
-        return continueStory(player, holder, new AsyncToken());
+        bindStoryFunctions(debug);
+        return continueStory(new AsyncToken());
     }
 
-    private boolean continueStory(ServerPlayer player, IInkStoryStateHolder holder, AsyncToken asyncToken) {
+    private boolean continueStory(AsyncToken asyncToken) {
         try {
             if (story.canContinue()) {
                 var message = story.Continue().trim();
@@ -62,15 +65,14 @@ public class StoryEngine {
                                     }
 
                                     var story = Inkraft.getInstance().getStoriesManager().getStory(player);
-                                    var storyHolder = InkraftPlatform.getPlayerStoryStateHolder(player);
-                                    var result = story.continueStory(player, storyHolder, asyncToken.async());
+                                    var result = story.continueStory(asyncToken.async());
                                     if (!result || !story.canAutoContinue()) {
                                         asyncToken.cancel();
                                     }
                                 }, 0, continueSpeed);
                             }
 
-                            save(holder, false);
+                            save(false);
                             return true;
                         }
 
@@ -79,10 +81,10 @@ public class StoryEngine {
                         component.setStyle(component.getStyle().withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.translatable(CommandConstants.MESSAGE_STORY_HINT_CONTINUE).withStyle(ChatFormatting.GREEN))));
                         player.sendSystemMessage(component);
 
-                        save(holder, false);
+                        save(false);
                         return true;
                     } else {
-                        save(holder, true);
+                        save(true);
                         return true;
                     }
                 } else {
@@ -94,14 +96,14 @@ public class StoryEngine {
                         player.sendSystemMessage(component);
                     }
 
-                    save(holder, false);
+                    save(false);
                     return true;
                 }
             } else {
                 if (story.getCurrentChoices().size() == 0) {
-                    save(holder, true);
+                    save(true);
                 } else {
-                    save(holder, false);
+                    save(false);
                 }
 
                 return true;
@@ -112,40 +114,39 @@ public class StoryEngine {
         }
     }
 
-    public boolean continueStoryWithoutChoice(ServerPlayer player, IInkStoryStateHolder holder) {
+    public boolean continueStoryWithoutChoice() {
         try {
-            load(holder);
+            load();
         } catch (RuntimeException ignored) {
             // Silent is gold.
         }
 
-        return continueStory(player, holder, new AsyncToken());
+        return continueStory(new AsyncToken());
     }
 
-    public boolean continueStoryWithChoice(ServerPlayer player, IInkStoryStateHolder holder, int choice) {
+    public boolean continueStoryWithChoice(int choice) {
         try {
-            load(holder);
+            load();
             story.chooseChoiceIndex(choice);
         } catch (Exception ex) {
             ex.printStackTrace();
         }
 
-        return continueStory(player, holder, new AsyncToken());
+        return continueStory(new AsyncToken());
     }
 
-    public void save(IInkStoryStateHolder stateHolder, boolean isStoryEnd) {
+    public void save(boolean isStoryEnd) {
         try {
-            stateHolder.setState(story.getState().toJson());
-            stateHolder.setInStory(!isStoryEnd);
+            holder.setState(story.getState().toJson());
+            holder.setInStory(!isStoryEnd);
         } catch (Exception ex) {
-//            ex.printStackTrace();
             // qyl27: silent is gold.
         }
     }
 
-    public void load(IInkStoryStateHolder stateHolder) {
+    public void load() {
         try {
-            story.getState().loadJson(stateHolder.getState());
+            story.getState().loadJson(holder.getState());
         } catch (Exception ex) {
             throw new RuntimeException(ex);
         }
@@ -166,7 +167,7 @@ public class StoryEngine {
         }
     }
 
-    private void bindStoryFunctions(Story story, ServerPlayer player, boolean debug) {
+    private void bindStoryFunctions(boolean debug) {
         try {
             for (var funcSupplier : StoryFunctions.FUNCTIONS) {
                 var func = funcSupplier.get();
@@ -197,7 +198,7 @@ public class StoryEngine {
 
     private long continueSpeed = -1;
 
-    public void setAutoContinue(ServerPlayer player, boolean value) {
+    public void setAutoContinue(boolean value) {
         autoContinue = value;
 
         if (autoContinue && continueSpeed <= 0) {

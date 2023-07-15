@@ -218,7 +218,7 @@ public class InkraftCommand {
             story = storiesManager.getStory(player);
         }
 
-        story.startStory(player, stateHolder, path, isDebug);
+        story.startStory(path, isDebug);
     }
 
     private static void continueStory(ServerPlayer player, IInkStoryStateHolder holder, int choice) {
@@ -226,9 +226,9 @@ public class InkraftCommand {
         var story = storiesManager.getStory(player);
 
         if (choice == -1) {
-            story.continueStoryWithoutChoice(player, holder);
+            story.continueStoryWithoutChoice();
         } else {
-            story.continueStoryWithChoice(player, holder, choice);
+            story.continueStoryWithChoice(choice);
         }
     }
 
