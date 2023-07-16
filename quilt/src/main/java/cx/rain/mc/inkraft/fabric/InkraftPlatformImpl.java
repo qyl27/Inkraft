@@ -3,7 +3,7 @@ package cx.rain.mc.inkraft.fabric;
 import cx.rain.mc.inkraft.command.IInkPermissionManager;
 import cx.rain.mc.inkraft.quilt.platform.InkPermissionManagerQuilt;
 import cx.rain.mc.inkraft.quilt.platform.InkStoryStateHolderQuilt;
-import cx.rain.mc.inkraft.story.IInkStoryStateHolder;
+import cx.rain.mc.inkraft.story.state.IInkStoryStateHolder;
 import net.minecraft.server.level.ServerPlayer;
 
 import java.util.HashMap;

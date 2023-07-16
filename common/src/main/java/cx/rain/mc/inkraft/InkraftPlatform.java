@@ -1,8 +1,7 @@
 package cx.rain.mc.inkraft;
 
 import cx.rain.mc.inkraft.command.IInkPermissionManager;
-import cx.rain.mc.inkraft.story.IInkStoryStateHolder;
-import cx.rain.mc.inkraft.timer.IInkTimerManager;
+import cx.rain.mc.inkraft.story.state.IInkStoryStateHolder;
 import dev.architectury.injectables.annotations.ExpectPlatform;
 import net.minecraft.server.level.ServerPlayer;
 

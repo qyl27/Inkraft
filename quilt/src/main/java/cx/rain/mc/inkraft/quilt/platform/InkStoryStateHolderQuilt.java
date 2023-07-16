@@ -1,7 +1,7 @@
 package cx.rain.mc.inkraft.quilt.platform;
 
 import cx.rain.mc.inkraft.quilt.mixins.interfaces.IPlayerMixin;
-import cx.rain.mc.inkraft.story.IInkStoryStateHolder;
+import cx.rain.mc.inkraft.story.state.IInkStoryStateHolder;
 import net.minecraft.world.entity.player.Player;
 
 import java.util.UUID;

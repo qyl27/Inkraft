@@ -1,12 +1,13 @@
 package cx.rain.mc.inkraft.story;
 
 import com.bladecoder.ink.runtime.Story;
+import com.bladecoder.ink.runtime.VariablesState;
 import cx.rain.mc.inkraft.Inkraft;
-import cx.rain.mc.inkraft.InkraftPlatform;
 import cx.rain.mc.inkraft.command.CommandConstants;
 import cx.rain.mc.inkraft.data.StoriesManager;
 import cx.rain.mc.inkraft.story.function.StoryFunctionResults;
 import cx.rain.mc.inkraft.story.function.StoryFunctions;
+import cx.rain.mc.inkraft.story.state.IInkStoryStateHolder;
 import cx.rain.mc.inkraft.utility.InkTagCommandHelper;
 import cx.rain.mc.inkraft.utility.TextStyleHelper;
 import net.minecraft.ChatFormatting;
@@ -237,5 +238,9 @@ public class StoryEngine {
             isCanceled = true;
             return this;
         }
+    }
+
+    public VariablesState getVariablesState() {
+        return story.getVariablesState();
     }
 }

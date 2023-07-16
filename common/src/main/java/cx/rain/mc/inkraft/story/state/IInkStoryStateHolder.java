@@ -1,4 +1,4 @@
-package cx.rain.mc.inkraft.story;
+package cx.rain.mc.inkraft.story.state;
 
 import java.util.UUID;
 

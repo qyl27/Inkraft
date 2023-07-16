@@ -1,7 +1,7 @@
 package cx.rain.mc.inkraft.forge.capability;
 
 import cx.rain.mc.inkraft.Inkraft;
-import cx.rain.mc.inkraft.story.IInkStoryStateHolder;
+import cx.rain.mc.inkraft.story.state.IInkStoryStateHolder;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityManager;

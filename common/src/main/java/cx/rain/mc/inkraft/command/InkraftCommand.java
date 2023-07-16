@@ -9,7 +9,7 @@ import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import cx.rain.mc.inkraft.Inkraft;
 import cx.rain.mc.inkraft.InkraftPlatform;
-import cx.rain.mc.inkraft.story.IInkStoryStateHolder;
+import cx.rain.mc.inkraft.story.state.IInkStoryStateHolder;
 import cx.rain.mc.inkraft.story.StoryEngine;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;

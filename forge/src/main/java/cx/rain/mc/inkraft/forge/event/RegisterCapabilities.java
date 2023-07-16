@@ -3,7 +3,7 @@ package cx.rain.mc.inkraft.forge.event;
 import cx.rain.mc.inkraft.Inkraft;
 import cx.rain.mc.inkraft.forge.capability.InkStoryStateHolderProvider;
 import cx.rain.mc.inkraft.forge.capability.InkraftCapabilities;
-import cx.rain.mc.inkraft.story.IInkStoryStateHolder;
+import cx.rain.mc.inkraft.story.state.IInkStoryStateHolder;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.common.capabilities.RegisterCapabilitiesEvent;
