@@ -13,6 +13,11 @@ public class RenderHUD {
     @SubscribeEvent
     public static void onPreRenderGuiOverlay(RenderGuiOverlayEvent.Pre event) {
         var graphics = event.getGuiGraphics();
+
+        if (!event.getOverlay().id().toString().equals("minecraft:scoreboard")) {
+            return;
+        }
+
         if (!InkraftClient.getInstance().getVariables().isEmpty()) {
             VariableHUD.render(graphics);
         }

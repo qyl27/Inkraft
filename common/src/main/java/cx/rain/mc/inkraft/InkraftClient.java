@@ -10,6 +10,7 @@ public class InkraftClient {
 
     private final Map<String, Pair<String, String>> variables = new HashMap<>();
 
+    // Todo: use capability instead.
     public InkraftClient() {
     }
 
