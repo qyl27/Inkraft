@@ -24,6 +24,9 @@
     "entrypoints": {
       "init": [
         "cx.rain.mc.inkraft.quilt.InkraftQuilt"
+      ],
+      "client": [
+        "cx.rain.mc.inkraft.quilt.InkraftQuiltClient"
       ]
     },
     "depends": [

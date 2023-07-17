@@ -1,9 +1,7 @@
 package cx.rain.mc.inkraft.gui;
 
-import com.mojang.blaze3d.platform.GlStateManager;
-import com.mojang.blaze3d.systems.RenderSystem;
-import cx.rain.mc.inkraft.InkraftClient;
 import cx.rain.mc.inkraft.Constants;
+import cx.rain.mc.inkraft.InkraftPlatform;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
@@ -12,12 +10,14 @@ public class VariableHUD {
 
     public static void render(GuiGraphics graphics) {
         var font = Minecraft.getInstance().font;
+        var player = Minecraft.getInstance().player;
 
-        int maxKeyLen = 0;
-        int maxValueLen = 0;
-        int lineCount = 1;
+        var maxKeyLen = 0;
+        var maxValueLen = 0;
+        var lineCount = 1;
 
-        for (var entry : InkraftClient.getInstance().getVariables().entrySet()) {
+        var entries = InkraftPlatform.getPlayerStoryStateHolder(player).getVariables().entrySet();
+        for (var entry : entries) {
             var key = entry.getKey();
             var value = entry.getValue();
             var displayName = value.getFirst();
@@ -51,14 +51,12 @@ public class VariableHUD {
 
         var backgroundColor = ((int) (255.0 * Minecraft.getInstance().options.textBackgroundOpacity().get())) << 24;
 
-//        RenderSystem.enableBlend();
-//        RenderSystem.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
         graphics.fill(x, y, x + width, y + height, backgroundColor);
 
         graphics.drawCenteredString(font, title, x + width / 2, y, 16777215);
 
         var i = 0;
-        for (var entry : InkraftClient.getInstance().getVariables().entrySet()) {
+        for (var entry : entries) {
             var value = entry.getValue();
             var displayName = value.getFirst();
             var displayValue = value.getSecond();
@@ -69,7 +67,5 @@ public class VariableHUD {
 
             i += 1;
         }
-
-//        RenderSystem.disableBlend();
     }
 }

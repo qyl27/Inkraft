@@ -4,7 +4,7 @@ import cx.rain.mc.inkraft.command.IInkPermissionManager;
 import cx.rain.mc.inkraft.fabric.platform.InkPermissionManagerFabric;
 import cx.rain.mc.inkraft.fabric.platform.InkStoryStateHolderFabric;
 import cx.rain.mc.inkraft.story.state.IInkStoryStateHolder;
-import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Player;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -14,7 +14,7 @@ public class InkraftPlatformImpl {
     private static final Map<UUID, InkStoryStateHolderFabric> CACHED_PLAYER_HOLDER = new HashMap<>();
     private static final IInkPermissionManager PERMISSION_MANAGER = new InkPermissionManagerFabric();
 
-    public static IInkStoryStateHolder getPlayerStoryStateHolder(ServerPlayer player) {
+    public static IInkStoryStateHolder getPlayerStoryStateHolder(Player player) {
         if (!CACHED_PLAYER_HOLDER.containsKey(player.getUUID())) {
             CACHED_PLAYER_HOLDER.put(player.getUUID(), new InkStoryStateHolderFabric(player));
         }

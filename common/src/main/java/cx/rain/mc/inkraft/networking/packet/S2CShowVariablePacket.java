@@ -1,6 +1,6 @@
 package cx.rain.mc.inkraft.networking.packet;
 
-import cx.rain.mc.inkraft.InkraftClient;
+import cx.rain.mc.inkraft.InkraftPlatform;
 import dev.architectury.networking.NetworkManager;
 import net.minecraft.network.FriendlyByteBuf;
 
@@ -32,6 +32,6 @@ public class S2CShowVariablePacket {
 
     public void apply(Supplier<NetworkManager.PacketContext> contextSupplier) {
         var context = contextSupplier.get();
-        context.queue(() -> InkraftClient.getInstance().putVariable(name, displayName, isShow, value));
+        context.queue(() -> InkraftPlatform.getPlayerStoryStateHolder(context.getPlayer()).putVariable(name, displayName, isShow, value));
     }
 }

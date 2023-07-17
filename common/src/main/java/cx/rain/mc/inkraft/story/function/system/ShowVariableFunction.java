@@ -1,10 +1,9 @@
 package cx.rain.mc.inkraft.story.function.system;
 
-import cx.rain.mc.inkraft.Inkraft;
-import cx.rain.mc.inkraft.networking.packet.S2CShowVariablePacket;
 import cx.rain.mc.inkraft.story.StoryEngine;
 import cx.rain.mc.inkraft.story.function.StoryFunction;
 import cx.rain.mc.inkraft.story.function.StoryFunctionResults;
+import cx.rain.mc.inkraft.utility.ShowVariableHelper;
 import net.minecraft.server.level.ServerPlayer;
 
 import java.util.function.BiFunction;
@@ -28,12 +27,12 @@ public class ShowVariableFunction implements StoryFunction {
             var isShow = args[2].toString().equalsIgnoreCase("true");
             var value = engine.getVariablesState().get(name).toString();
 
-            Inkraft.getInstance().getNetworking().sendToPlayer(player, new S2CShowVariablePacket(name, displayName, isShow, value));
+            ShowVariableHelper.showVariable(player, name, displayName, isShow, value);
             engine.removeVariableObserver(name);
 
             if (isShow) {
                 engine.observerVariable(name, ((variableName, newValue) -> {
-                    Inkraft.getInstance().getNetworking().sendToPlayer(player, new S2CShowVariablePacket(variableName, displayName, true, newValue.toString()));
+                    ShowVariableHelper.showVariable(player, variableName, displayName, true, newValue.toString());
                 }));
             }
 

@@ -1,5 +1,8 @@
 package cx.rain.mc.inkraft.quilt.mixins.interfaces;
 
+import com.mojang.datafixers.util.Pair;
+
+import java.util.Map;
 import java.util.UUID;
 
 public interface IPlayerMixin {
@@ -11,4 +14,8 @@ public interface IPlayerMixin {
 
     boolean inkraft$isInStory();
     void inkraft$setInStory(boolean inStory);
+
+    Map<String, Pair<String, String>> inkraft$getVariables();
+    void inkraft$putVariable(String name, String displayName, boolean isShow, String value);
+    void inkraft$clearShowedVariables();
 }

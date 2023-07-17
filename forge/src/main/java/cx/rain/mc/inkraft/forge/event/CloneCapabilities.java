@@ -16,6 +16,11 @@ public class CloneCapabilities {
                 event.getEntity().getCapability(InkraftCapabilities.INKRAFT_STORY_STATE_HOLDER).ifPresent(newCap -> {
                     newCap.setState(cap.getState());
                     newCap.setContinueToken(cap.getContinueToken());
+
+                    newCap.clearShowedVariables();
+                    for (var entry : cap.getVariables().entrySet()) {
+                        newCap.putVariable(entry.getKey(), entry.getValue().getFirst(), true, entry.getValue().getSecond());
+                    }
                 });
             });
         }

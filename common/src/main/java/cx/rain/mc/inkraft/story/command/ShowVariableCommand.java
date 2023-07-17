@@ -1,7 +1,6 @@
 package cx.rain.mc.inkraft.story.command;
 
 import cx.rain.mc.inkraft.Inkraft;
-import cx.rain.mc.inkraft.InkraftClient;
 import cx.rain.mc.inkraft.networking.packet.S2CShowVariablePacket;
 import cx.rain.mc.inkraft.story.StoryEngine;
 import net.minecraft.server.level.ServerPlayer;
