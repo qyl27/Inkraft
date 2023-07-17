@@ -1,11 +1,9 @@
 package cx.rain.mc.inkraft.story.function.game;
 
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import cx.rain.mc.inkraft.story.StoryEngine;
 import cx.rain.mc.inkraft.story.function.StoryFunction;
 import cx.rain.mc.inkraft.story.function.StoryFunctionResults;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.TagParser;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
 
@@ -18,7 +16,7 @@ public class GiveItemFunction implements StoryFunction {
     }
 
     @Override
-    public BiFunction<Object[], ServerPlayer, StoryFunctionResults.IStoryFunctionResult> func(boolean isDebug) {
+    public BiFunction<Object[], ServerPlayer, StoryFunctionResults.IStoryFunctionResult> func(StoryEngine engine) {
         return (args, player) -> {
             if (args.length != 2) {
                 return new StoryFunctionResults.BoolResult(false);

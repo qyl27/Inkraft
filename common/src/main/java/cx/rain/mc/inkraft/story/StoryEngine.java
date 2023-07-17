@@ -24,6 +24,8 @@ public class StoryEngine {
 
     private final StoriesManager manager;
 
+    private boolean debug = false;
+
     private Story story;
     private ServerPlayer player;
     private IInkStoryStateHolder holder;
@@ -35,39 +37,36 @@ public class StoryEngine {
     }
 
     public boolean startStory(ResourceLocation path, boolean debug) {
+        this.debug = debug;
+
         flowTo(path);
-        bindStoryFunctions(debug);
+        bindStoryFunctions();
         return continueStory(new AsyncToken());
     }
 
-    // XXX: why?
-//    private String cachedContinue = "";
+    public boolean isDebug() {
+        return debug;
+    }
 
     private boolean continueStory(AsyncToken asyncToken) {
         try {
             if (story.canContinue()) {
                 var message = story.Continue().trim();
 
-//                if (message.equals(cachedContinue)) {
-//                    message = story.Continue().trim();
-//                }
-//
-//                cachedContinue = message;
+//                var tags = story.getCurrentTags();
+//                var ops = InkTagCommandHelper.parseTag(tags);
+//                InkTagCommandHelper.runTagCommands(this, ops, player);
 
-                var tags = story.getCurrentTags();
-                var ops = InkTagCommandHelper.parseTag(tags);
-                InkTagCommandHelper.runTagCommands(this, ops, player);
+                while (message.equals("")) {
+                    message = story.Continue().trim();
+                }
 
                 player.sendSystemMessage(TextStyleHelper.parseStyle(message));
 
                 var choices = story.getCurrentChoices();
-
-                var token = UUID.randomUUID();
-                holder.setContinueToken(token);
-
                 if (choices.size() == 0) {
                     if (story.canContinue()) {
-                        if (autoContinue) {
+                        if (canAutoContinue()) {
                             if (!asyncToken.isAsync()) {
                                 Inkraft.getInstance().getTimerManager().addTimer(player, () -> {
                                     if (asyncToken.isCanceled()) {
@@ -76,52 +75,63 @@ public class StoryEngine {
                                     }
 
                                     var story = Inkraft.getInstance().getStoriesManager().getStory(player);
-                                    var result = story.continueStory(asyncToken.async());
-                                    if (!result || !story.canAutoContinue()) {
-                                        asyncToken.cancel();
+
+                                    if (story.canAutoContinue()) {
+                                        var result = story.continueStory(asyncToken.async());
+
+                                        if (!result || !story.canAutoContinue()) {
+                                            asyncToken.cancel();
+                                        }
+                                    } else {
+                                        sendContinue();
                                     }
                                 }, 0, continueSpeed);
                             }
-
-                            save(false);
-                            return true;
+                        } else {
+                            sendContinue();
                         }
-
-                        var component = Component.translatable(Constants.MESSAGE_STORY_CONTINUE).withStyle(ChatFormatting.YELLOW);
-                        component.setStyle(component.getStyle().withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/inkraft continue " + token)));
-                        component.setStyle(component.getStyle().withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.translatable(Constants.MESSAGE_STORY_HINT_CONTINUE).withStyle(ChatFormatting.GREEN))));
-                        player.sendSystemMessage(component);
-
-                        save(false);
-                        return true;
                     } else {
                         save(true);
                         return true;
                     }
                 } else {
-                    for (int i = 0; i < choices.size(); i++) {
-                        var choice = choices.get(i);
-                        var component = Component.translatable(Constants.MESSAGE_STORY_CONTINUE_CHOICE, choice.getText()).withStyle(ChatFormatting.YELLOW);
-                        component.setStyle(component.getStyle().withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/inkraft continue " + token + " " + i)));
-                        component.setStyle(component.getStyle().withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.translatable(Constants.MESSAGE_STORY_HINT_CONTINUE_CHOICE).withStyle(ChatFormatting.GREEN))));
-                        player.sendSystemMessage(component);
-                    }
-
-                    save(false);
-                    return true;
+                    sendContinue();
                 }
+
+                save(false);
             } else {
-                if (story.getCurrentChoices().size() == 0) {
-                    save(true);
-                } else {
-                    save(false);
-                }
-
-                return true;
+                save(story.getCurrentChoices().size() == 0);
             }
+            return true;
         } catch (Exception ex) {
             ex.printStackTrace();
             return false;
+        }
+    }
+
+    public void sendContinue() {
+        if (!story.canContinue() && story.getCurrentChoices().size() == 0) {
+            return;
+        }
+
+        var token = UUID.randomUUID();
+        holder.setContinueToken(token);
+
+        if (story.getCurrentChoices().size() == 0) {
+            var component = Component.translatable(Constants.MESSAGE_STORY_CONTINUE).withStyle(ChatFormatting.YELLOW);
+            component.setStyle(component.getStyle().withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/inkraft continue " + token)));
+            component.setStyle(component.getStyle().withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.translatable(Constants.MESSAGE_STORY_HINT_CONTINUE).withStyle(ChatFormatting.GREEN))));
+            player.sendSystemMessage(component);
+        } else {
+            var choices = story.getCurrentChoices();
+
+            for (int i = 0; i < choices.size(); i++) {
+                var choice = choices.get(i);
+                var component = Component.translatable(Constants.MESSAGE_STORY_CONTINUE_CHOICE, choice.getText()).withStyle(ChatFormatting.YELLOW);
+                component.setStyle(component.getStyle().withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/inkraft continue " + token + " " + i)));
+                component.setStyle(component.getStyle().withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.translatable(Constants.MESSAGE_STORY_HINT_CONTINUE_CHOICE).withStyle(ChatFormatting.GREEN))));
+                player.sendSystemMessage(component);
+            }
         }
     }
 
@@ -185,14 +195,14 @@ public class StoryEngine {
         Inkraft.getInstance().getNetworking().sendToPlayer(player, new S2CHideAllVariablePacket());
     }
 
-    private void bindStoryFunctions(boolean debug) {
+    private void bindStoryFunctions() {
         try {
             for (var funcSupplier : StoryFunctions.FUNCTIONS) {
                 var func = funcSupplier.get();
                 var funcName = func.getName().isBlank() ? funcSupplier.getRegistryId().getPath() : func.getName();
 
                 story.bindExternalFunction(funcName, args -> {
-                    var result = func.func(debug).apply(args, player);
+                    var result = func.func(this).apply(args, player);
                     if (result instanceof StoryFunctionResults.StringResult stringResult) {
                         return stringResult.stringResult();
                     } else if (result instanceof StoryFunctionResults.IntResult intResult) {
@@ -209,7 +219,7 @@ public class StoryEngine {
     }
 
     public boolean canAutoContinue() {
-        return story.canContinue();
+        return autoContinue && story.canContinue();
     }
 
     private boolean autoContinue = false;

@@ -48,6 +48,6 @@ public class VariableHUD {
         var y = (graphics.guiHeight() - height) / 2;
 
         var backgroundColor = ((int) (255.0 * Minecraft.getInstance().options.textBackgroundOpacity().get())) << 24;
-        graphics.fill(x, y, width, height, backgroundColor);
+        graphics.fill(x, y, width, height, -1873784752);
     }
 }

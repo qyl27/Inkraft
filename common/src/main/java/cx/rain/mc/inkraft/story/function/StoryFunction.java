@@ -1,5 +1,6 @@
 package cx.rain.mc.inkraft.story.function;
 
+import cx.rain.mc.inkraft.story.StoryEngine;
 import net.minecraft.server.level.ServerPlayer;
 
 import java.util.function.BiFunction;
@@ -10,5 +11,5 @@ public interface StoryFunction {
         return "";
     }
 
-    BiFunction<Object[], ServerPlayer, StoryFunctionResults.IStoryFunctionResult> func(boolean isDebug);
+    BiFunction<Object[], ServerPlayer, StoryFunctionResults.IStoryFunctionResult> func(StoryEngine engine);
 }

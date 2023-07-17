@@ -20,9 +20,9 @@ public class StoryCommands {
         COMMANDS.register();
     }
 
-    public static final RegistrySupplier<StoryCommand> COMMAND = COMMANDS.register("command", CommandCommand::new);
-    public static final RegistrySupplier<StoryCommand> GIVE_ITEM = COMMANDS.register("give_item", GiveItemCommand::new);
-    public static final RegistrySupplier<StoryCommand> AUTO_CONTINUE = COMMANDS.register("auto_continue", AutoContinueCommand::new);
-    public static final RegistrySupplier<StoryCommand> AUTO_CONTINUE_SPEED = COMMANDS.register("auto_continue_speed", AutoContinueSpeedCommand::new);
-    public static final RegistrySupplier<StoryCommand> SHOW_VARIABLE = COMMANDS.register("show_variable", ShowVariableCommand::new);
+//    public static final RegistrySupplier<StoryCommand> COMMAND = COMMANDS.register("command", CommandCommand::new);
+//    public static final RegistrySupplier<StoryCommand> GIVE_ITEM = COMMANDS.register("give_item", GiveItemCommand::new);
+//    public static final RegistrySupplier<StoryCommand> AUTO_CONTINUE = COMMANDS.register("auto_continue", AutoContinueCommand::new);
+//    public static final RegistrySupplier<StoryCommand> AUTO_CONTINUE_SPEED = COMMANDS.register("auto_continue_speed", AutoContinueSpeedCommand::new);
+//    public static final RegistrySupplier<StoryCommand> SHOW_VARIABLE = COMMANDS.register("show_variable", ShowVariableCommand::new);
 }

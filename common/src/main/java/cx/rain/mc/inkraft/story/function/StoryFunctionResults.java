@@ -11,5 +11,7 @@ public class StoryFunctionResults {
     }
 
     public record BoolResult(boolean boolResult) implements IStoryFunctionResult {
+        public static final BoolResult TRUE = new BoolResult(true);
+        public static final BoolResult FALSE = new BoolResult(false);
     }
 }
