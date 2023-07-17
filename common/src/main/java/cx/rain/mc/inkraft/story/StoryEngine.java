@@ -40,10 +40,19 @@ public class StoryEngine {
         return continueStory(new AsyncToken());
     }
 
+    // XXX: why?
+//    private String cachedContinue = "";
+
     private boolean continueStory(AsyncToken asyncToken) {
         try {
             if (story.canContinue()) {
                 var message = story.Continue().trim();
+
+//                if (message.equals(cachedContinue)) {
+//                    message = story.Continue().trim();
+//                }
+//
+//                cachedContinue = message;
 
                 var tags = story.getCurrentTags();
                 var ops = InkTagCommandHelper.parseTag(tags);
@@ -214,7 +223,7 @@ public class StoryEngine {
             continueSpeed = 20;
         }
 
-        if (!value) {
+        if (!autoContinue) {
             Inkraft.getInstance().getTimerManager().removeTimers(player);
         }
     }

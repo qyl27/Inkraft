@@ -158,7 +158,7 @@ public class InkraftCommand {
         var token = UuidArgument.getUuid(context, "token");
         var stateHolder = InkraftPlatform.getPlayerStoryStateHolder(player);
 
-        if (stateHolder.getContinueToken().equals(token)) {
+        if (stateHolder.getContinueToken() != null && stateHolder.getContinueToken().equals(token)) {
             continueStory(player, stateHolder, -1);
         } else {
             player.sendSystemMessage(Component.translatable(Constants.MESSAGE_STORY_BAD_TOKEN).withStyle(ChatFormatting.RED));
@@ -178,7 +178,7 @@ public class InkraftCommand {
         var choice = IntegerArgumentType.getInteger(context, "choice");
         var stateHolder = InkraftPlatform.getPlayerStoryStateHolder(player);
 
-        if (stateHolder.getContinueToken().equals(token)) {
+        if (stateHolder.getContinueToken() != null && stateHolder.getContinueToken().equals(token)) {
             continueStory(player, stateHolder, choice);
         } else {
             player.sendSystemMessage(Component.translatable(Constants.MESSAGE_STORY_BAD_TOKEN).withStyle(ChatFormatting.RED));
