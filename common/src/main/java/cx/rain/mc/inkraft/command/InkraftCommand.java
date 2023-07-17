@@ -7,6 +7,7 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
+import cx.rain.mc.inkraft.Constants;
 import cx.rain.mc.inkraft.Inkraft;
 import cx.rain.mc.inkraft.InkraftPlatform;
 import cx.rain.mc.inkraft.story.state.IInkStoryStateHolder;
@@ -110,7 +111,7 @@ public class InkraftCommand {
         stateHolder.clearState();
         Inkraft.getInstance().getStoriesManager().refreshStory(player);
 
-        context.getSource().sendSystemMessage(Component.translatable(CommandConstants.MESSAGE_COMMAND_SUCCESS)
+        context.getSource().sendSystemMessage(Component.translatable(Constants.MESSAGE_COMMAND_SUCCESS)
                 .withStyle(ChatFormatting.LIGHT_PURPLE));
         return 1;
     }
@@ -160,7 +161,7 @@ public class InkraftCommand {
         if (stateHolder.getContinueToken().equals(token)) {
             continueStory(player, stateHolder, -1);
         } else {
-            player.sendSystemMessage(Component.translatable(CommandConstants.MESSAGE_STORY_BAD_TOKEN).withStyle(ChatFormatting.RED));
+            player.sendSystemMessage(Component.translatable(Constants.MESSAGE_STORY_BAD_TOKEN).withStyle(ChatFormatting.RED));
 
             return 1;
         }
@@ -180,7 +181,7 @@ public class InkraftCommand {
         if (stateHolder.getContinueToken().equals(token)) {
             continueStory(player, stateHolder, choice);
         } else {
-            player.sendSystemMessage(Component.translatable(CommandConstants.MESSAGE_STORY_BAD_TOKEN).withStyle(ChatFormatting.RED));
+            player.sendSystemMessage(Component.translatable(Constants.MESSAGE_STORY_BAD_TOKEN).withStyle(ChatFormatting.RED));
 
             return 1;
         }
@@ -199,7 +200,7 @@ public class InkraftCommand {
         stateHolder.clearState();
         Inkraft.getInstance().getStoriesManager().refreshStory(player);
 
-        player.sendSystemMessage(Component.translatable(CommandConstants.MESSAGE_COMMAND_SUCCESS)
+        player.sendSystemMessage(Component.translatable(Constants.MESSAGE_COMMAND_SUCCESS)
                 .withStyle(ChatFormatting.LIGHT_PURPLE));
         return 1;
     }
@@ -245,7 +246,7 @@ public class InkraftCommand {
         if (source.getPlayer() != null) {
             return true;
         } else {
-            source.sendFailure(Component.translatable(CommandConstants.MESSAGE_COMMAND_NOT_PLAYER).withStyle(ChatFormatting.RED));
+            source.sendFailure(Component.translatable(Constants.MESSAGE_COMMAND_NOT_PLAYER).withStyle(ChatFormatting.RED));
             return false;
         }
     }

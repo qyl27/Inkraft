@@ -3,6 +3,7 @@ package cx.rain.mc.inkraft;
 import cx.rain.mc.inkraft.data.InkReloadListener;
 import cx.rain.mc.inkraft.data.StoriesManager;
 import cx.rain.mc.inkraft.data.loot.predicate.InkraftPredicates;
+import cx.rain.mc.inkraft.networking.InkraftNetworking;
 import cx.rain.mc.inkraft.story.command.StoryCommands;
 import cx.rain.mc.inkraft.story.function.StoryFunctions;
 import cx.rain.mc.inkraft.timer.IInkTimerManager;
@@ -21,6 +22,7 @@ public class Inkraft {
     private final InkraftPlatform platform;
     private final StoriesManager storiesManager;
     private final IInkTimerManager timerManager;
+    private final InkraftNetworking networking;
 
     private Logger logger = LoggerFactory.getLogger(MODID);
 
@@ -30,6 +32,7 @@ public class Inkraft {
         platform = new InkraftPlatform();
         storiesManager = new StoriesManager();
         timerManager = new InkTimerManager();
+        networking = new InkraftNetworking();
 
         logger.info("Initializing Inkraft. Ver: " + VERSION);
     }
@@ -61,5 +64,9 @@ public class Inkraft {
 
     public IInkTimerManager getTimerManager() {
         return timerManager;
+    }
+
+    public InkraftNetworking getNetworking() {
+        return networking;
     }
 }

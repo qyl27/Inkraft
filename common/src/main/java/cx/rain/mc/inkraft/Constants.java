@@ -1,6 +1,6 @@
-package cx.rain.mc.inkraft.command;
+package cx.rain.mc.inkraft;
 
-public class CommandConstants {
+public class Constants {
     public static final String MESSAGE_COMMAND_NOT_PLAYER = "message.command.not_a_player";
     public static final String MESSAGE_COMMAND_SUCCESS = "message.command.success";
 
@@ -9,4 +9,6 @@ public class CommandConstants {
     public static final String MESSAGE_STORY_HINT_CONTINUE = "message.story.hint.continue";
     public static final String MESSAGE_STORY_HINT_CONTINUE_CHOICE = "message.story.hint.continue.choice";
     public static final String MESSAGE_STORY_BAD_TOKEN = "message.story.bad_token";
+
+    public static final String HUD_INFO = "hud.info";
 }

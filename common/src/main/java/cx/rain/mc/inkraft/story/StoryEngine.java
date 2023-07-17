@@ -3,8 +3,9 @@ package cx.rain.mc.inkraft.story;
 import com.bladecoder.ink.runtime.Story;
 import com.bladecoder.ink.runtime.VariablesState;
 import cx.rain.mc.inkraft.Inkraft;
-import cx.rain.mc.inkraft.command.CommandConstants;
+import cx.rain.mc.inkraft.Constants;
 import cx.rain.mc.inkraft.data.StoriesManager;
+import cx.rain.mc.inkraft.networking.packet.S2CHideAllVariablePacket;
 import cx.rain.mc.inkraft.story.function.StoryFunctionResults;
 import cx.rain.mc.inkraft.story.function.StoryFunctions;
 import cx.rain.mc.inkraft.story.state.IInkStoryStateHolder;
@@ -17,7 +18,7 @@ import net.minecraft.network.chat.HoverEvent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 
-import java.util.UUID;
+import java.util.*;
 
 public class StoryEngine {
 
@@ -77,9 +78,9 @@ public class StoryEngine {
                             return true;
                         }
 
-                        var component = Component.translatable(CommandConstants.MESSAGE_STORY_CONTINUE).withStyle(ChatFormatting.YELLOW);
+                        var component = Component.translatable(Constants.MESSAGE_STORY_CONTINUE).withStyle(ChatFormatting.YELLOW);
                         component.setStyle(component.getStyle().withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/inkraft continue " + token)));
-                        component.setStyle(component.getStyle().withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.translatable(CommandConstants.MESSAGE_STORY_HINT_CONTINUE).withStyle(ChatFormatting.GREEN))));
+                        component.setStyle(component.getStyle().withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.translatable(Constants.MESSAGE_STORY_HINT_CONTINUE).withStyle(ChatFormatting.GREEN))));
                         player.sendSystemMessage(component);
 
                         save(false);
@@ -91,9 +92,9 @@ public class StoryEngine {
                 } else {
                     for (int i = 0; i < choices.size(); i++) {
                         var choice = choices.get(i);
-                        var component = Component.translatable(CommandConstants.MESSAGE_STORY_CONTINUE_CHOICE, choice.getText()).withStyle(ChatFormatting.YELLOW);
+                        var component = Component.translatable(Constants.MESSAGE_STORY_CONTINUE_CHOICE, choice.getText()).withStyle(ChatFormatting.YELLOW);
                         component.setStyle(component.getStyle().withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/inkraft continue " + token + " " + i)));
-                        component.setStyle(component.getStyle().withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.translatable(CommandConstants.MESSAGE_STORY_HINT_CONTINUE_CHOICE).withStyle(ChatFormatting.GREEN))));
+                        component.setStyle(component.getStyle().withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.translatable(Constants.MESSAGE_STORY_HINT_CONTINUE_CHOICE).withStyle(ChatFormatting.GREEN))));
                         player.sendSystemMessage(component);
                     }
 
@@ -158,14 +159,21 @@ public class StoryEngine {
             // Todo: qyl27: flow support!
             story = new Story(manager.getStoryString(path));
 
-            autoContinue = false;
-            continueSpeed = -1;
+            clean();
 //            if (story.currentFlowIsDefaultFlow()) {
 //                story.switchFlow(path.toString());
 //            }
         } catch (Exception ex) {
             ex.printStackTrace();
         }
+    }
+
+    public void clean() {
+        autoContinue = false;
+        continueSpeed = -1;
+        variableObservers.clear();
+
+        Inkraft.getInstance().getNetworking().sendToPlayer(player, new S2CHideAllVariablePacket());
     }
 
     private void bindStoryFunctions(boolean debug) {
@@ -242,5 +250,34 @@ public class StoryEngine {
 
     public VariablesState getVariablesState() {
         return story.getVariablesState();
+    }
+
+    private final Map<String, List<Story.VariableObserver>> variableObservers = new HashMap<>();
+
+    public void observerVariable(String name, Story.VariableObserver observer) {
+        if (!variableObservers.containsKey(name)) {
+            variableObservers.put(name, new ArrayList<>());
+        }
+
+        try {
+            story.observeVariable(name, observer);
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
+        }
+
+        variableObservers.get(name).add(observer);
+    }
+
+    public void removeVariableObserver(String name) {
+        try {
+            var list = variableObservers.get(name);
+            if (list != null) {
+                for (var observer : list) {
+                    story.removeVariableObserver(observer, name);
+                }
+            }
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
+        }
     }
 }

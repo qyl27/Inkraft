@@ -1,6 +1,8 @@
 package cx.rain.mc.inkraft.data;
 
+import cx.rain.mc.inkraft.Inkraft;
 import cx.rain.mc.inkraft.InkraftPlatform;
+import cx.rain.mc.inkraft.networking.packet.S2CHideAllVariablePacket;
 import cx.rain.mc.inkraft.story.StoryEngine;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
@@ -51,6 +53,7 @@ public class StoriesManager {
 
     public void refreshStory(ServerPlayer player) {
         cachedStories.remove(player.getUUID());
+        Inkraft.getInstance().getNetworking().sendToPlayer(player, new S2CHideAllVariablePacket());
     }
 
     public void refreshStories() {
