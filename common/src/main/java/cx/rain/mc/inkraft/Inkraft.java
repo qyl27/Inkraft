@@ -4,7 +4,6 @@ import cx.rain.mc.inkraft.data.InkReloadListener;
 import cx.rain.mc.inkraft.data.StoriesManager;
 import cx.rain.mc.inkraft.data.loot.predicate.InkraftPredicates;
 import cx.rain.mc.inkraft.networking.InkraftNetworking;
-import cx.rain.mc.inkraft.story.command.StoryCommands;
 import cx.rain.mc.inkraft.story.function.StoryFunctions;
 import cx.rain.mc.inkraft.timer.IInkTimerManager;
 import cx.rain.mc.inkraft.timer.InkTimerManager;
@@ -48,7 +47,6 @@ public class Inkraft {
     public void init() {
         ReloadListenerRegistry.register(PackType.SERVER_DATA, new InkReloadListener(), InkReloadListener.INKRAFT_STORY);
 
-        StoryCommands.register();
         StoryFunctions.register();
 
         InkraftPredicates.register();

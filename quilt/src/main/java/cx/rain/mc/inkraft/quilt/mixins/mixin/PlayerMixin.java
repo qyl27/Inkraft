@@ -20,6 +20,7 @@ import java.util.UUID;
 public abstract class PlayerMixin implements IPlayerMixin {
     private UUID inkraft$continueToken = UUID.randomUUID();
     private String inkraft$state = "";
+    private String inkraft$lastMessage = "";
     private boolean inkraft$inStory = false;
     private final Map<String, Pair<String, String>> inkraft$variables = new HashMap<>();
 
@@ -31,6 +32,14 @@ public abstract class PlayerMixin implements IPlayerMixin {
     @Override
     public void inkraft$setState(String state) {
         inkraft$state = state;
+    }
+
+    public String inkraft$getLastMessage() {
+        return inkraft$lastMessage;
+    }
+
+    public void inkraft$setLastMessage(String message) {
+        this.inkraft$lastMessage = message;
     }
 
     @Override
@@ -76,6 +85,7 @@ public abstract class PlayerMixin implements IPlayerMixin {
     private void inkraft$addAdditionalSaveData(CompoundTag tag, CallbackInfo ci) {
         var compound = new CompoundTag();
         compound.putString(InkStoryStateHolderQuilt.TAG_STATE_NAME, inkraft$getState());
+        compound.putString(InkStoryStateHolderQuilt.TAG_LAST_MESSAGE_NAME, inkraft$getLastMessage());
         compound.putUUID(InkStoryStateHolderQuilt.TAG_TOKEN_NAME, inkraft$getContinueToken());
         compound.putBoolean(InkStoryStateHolderQuilt.TAG_IN_STORY_NAME, inkraft$isInStory());
 
@@ -96,6 +106,7 @@ public abstract class PlayerMixin implements IPlayerMixin {
     private void inkraft$readAdditionalSaveData(CompoundTag tag, CallbackInfo ci) {
         var compound = tag.getCompound(InkStoryStateHolderQuilt.TAG_INKRAFT_NAME);
         inkraft$setState(compound.getString(InkStoryStateHolderQuilt.TAG_STATE_NAME));
+        inkraft$setLastMessage(compound.getString(InkStoryStateHolderQuilt.TAG_LAST_MESSAGE_NAME));
         inkraft$setContinueToken(compound.getUUID(InkStoryStateHolderQuilt.TAG_TOKEN_NAME));
         inkraft$setInStory(compound.getBoolean(InkStoryStateHolderQuilt.TAG_IN_STORY_NAME));
 

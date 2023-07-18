@@ -6,6 +6,7 @@ import cx.rain.mc.inkraft.fabric.platform.InkStoryStateHolderFabric;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -20,6 +21,7 @@ import java.util.UUID;
 public abstract class PlayerMixin implements IPlayerMixin {
     private UUID inkraft$continueToken = UUID.randomUUID();
     private String inkraft$state = "";
+    private String inkraft$lastMessage = "";
     private boolean inkraft$inStory = false;
     private final Map<String, Pair<String, String>> inkraft$variables = new HashMap<>();
 
@@ -31,6 +33,14 @@ public abstract class PlayerMixin implements IPlayerMixin {
     @Override
     public void inkraft$setState(String state) {
         inkraft$state = state;
+    }
+
+    public String inkraft$getLastMessage() {
+        return inkraft$lastMessage;
+    }
+
+    public void inkraft$setLastMessage(String message) {
+        this.inkraft$lastMessage = message;
     }
 
     @Override
@@ -72,10 +82,23 @@ public abstract class PlayerMixin implements IPlayerMixin {
         inkraft$variables.clear();
     }
 
+    private ResourceLocation inkraft$currentStory;
+
+    @Override
+    public ResourceLocation inkraft$getCurrentStory() {
+        return inkraft$currentStory;
+    }
+
+    @Override
+    public void inkraft$setCurrentStory(ResourceLocation story) {
+        inkraft$currentStory = story;
+    }
+
     @Inject(at = @At("HEAD"), method = "addAdditionalSaveData")
     private void inkraft$addAdditionalSaveData(CompoundTag tag, CallbackInfo ci) {
         var compound = new CompoundTag();
         compound.putString(InkStoryStateHolderFabric.TAG_STATE_NAME, inkraft$getState());
+        compound.putString(InkStoryStateHolderFabric.TAG_LAST_MESSAGE_NAME, inkraft$getLastMessage());
         compound.putUUID(InkStoryStateHolderFabric.TAG_TOKEN_NAME, inkraft$getContinueToken());
         compound.putBoolean(InkStoryStateHolderFabric.TAG_IN_STORY_NAME, inkraft$isInStory());
 
@@ -87,7 +110,9 @@ public abstract class PlayerMixin implements IPlayerMixin {
             compoundTag.putString(InkStoryStateHolderFabric.TAG_VARIABLES_VALUE_NAME, entry.getValue().getSecond());
             list.add(compoundTag);
         }
-        tag.put(InkStoryStateHolderFabric.TAG_VARIABLES_NAME, list);
+        compound.put(InkStoryStateHolderFabric.TAG_VARIABLES_NAME, list);
+
+        compound.putString(InkStoryStateHolderFabric.TAG_CURRENT_STORY_NAME, inkraft$currentStory.toString());
 
         tag.put(InkStoryStateHolderFabric.TAG_INKRAFT_NAME, compound);
     }
@@ -96,15 +121,18 @@ public abstract class PlayerMixin implements IPlayerMixin {
     private void inkraft$readAdditionalSaveData(CompoundTag tag, CallbackInfo ci) {
         var compound = tag.getCompound(InkStoryStateHolderFabric.TAG_INKRAFT_NAME);
         inkraft$setState(compound.getString(InkStoryStateHolderFabric.TAG_STATE_NAME));
+        inkraft$setLastMessage(compound.getString(InkStoryStateHolderFabric.TAG_LAST_MESSAGE_NAME));
         inkraft$setContinueToken(compound.getUUID(InkStoryStateHolderFabric.TAG_TOKEN_NAME));
         inkraft$setInStory(compound.getBoolean(InkStoryStateHolderFabric.TAG_IN_STORY_NAME));
 
-        for (var entry : tag.getList(InkStoryStateHolderFabric.TAG_VARIABLES_NAME, Tag.TAG_COMPOUND)) {
+        for (var entry : compound.getList(InkStoryStateHolderFabric.TAG_VARIABLES_NAME, Tag.TAG_COMPOUND)) {
             var compoundTag = (CompoundTag) entry;
             var name = compoundTag.getString(InkStoryStateHolderFabric.TAG_VARIABLES_NAME_NAME);
             var displayName = compoundTag.getString(InkStoryStateHolderFabric.TAG_VARIABLES_DISPLAY_NAME);
             var value = compoundTag.getString(InkStoryStateHolderFabric.TAG_VARIABLES_VALUE_NAME);
             inkraft$putVariable(name, displayName, true, value);
         }
+
+        inkraft$setCurrentStory(new ResourceLocation(compound.getString(InkStoryStateHolderFabric.TAG_CURRENT_STORY_NAME)));
     }
 }

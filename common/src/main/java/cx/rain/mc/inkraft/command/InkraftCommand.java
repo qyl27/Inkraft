@@ -57,7 +57,12 @@ public class InkraftCommand {
                     .requires(InkraftPlatform.getPermissionManager()::hasClearPermission)
                     .then(argument("player", EntityArgument.player())
                             .executes(InkraftCommand::onClearStateForOther))
-                    .executes(InkraftCommand::onClearState));
+                    .executes(InkraftCommand::onClearState))
+            .then(literal("repeat")
+                    .requires(InkraftPlatform.getPermissionManager()::hasContinuePermission)
+                    .then(argument("player", EntityArgument.player())
+                            .executes(InkraftCommand::onRepeatForOther))
+                    .executes(InkraftCommand::onRepeat));
 
     private static int onVersion(final CommandContext<CommandSourceStack> context) {
         context.getSource().sendSuccess(() ->
@@ -65,60 +70,7 @@ public class InkraftCommand {
         return 1;
     }
 
-    /// <editor-fold desc="For other.">
-
-    private static int onStartForOther(final CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
-        var player = EntityArgument.getPlayer(context, "player");
-        var path = ResourceLocationArgument.getId(context, "path");
-        var stateHolder = InkraftPlatform.getPlayerStoryStateHolder(player);
-
-        startStory(player, path, stateHolder, false);
-
-        return 1;
-    }
-
-    private static int onStartForOtherDebug(final CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
-        var player = EntityArgument.getPlayer(context, "player");
-        var path = ResourceLocationArgument.getId(context, "path");
-        var debug = BoolArgumentType.getBool(context, "debug");
-        var stateHolder = InkraftPlatform.getPlayerStoryStateHolder(player);
-
-        startStory(player, path, stateHolder, debug);
-        return 1;
-    }
-
-    private static int onSimpleContinueForOther(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
-        var player = EntityArgument.getPlayer(context, "player");
-        var stateHolder = InkraftPlatform.getPlayerStoryStateHolder(player);
-
-        continueStory(player, stateHolder, -1);
-        return 1;
-    }
-
-    private static int onChoiceContinueForOther(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
-        var player = EntityArgument.getPlayer(context, "player");
-        var stateHolder = InkraftPlatform.getPlayerStoryStateHolder(player);
-        var choice = IntegerArgumentType.getInteger(context, "choice");
-
-        continueStory(player, stateHolder, choice);
-        return 1;
-    }
-
-    private static int onClearStateForOther(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
-        var player = EntityArgument.getPlayer(context, "player");
-        var stateHolder = InkraftPlatform.getPlayerStoryStateHolder(player);
-
-        stateHolder.clearState();
-        Inkraft.getInstance().getStoriesManager().refreshStory(player);
-
-        context.getSource().sendSystemMessage(Component.translatable(Constants.MESSAGE_COMMAND_SUCCESS)
-                .withStyle(ChatFormatting.LIGHT_PURPLE));
-        return 1;
-    }
-
-    /// </editor-fold>
-
-    /// <editor-fold desc="For oneself.">
+    /// <editor-fold desc="Start.">
 
     private static int onStart(final CommandContext<CommandSourceStack> context) {
         if (!ensurePlayer(context)) {
@@ -148,6 +100,30 @@ public class InkraftCommand {
 
         return 1;
     }
+
+    private static int onStartForOther(final CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+        var player = EntityArgument.getPlayer(context, "player");
+        var path = ResourceLocationArgument.getId(context, "path");
+        var stateHolder = InkraftPlatform.getPlayerStoryStateHolder(player);
+
+        startStory(player, path, stateHolder, false);
+
+        return 1;
+    }
+
+    private static int onStartForOtherDebug(final CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+        var player = EntityArgument.getPlayer(context, "player");
+        var path = ResourceLocationArgument.getId(context, "path");
+        var debug = BoolArgumentType.getBool(context, "debug");
+        var stateHolder = InkraftPlatform.getPlayerStoryStateHolder(player);
+
+        startStory(player, path, stateHolder, debug);
+        return 1;
+    }
+
+    /// </editor-fold>
+
+    /// <editor-fold desc="Continue.">
 
     private static int onSimpleContinue(final CommandContext<CommandSourceStack> context) {
         if (!ensurePlayer(context)) {
@@ -189,6 +165,27 @@ public class InkraftCommand {
         return 1;
     }
 
+    private static int onSimpleContinueForOther(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+        var player = EntityArgument.getPlayer(context, "player");
+        var stateHolder = InkraftPlatform.getPlayerStoryStateHolder(player);
+
+        continueStory(player, stateHolder, -1);
+        return 1;
+    }
+
+    private static int onChoiceContinueForOther(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+        var player = EntityArgument.getPlayer(context, "player");
+        var stateHolder = InkraftPlatform.getPlayerStoryStateHolder(player);
+        var choice = IntegerArgumentType.getInteger(context, "choice");
+
+        continueStory(player, stateHolder, choice);
+        return 1;
+    }
+
+    /// </editor-fold>
+
+    /// <editor-fold desc="Clear states.">
+
     private static int onClearState(CommandContext<CommandSourceStack> context) {
         if (!ensurePlayer(context)) {
             return 0;
@@ -202,6 +199,42 @@ public class InkraftCommand {
 
         player.sendSystemMessage(Component.translatable(Constants.MESSAGE_COMMAND_SUCCESS)
                 .withStyle(ChatFormatting.LIGHT_PURPLE));
+        return 1;
+    }
+
+    private static int onClearStateForOther(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+        var player = EntityArgument.getPlayer(context, "player");
+        var stateHolder = InkraftPlatform.getPlayerStoryStateHolder(player);
+
+        stateHolder.clearState();
+        Inkraft.getInstance().getStoriesManager().refreshStory(player);
+
+        context.getSource().sendSystemMessage(Component.translatable(Constants.MESSAGE_COMMAND_SUCCESS)
+                .withStyle(ChatFormatting.LIGHT_PURPLE));
+        return 1;
+    }
+
+    /// </editor-fold>
+
+    /// <editor-fold desc="Repeat.">
+
+    private static int onRepeat(CommandContext<CommandSourceStack> context) {
+        if (!ensurePlayer(context)) {
+            return 0;
+        }
+
+        var player = context.getSource().getPlayer();
+
+        repeatChoices(player);
+
+        return 1;
+    }
+
+    private static int onRepeatForOther(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+        var player = EntityArgument.getPlayer(context, "player");
+
+        repeatChoices(player);
+
         return 1;
     }
 
@@ -231,6 +264,21 @@ public class InkraftCommand {
         } else {
             story.continueStoryWithChoice(choice);
         }
+    }
+
+    private static void repeatChoices(ServerPlayer player) {
+        var storiesManager = Inkraft.getInstance().getStoriesManager();
+
+        StoryEngine story;
+        if (!storiesManager.hasCachedStory(player)) {
+            story = storiesManager.createStory(player);
+        } else {
+            story = storiesManager.getStory(player);
+        }
+
+        var holder = InkraftPlatform.getPlayerStoryStateHolder(player);
+        story.load(holder.getCurrentStory());
+        story.repeatContinue();
     }
 
     private static CompletableFuture<Suggestions> suggestStart(final CommandContext<CommandSourceStack> context,

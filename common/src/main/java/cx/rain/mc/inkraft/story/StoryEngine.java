@@ -9,7 +9,6 @@ import cx.rain.mc.inkraft.networking.packet.S2CHideAllVariablePacket;
 import cx.rain.mc.inkraft.story.function.StoryFunctionResults;
 import cx.rain.mc.inkraft.story.function.StoryFunctions;
 import cx.rain.mc.inkraft.story.state.IInkStoryStateHolder;
-import cx.rain.mc.inkraft.utility.InkTagCommandHelper;
 import cx.rain.mc.inkraft.utility.TextStyleHelper;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.ClickEvent;
@@ -91,16 +90,16 @@ public class StoryEngine {
                             sendContinue();
                         }
                     } else {
-                        save(true);
+                        save(message, true);
                         return true;
                     }
                 } else {
                     sendContinue();
                 }
 
-                save(false);
+                save(message, false);
             } else {
-                save(story.getCurrentChoices().size() == 0);
+                save(null, story.getCurrentChoices().size() == 0);
             }
             return true;
         } catch (Exception ex) {
@@ -135,19 +134,23 @@ public class StoryEngine {
         }
     }
 
-    public boolean continueStoryWithoutChoice() {
-        try {
-            load();
-        } catch (RuntimeException ignored) {
-            // Silent is gold.
+    public void repeatContinue() {
+        if (!holder.isInStory()) {
+            return;
         }
 
+        var message = holder.getLastMessage();
+
+        player.sendSystemMessage(TextStyleHelper.parseStyle(message));
+        sendContinue();
+    }
+
+    public boolean continueStoryWithoutChoice() {
         return continueStory(new AsyncToken());
     }
 
     public boolean continueStoryWithChoice(int choice) {
         try {
-            load();
             story.chooseChoiceIndex(choice);
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -156,8 +159,12 @@ public class StoryEngine {
         return continueStory(new AsyncToken());
     }
 
-    public void save(boolean isStoryEnd) {
+    public void save(String lastMessage, boolean isStoryEnd) {
         try {
+            if (lastMessage != null) {
+                holder.setLastMessage(lastMessage);
+            }
+
             holder.setState(story.getState().toJson());
             holder.setInStory(!isStoryEnd);
         } catch (Exception ex) {
@@ -165,8 +172,10 @@ public class StoryEngine {
         }
     }
 
-    public void load() {
+    public void load(ResourceLocation path) {
         try {
+            story = new Story(manager.getStoryString(path));
+            bindStoryFunctions();
             story.getState().loadJson(holder.getState());
         } catch (Exception ex) {
             throw new RuntimeException(ex);
@@ -177,6 +186,7 @@ public class StoryEngine {
         try {
             // Todo: qyl27: flow support!
             story = new Story(manager.getStoryString(path));
+            holder.setCurrentStory(path);
 
             clean();
 //            if (story.currentFlowIsDefaultFlow()) {

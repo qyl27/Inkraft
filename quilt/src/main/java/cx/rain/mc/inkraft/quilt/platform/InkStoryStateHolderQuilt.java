@@ -3,6 +3,7 @@ package cx.rain.mc.inkraft.quilt.platform;
 import com.mojang.datafixers.util.Pair;
 import cx.rain.mc.inkraft.quilt.mixins.interfaces.IPlayerMixin;
 import cx.rain.mc.inkraft.story.state.IInkStoryStateHolder;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 
 import java.util.Map;
@@ -11,6 +12,7 @@ import java.util.UUID;
 public class InkStoryStateHolderQuilt implements IInkStoryStateHolder {
     public static final String TAG_INKRAFT_NAME = "inkraft";
     public static final String TAG_STATE_NAME = "state";
+    public static final String TAG_LAST_MESSAGE_NAME = "lastMessage";
     public static final String TAG_TOKEN_NAME = "token";
     public static final String TAG_IN_STORY_NAME = "inStory";
     public static final String TAG_VARIABLES_NAME = "variables";
@@ -32,6 +34,16 @@ public class InkStoryStateHolderQuilt implements IInkStoryStateHolder {
     @Override
     public void setState(String state) {
         ((IPlayerMixin) player).inkraft$setState(state);
+    }
+
+    @Override
+    public String getLastMessage() {
+        return ((IPlayerMixin) player).inkraft$getLastMessage();
+    }
+
+    @Override
+    public void setLastMessage(String message) {
+        ((IPlayerMixin) player).inkraft$setLastMessage(message);
     }
 
     @Override
@@ -58,6 +70,7 @@ public class InkStoryStateHolderQuilt implements IInkStoryStateHolder {
     public void clearState() {
         setState("");
         setInStory(false);
+        setLastMessage("");
     }
 
     @Override
@@ -73,5 +86,15 @@ public class InkStoryStateHolderQuilt implements IInkStoryStateHolder {
     @Override
     public void clearShowedVariables() {
         ((IPlayerMixin) player).inkraft$clearShowedVariables();
+    }
+
+    @Override
+    public ResourceLocation getCurrentStory() {
+        return ((IPlayerMixin) player).inkraft$getCurrentStory();
+    }
+
+    @Override
+    public void setCurrentStory(ResourceLocation story) {
+        ((IPlayerMixin) player).inkraft$setCurrentStory(story);
     }
 }

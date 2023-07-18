@@ -5,6 +5,7 @@ import cx.rain.mc.inkraft.story.state.IInkStoryStateHolder;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.common.util.INBTSerializable;
 
 import java.util.HashMap;
@@ -15,8 +16,9 @@ public class InkStoryStateHolder implements IInkStoryStateHolder, INBTSerializab
 
     /// <editor-fold desc="State holder.">
 
-    private String state = "";
     private UUID continueToken = UUID.randomUUID();
+    private String state = "";
+    private String lastMessage = "";
     private boolean isInStory = false;
 
     @Override
@@ -27,6 +29,16 @@ public class InkStoryStateHolder implements IInkStoryStateHolder, INBTSerializab
     @Override
     public void setState(String state) {
         this.state = state;
+    }
+
+    @Override
+    public String getLastMessage() {
+        return lastMessage;
+    }
+
+    @Override
+    public void setLastMessage(String message) {
+        lastMessage = message;
     }
 
     @Override
@@ -53,6 +65,7 @@ public class InkStoryStateHolder implements IInkStoryStateHolder, INBTSerializab
     public void clearState() {
         setState("");
         setInStory(false);
+        setLastMessage("");
     }
 
     /// </editor-fold>
@@ -82,21 +95,36 @@ public class InkStoryStateHolder implements IInkStoryStateHolder, INBTSerializab
 
     /// </editor-fold>
 
+    private ResourceLocation currentStory = null;
+
+    @Override
+    public ResourceLocation getCurrentStory() {
+        return currentStory;
+    }
+
+    @Override
+    public void setCurrentStory(ResourceLocation story) {
+        currentStory = story;
+    }
+
     /// <editor-fold desc="NBT (de)serialize.">
 
     public static final String TAG_STATE_NAME = "state";
+    public static final String TAG_LAST_MESSAGE_NAME = "lastMessage";
     public static final String TAG_TOKEN_NAME = "token";
     public static final String TAG_IN_STORY_NAME = "inStory";
     public static final String TAG_VARIABLES_NAME = "variables";
     public static final String TAG_VARIABLES_NAME_NAME = "name";
     public static final String TAG_VARIABLES_DISPLAY_NAME = "displayDame";
     public static final String TAG_VARIABLES_VALUE_NAME = "value";
+    public static final String TAG_CURRENT_STORY_NAME = "currentStory";
 
     @Override
     public CompoundTag serializeNBT() {
         var tag = new CompoundTag();
 
         tag.putString(TAG_STATE_NAME, getState());
+        tag.putString(TAG_LAST_MESSAGE_NAME, getLastMessage());
         tag.putUUID(TAG_TOKEN_NAME, getContinueToken());
         tag.putBoolean(TAG_IN_STORY_NAME, isInStory());
 
@@ -109,12 +137,15 @@ public class InkStoryStateHolder implements IInkStoryStateHolder, INBTSerializab
             list.add(compoundTag);
         }
         tag.put(TAG_VARIABLES_NAME, list);
+
+        tag.putString(TAG_CURRENT_STORY_NAME, getCurrentStory().toString());
         return tag;
     }
 
     @Override
     public void deserializeNBT(CompoundTag tag) {
         setState(tag.getString(TAG_STATE_NAME));
+        setLastMessage(tag.getString(TAG_LAST_MESSAGE_NAME));
         setContinueToken(tag.getUUID(TAG_TOKEN_NAME));
         setInStory(tag.getBoolean(TAG_IN_STORY_NAME));
 
@@ -125,6 +156,8 @@ public class InkStoryStateHolder implements IInkStoryStateHolder, INBTSerializab
             var value = compoundTag.getString(TAG_VARIABLES_VALUE_NAME);
             putVariable(name, displayName, true, value);
         }
+
+        setCurrentStory(new ResourceLocation(tag.getString(TAG_CURRENT_STORY_NAME)));
     }
 
     /// </editor-fold>

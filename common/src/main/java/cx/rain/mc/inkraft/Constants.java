@@ -11,4 +11,5 @@ public class Constants {
     public static final String MESSAGE_STORY_BAD_TOKEN = "message.story.bad_token";
 
     public static final String HUD_INFO = "hud.info";
+    public static final String MESSAGE_STORY_LOGGED_IN_CONTINUE = "message.story.logged_in_continue";
 }
