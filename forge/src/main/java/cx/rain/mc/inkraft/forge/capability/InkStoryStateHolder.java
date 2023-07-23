@@ -138,7 +138,11 @@ public class InkStoryStateHolder implements IInkStoryStateHolder, INBTSerializab
         }
         tag.put(TAG_VARIABLES_NAME, list);
 
-        tag.putString(TAG_CURRENT_STORY_NAME, getCurrentStory().toString());
+        var story = getCurrentStory();
+        if (story != null) {
+            tag.putString(TAG_CURRENT_STORY_NAME, story.toString());
+        }
+
         return tag;
     }
 
@@ -157,7 +161,10 @@ public class InkStoryStateHolder implements IInkStoryStateHolder, INBTSerializab
             putVariable(name, displayName, true, value);
         }
 
-        setCurrentStory(new ResourceLocation(tag.getString(TAG_CURRENT_STORY_NAME)));
+        var story = tag.getString(TAG_CURRENT_STORY_NAME);
+        if (!story.isBlank()) {
+            setCurrentStory(new ResourceLocation(story));
+        }
     }
 
     /// </editor-fold>

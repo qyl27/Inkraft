@@ -112,7 +112,9 @@ public abstract class PlayerMixin implements IPlayerMixin {
         }
         compound.put(InkStoryStateHolderFabric.TAG_VARIABLES_NAME, list);
 
-        compound.putString(InkStoryStateHolderFabric.TAG_CURRENT_STORY_NAME, inkraft$currentStory.toString());
+        if (inkraft$currentStory != null) {
+            compound.putString(InkStoryStateHolderFabric.TAG_CURRENT_STORY_NAME, inkraft$currentStory.toString());
+        }
 
         tag.put(InkStoryStateHolderFabric.TAG_INKRAFT_NAME, compound);
     }
@@ -133,6 +135,9 @@ public abstract class PlayerMixin implements IPlayerMixin {
             inkraft$putVariable(name, displayName, true, value);
         }
 
-        inkraft$setCurrentStory(new ResourceLocation(compound.getString(InkStoryStateHolderFabric.TAG_CURRENT_STORY_NAME)));
+        var story = compound.getString(InkStoryStateHolderFabric.TAG_CURRENT_STORY_NAME);
+        if (!story.isBlank()) {
+            inkraft$setCurrentStory(new ResourceLocation(story));
+        }
     }
 }
