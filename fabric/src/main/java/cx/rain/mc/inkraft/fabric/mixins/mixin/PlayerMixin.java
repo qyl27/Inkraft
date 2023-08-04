@@ -124,7 +124,11 @@ public abstract class PlayerMixin implements IPlayerMixin {
         var compound = tag.getCompound(InkStoryStateHolderFabric.TAG_INKRAFT_NAME);
         inkraft$setState(compound.getString(InkStoryStateHolderFabric.TAG_STATE_NAME));
         inkraft$setLastMessage(compound.getString(InkStoryStateHolderFabric.TAG_LAST_MESSAGE_NAME));
-        inkraft$setContinueToken(compound.getUUID(InkStoryStateHolderFabric.TAG_TOKEN_NAME));
+
+        if (tag.contains(InkStoryStateHolderFabric.TAG_TOKEN_NAME)) {
+            inkraft$setContinueToken(compound.getUUID(InkStoryStateHolderFabric.TAG_TOKEN_NAME));
+        }
+
         inkraft$setInStory(compound.getBoolean(InkStoryStateHolderFabric.TAG_IN_STORY_NAME));
 
         for (var entry : compound.getList(InkStoryStateHolderFabric.TAG_VARIABLES_NAME, Tag.TAG_COMPOUND)) {

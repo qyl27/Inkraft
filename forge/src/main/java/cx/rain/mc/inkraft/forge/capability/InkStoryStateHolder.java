@@ -150,7 +150,11 @@ public class InkStoryStateHolder implements IInkStoryStateHolder, INBTSerializab
     public void deserializeNBT(CompoundTag tag) {
         setState(tag.getString(TAG_STATE_NAME));
         setLastMessage(tag.getString(TAG_LAST_MESSAGE_NAME));
-        setContinueToken(tag.getUUID(TAG_TOKEN_NAME));
+
+        if (tag.contains(TAG_TOKEN_NAME)) {
+            setContinueToken(tag.getUUID(TAG_TOKEN_NAME));
+        }
+
         setInStory(tag.getBoolean(TAG_IN_STORY_NAME));
 
         for (var entry : tag.getList(TAG_VARIABLES_NAME, Tag.TAG_COMPOUND)) {
