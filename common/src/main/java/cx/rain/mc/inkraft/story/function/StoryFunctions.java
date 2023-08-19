@@ -27,6 +27,7 @@ public class StoryFunctions {
     public static final RegistrySupplier<StoryFunction> SET_AUTO_CONTINUE = FUNCTIONS.register("set_auto_continue", SetAutoContinueFunction::new);
     public static final RegistrySupplier<StoryFunction> SET_AUTO_CONTINUE_SPEED = FUNCTIONS.register("set_auto_continue_speed", SetAutoContinueSpeedFunction::new);
     public static final RegistrySupplier<StoryFunction> SHOW_VARIABLE = FUNCTIONS.register("show_variable", ShowVariableFunction::new);
+    public static final RegistrySupplier<StoryFunction> HIDE_CONTINUE = FUNCTIONS.register("hide_continue", HideContinueFunction::new);
 
     public static final RegistrySupplier<StoryFunction> RUN_COMMAND = FUNCTIONS.register("run_command", RunCommandFunction::new);
     public static final RegistrySupplier<StoryFunction> GET_PLAYER_NAME = FUNCTIONS.register("get_player_name", GetPlayerNameFunction::new);

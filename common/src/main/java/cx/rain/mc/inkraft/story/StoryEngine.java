@@ -116,6 +116,10 @@ public class StoryEngine {
         var token = UUID.randomUUID();
         holder.setContinueToken(token);
 
+        if (hideContinue) {
+            return;
+        }
+
         if (story.getCurrentChoices().size() == 0) {
             var component = Component.translatable(Constants.MESSAGE_STORY_CONTINUE).withStyle(ChatFormatting.YELLOW);
             component.setStyle(component.getStyle().withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/inkraft continue " + token)));
@@ -233,7 +237,6 @@ public class StoryEngine {
     }
 
     private boolean autoContinue = false;
-
     private long continueSpeed = -1;
 
     public void setAutoContinue(boolean value) {
@@ -252,6 +255,12 @@ public class StoryEngine {
         if (value > 0) {
             continueSpeed = value;
         }
+    }
+
+    private boolean hideContinue = false;
+
+    public void setHideContinue(boolean isHide) {
+        hideContinue = isHide;
     }
 
     private static class AsyncToken {
