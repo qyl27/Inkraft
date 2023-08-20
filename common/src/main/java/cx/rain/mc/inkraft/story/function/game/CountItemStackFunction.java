@@ -4,6 +4,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import cx.rain.mc.inkraft.story.StoryEngine;
 import cx.rain.mc.inkraft.story.function.StoryFunction;
 import cx.rain.mc.inkraft.story.function.StoryFunctionResults;
+import cx.rain.mc.inkraft.utility.NbtMatchHelper;
 import net.minecraft.nbt.TagParser;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
@@ -29,7 +30,7 @@ public class CountItemStackFunction implements StoryFunction {
                 var count = 0;
 
                 for (var i : player.getInventory().items) {
-                    if (!i.isEmpty() && ItemStack.isSameItemSameTags(i, itemStack)) {
+                    if (!i.isEmpty() && ItemStack.isSameItem(i, itemStack) && NbtMatchHelper.match(i.getTag(), itemStack.getTag())) {
                         count += i.getCount();
                     }
                 }

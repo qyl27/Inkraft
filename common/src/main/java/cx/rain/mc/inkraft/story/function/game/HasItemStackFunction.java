@@ -4,6 +4,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import cx.rain.mc.inkraft.story.StoryEngine;
 import cx.rain.mc.inkraft.story.function.StoryFunction;
 import cx.rain.mc.inkraft.story.function.StoryFunctionResults;
+import cx.rain.mc.inkraft.utility.NbtMatchHelper;
 import net.minecraft.nbt.TagParser;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
@@ -26,11 +27,18 @@ public class HasItemStackFunction implements StoryFunction {
             var item = args[0].toString();
             try {
                 var itemStack = ItemStack.of(TagParser.parseTag(item));
-                return new StoryFunctionResults.BoolResult(player.getInventory().contains(itemStack));
+
+                for (var i : player.getInventory().items) {
+                    if (ItemStack.isSameItem(itemStack, i) && NbtMatchHelper.match(itemStack.getTag(), i.getTag())) {
+                        return StoryFunctionResults.BoolResult.TRUE;
+                    }
+                }
+
+                return StoryFunctionResults.BoolResult.FALSE;
             } catch (CommandSyntaxException ex) {
                 ex.printStackTrace();
 
-                return new StoryFunctionResults.BoolResult(false);
+                return StoryFunctionResults.BoolResult.FALSE;
             }
         };
     }

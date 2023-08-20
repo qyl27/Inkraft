@@ -23,9 +23,9 @@ public class GiveItemStackFunction implements StoryFunction {
                 return new StoryFunctionResults.BoolResult(false);
             }
 
-            var item = args[0];
+            var item = args[0].toString();
             try {
-                var itemStack = ItemStack.of(TagParser.parseTag(item.toString()));
+                var itemStack = ItemStack.of(TagParser.parseTag(item));
                 giveItem(player, itemStack);
 
                 return new StoryFunctionResults.BoolResult(true);
