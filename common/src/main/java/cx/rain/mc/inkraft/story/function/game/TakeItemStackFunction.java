@@ -3,7 +3,7 @@ package cx.rain.mc.inkraft.story.function.game;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import cx.rain.mc.inkraft.story.StoryEngine;
 import cx.rain.mc.inkraft.story.function.StoryFunction;
-import cx.rain.mc.inkraft.story.function.StoryFunctionResults;
+import cx.rain.mc.inkraft.utility.StoryVariables;
 import cx.rain.mc.inkraft.utility.NbtMatchHelper;
 import net.minecraft.nbt.TagParser;
 import net.minecraft.server.level.ServerPlayer;
@@ -18,20 +18,20 @@ public class TakeItemStackFunction implements StoryFunction {
     }
 
     @Override
-    public BiFunction<Object[], ServerPlayer, StoryFunctionResults.IStoryFunctionResult> func(StoryEngine engine) {
+    public BiFunction<Object[], ServerPlayer, StoryVariables.IStoryVariable> func(StoryEngine engine) {
         return (args, player) -> {
             if (args.length != 1) {
-                return new StoryFunctionResults.IntResult(0);
+                return new StoryVariables.IntVar(0);
             }
 
             var item = args[0].toString();
             try {
                 var itemStack = ItemStack.of(TagParser.parseTag(item));
-                return new StoryFunctionResults.IntResult(takeItem(player, itemStack));
+                return new StoryVariables.IntVar(takeItem(player, itemStack));
             } catch (CommandSyntaxException ex) {
                 ex.printStackTrace();
 
-                return new StoryFunctionResults.IntResult(0);
+                return new StoryVariables.IntVar(0);
             }
         };
     }

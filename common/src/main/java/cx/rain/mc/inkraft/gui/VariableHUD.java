@@ -18,10 +18,14 @@ public class VariableHUD {
 
         var entries = InkraftPlatform.getPlayerStoryStateHolder(player).getVariables().entrySet();
         for (var entry : entries) {
-            var key = entry.getKey();
             var value = entry.getValue();
-            var displayName = value.getFirst();
-            var displayValue = value.getSecond();
+
+            if (!value.getMiddle()) {
+                continue;
+            }
+
+            var displayName = value.getLeft();
+            var displayValue = value.getRight().asString();
 
             var keyLen = font.width(displayName);
             var valueLen = font.width(displayValue);
@@ -58,8 +62,12 @@ public class VariableHUD {
         var i = 0;
         for (var entry : entries) {
             var value = entry.getValue();
-            var displayName = value.getFirst();
-            var displayValue = value.getSecond();
+            if (!value.getMiddle()) {
+                continue;
+            }
+
+            var displayName = value.getLeft();
+            var displayValue = value.getRight().asString();
 
             int newY = y + font.lineHeight * (i + 1) + 2 * (i + 1);
             graphics.drawString(font, displayName, x, newY, 16777215);

@@ -1,10 +1,11 @@
 package cx.rain.mc.inkraft.fabric.platform;
 
-import com.mojang.datafixers.util.Pair;
 import cx.rain.mc.inkraft.fabric.mixins.interfaces.IPlayerMixin;
 import cx.rain.mc.inkraft.story.state.IInkStoryStateHolder;
+import cx.rain.mc.inkraft.utility.StoryVariables;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
+import org.apache.commons.lang3.tuple.Triple;
 
 import java.util.Map;
 import java.util.UUID;
@@ -17,7 +18,8 @@ public class InkStoryStateHolderFabric implements IInkStoryStateHolder {
     public static final String TAG_IN_STORY_NAME = "inStory";
     public static final String TAG_VARIABLES_NAME = "variables";
     public static final String TAG_VARIABLES_NAME_NAME = "name";
-    public static final String TAG_VARIABLES_DISPLAY_NAME = "displayDame";
+    public static final String TAG_VARIABLES_DISPLAY_NAME = "displayName";
+    public static final String TAG_VARIABLES_SHOW_NAME = "isShow";
     public static final String TAG_VARIABLES_VALUE_NAME = "value";
     public static final String TAG_CURRENT_STORY_NAME = "currentStory";
 
@@ -75,18 +77,28 @@ public class InkStoryStateHolderFabric implements IInkStoryStateHolder {
     }
 
     @Override
-    public Map<String, Pair<String, String>> getVariables() {
+    public Map<String, Triple<String, Boolean, StoryVariables.IStoryVariable>> getVariables() {
         return ((IPlayerMixin) player).inkraft$getVariables();
     }
 
     @Override
-    public void putVariable(String name, String displayName, boolean isShow, String value) {
+    public void putVariable(String name, String displayName, boolean isShow, StoryVariables.IStoryVariable value) {
         ((IPlayerMixin) player).inkraft$putVariable(name, displayName, isShow, value);
     }
 
     @Override
-    public void clearShowedVariables() {
-        ((IPlayerMixin) player).inkraft$clearShowedVariables();
+    public StoryVariables.IStoryVariable getVariable(String name) {
+        return ((IPlayerMixin) player).inkraft$getVariable(name);
+    }
+
+    @Override
+    public void hideVariables() {
+        ((IPlayerMixin) player).inkraft$hideVariables();
+    }
+
+    @Override
+    public void clearVariables() {
+        ((IPlayerMixin) player).inkraft$clearVariables();
     }
 
     @Override

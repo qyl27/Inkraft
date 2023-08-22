@@ -6,7 +6,7 @@ import cx.rain.mc.inkraft.Inkraft;
 import cx.rain.mc.inkraft.Constants;
 import cx.rain.mc.inkraft.data.StoriesManager;
 import cx.rain.mc.inkraft.networking.packet.S2CHideAllVariablePacket;
-import cx.rain.mc.inkraft.story.function.StoryFunctionResults;
+import cx.rain.mc.inkraft.utility.StoryVariables;
 import cx.rain.mc.inkraft.story.function.StoryFunctions;
 import cx.rain.mc.inkraft.story.state.IInkStoryStateHolder;
 import cx.rain.mc.inkraft.utility.TextStyleHelper;
@@ -217,12 +217,14 @@ public class StoryEngine {
 
                 story.bindExternalFunction(funcName, args -> {
                     var result = func.func(this).apply(args, player);
-                    if (result instanceof StoryFunctionResults.StringResult stringResult) {
-                        return stringResult.stringResult();
-                    } else if (result instanceof StoryFunctionResults.IntResult intResult) {
-                        return intResult.intResult();
-                    } else if (result instanceof StoryFunctionResults.BoolResult boolResult) {
-                        return boolResult.boolResult();
+                    if (result instanceof StoryVariables.StrVar strVar) {
+                        return strVar.stringResult();
+                    } else if (result instanceof StoryVariables.IntVar intVar) {
+                        return intVar.intResult();
+                    } else if (result instanceof StoryVariables.DoubleVar doubleVar) {
+                        return doubleVar.doubleResult();
+                    } else if (result instanceof StoryVariables.BoolVar boolVar) {
+                        return boolVar.boolResult();
                     }
                     return result;
                 });

@@ -10,7 +10,7 @@ import net.minecraft.server.level.ServerPlayer;
 import java.util.List;
 
 public class InkraftNetworking {
-    private final NetworkChannel channel = NetworkChannel.create(new ResourceLocation(Inkraft.MODID, "channel_variables"));
+    private final NetworkChannel channel = NetworkChannel.create(new ResourceLocation(Inkraft.MODID, "channel"));
 
     public InkraftNetworking() {
         channel.register(S2CShowVariablePacket.class, S2CShowVariablePacket::encode, S2CShowVariablePacket::new, S2CShowVariablePacket::apply);

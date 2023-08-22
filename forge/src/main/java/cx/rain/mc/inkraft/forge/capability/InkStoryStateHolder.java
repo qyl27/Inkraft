@@ -1,12 +1,14 @@
 package cx.rain.mc.inkraft.forge.capability;
 
-import com.mojang.datafixers.util.Pair;
 import cx.rain.mc.inkraft.story.state.IInkStoryStateHolder;
+import cx.rain.mc.inkraft.utility.StoryVariables;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.common.util.INBTSerializable;
+import org.apache.commons.lang3.tuple.MutableTriple;
+import org.apache.commons.lang3.tuple.Triple;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -72,24 +74,38 @@ public class InkStoryStateHolder implements IInkStoryStateHolder, INBTSerializab
 
     /// <editor-fold desc="Variables show.">
 
-    private final Map<String, Pair<String, String>> variables = new HashMap<>();
+    private final Map<String, Triple<String, Boolean, StoryVariables.IStoryVariable>> variables = new HashMap<>();
 
     @Override
-    public Map<String, Pair<String, String>> getVariables() {
+    public Map<String, Triple<String, Boolean, StoryVariables.IStoryVariable>> getVariables() {
         return variables;
     }
 
     @Override
-    public void putVariable(String name, String displayName, boolean isShow, String value) {
-        if (isShow) {
-            variables.put(name, new Pair<>(displayName, value));
-        } else {
-            variables.remove(name);
+    public void putVariable(String name, String displayName, boolean isShow, StoryVariables.IStoryVariable value) {
+        variables.put(name, new MutableTriple<>(displayName, isShow, value));
+    }
+
+    @Override
+    public StoryVariables.IStoryVariable getVariable(String name) {
+        if (!variables.containsKey(name)) {
+            putVariable(name, "", false, StoryVariables.BoolVar.FALSE);
+        }
+        return variables.get(name).getRight();
+    }
+
+    @Override
+    public void hideVariables() {
+        for (var variable : variables.entrySet()) {
+            if (variable.getValue().getMiddle()) {
+                var value = variable.getValue();
+                putVariable(variable.getKey(), value.getLeft(), false, value.getRight());
+            }
         }
     }
 
     @Override
-    public void clearShowedVariables() {
+    public void clearVariables() {
         variables.clear();
     }
 
@@ -115,7 +131,8 @@ public class InkStoryStateHolder implements IInkStoryStateHolder, INBTSerializab
     public static final String TAG_IN_STORY_NAME = "inStory";
     public static final String TAG_VARIABLES_NAME = "variables";
     public static final String TAG_VARIABLES_NAME_NAME = "name";
-    public static final String TAG_VARIABLES_DISPLAY_NAME = "displayDame";
+    public static final String TAG_VARIABLES_DISPLAY_NAME = "displayName";
+    public static final String TAG_VARIABLES_SHOW_NAME = "isShow";
     public static final String TAG_VARIABLES_VALUE_NAME = "value";
     public static final String TAG_CURRENT_STORY_NAME = "currentStory";
 
@@ -132,8 +149,9 @@ public class InkStoryStateHolder implements IInkStoryStateHolder, INBTSerializab
         for (var entry : variables.entrySet()) {
             var compoundTag = new CompoundTag();
             compoundTag.putString(TAG_VARIABLES_NAME_NAME, entry.getKey());
-            compoundTag.putString(TAG_VARIABLES_DISPLAY_NAME, entry.getValue().getFirst());
-            compoundTag.putString(TAG_VARIABLES_VALUE_NAME, entry.getValue().getSecond());
+            compoundTag.putString(TAG_VARIABLES_DISPLAY_NAME, entry.getValue().getLeft());
+            compoundTag.putBoolean(TAG_VARIABLES_SHOW_NAME, entry.getValue().getMiddle());
+            compoundTag.putString(TAG_VARIABLES_VALUE_NAME, entry.getValue().getRight().asString());
             list.add(compoundTag);
         }
         tag.put(TAG_VARIABLES_NAME, list);
@@ -161,8 +179,9 @@ public class InkStoryStateHolder implements IInkStoryStateHolder, INBTSerializab
             var compoundTag = (CompoundTag) entry;
             var name = compoundTag.getString(TAG_VARIABLES_NAME_NAME);
             var displayName = compoundTag.getString(TAG_VARIABLES_DISPLAY_NAME);
+            var isShow = compoundTag.getBoolean(TAG_VARIABLES_SHOW_NAME);
             var value = compoundTag.getString(TAG_VARIABLES_VALUE_NAME);
-            putVariable(name, displayName, true, value);
+            putVariable(name, displayName, isShow, StoryVariables.IStoryVariable.fromString(value));
         }
 
         var story = tag.getString(TAG_CURRENT_STORY_NAME);

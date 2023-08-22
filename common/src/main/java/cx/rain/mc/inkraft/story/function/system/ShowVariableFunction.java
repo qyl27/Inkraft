@@ -1,8 +1,9 @@
 package cx.rain.mc.inkraft.story.function.system;
 
+import cx.rain.mc.inkraft.InkraftPlatform;
 import cx.rain.mc.inkraft.story.StoryEngine;
 import cx.rain.mc.inkraft.story.function.StoryFunction;
-import cx.rain.mc.inkraft.story.function.StoryFunctionResults;
+import cx.rain.mc.inkraft.utility.StoryVariables;
 import cx.rain.mc.inkraft.utility.ShowVariableHelper;
 import net.minecraft.server.level.ServerPlayer;
 
@@ -16,18 +17,18 @@ public class ShowVariableFunction implements StoryFunction {
     }
 
     @Override
-    public BiFunction<Object[], ServerPlayer, StoryFunctionResults.IStoryFunctionResult> func(StoryEngine engine) {
+    public BiFunction<Object[], ServerPlayer, StoryVariables.IStoryVariable> func(StoryEngine engine) {
         return (args, player) -> {
             if (args.length != 3) {
-                return StoryFunctionResults.BoolResult.FALSE;
+                return StoryVariables.BoolVar.FALSE;
             }
 
             var name = args[0].toString();
             var displayName = args[1].toString();
             var isShow = args[2].toString().equalsIgnoreCase("true");
-            var value = engine.getVariablesState().get(name).toString();
+            var value = InkraftPlatform.getPlayerStoryStateHolder(player).getVariable(name);
 
-            ShowVariableHelper.showVariable(player, name, displayName, isShow, value);
+            ShowVariableHelper.showVariable(player, name, displayName, isShow, value.asString());
             engine.removeVariableObserver(name);
 
             if (isShow) {
@@ -36,7 +37,7 @@ public class ShowVariableFunction implements StoryFunction {
                 }));
             }
 
-            return StoryFunctionResults.BoolResult.TRUE;
+            return StoryVariables.BoolVar.TRUE;
         };
     }
 }

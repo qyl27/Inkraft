@@ -2,7 +2,7 @@ package cx.rain.mc.inkraft.story.function.game;
 
 import cx.rain.mc.inkraft.story.StoryEngine;
 import cx.rain.mc.inkraft.story.function.StoryFunction;
-import cx.rain.mc.inkraft.story.function.StoryFunctionResults;
+import cx.rain.mc.inkraft.utility.StoryVariables;
 import net.minecraft.server.level.ServerPlayer;
 
 import java.util.function.BiFunction;
@@ -14,10 +14,10 @@ public class RunCommandFunction implements StoryFunction {
     }
 
     @Override
-    public BiFunction<Object[], ServerPlayer, StoryFunctionResults.IStoryFunctionResult> func(StoryEngine engine) {
+    public BiFunction<Object[], ServerPlayer, StoryVariables.IStoryVariable> func(StoryEngine engine) {
         return (args, player) -> {
             if (args.length != 1) {
-                return new StoryFunctionResults.BoolResult(false);
+                return new StoryVariables.BoolVar(false);
             }
 
             var command = args[0].toString();
@@ -25,7 +25,7 @@ public class RunCommandFunction implements StoryFunction {
                     .getCommands()
                     .performPrefixedCommand(player.createCommandSourceStack()
                             .withPermission(4), command) == 1;
-            return new StoryFunctionResults.BoolResult(result);
+            return new StoryVariables.BoolVar(result);
         };
     }
 }

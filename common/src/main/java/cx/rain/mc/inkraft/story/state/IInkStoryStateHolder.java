@@ -1,7 +1,8 @@
 package cx.rain.mc.inkraft.story.state;
 
-import com.mojang.datafixers.util.Pair;
+import cx.rain.mc.inkraft.utility.StoryVariables;
 import net.minecraft.resources.ResourceLocation;
+import org.apache.commons.lang3.tuple.Triple;
 
 import java.util.Map;
 import java.util.UUID;
@@ -21,10 +22,13 @@ public interface IInkStoryStateHolder {
 
     void clearState();
 
-    Map<String, Pair<String, String>> getVariables();
-    void putVariable(String name, String displayName, boolean isShow, String value);
-    void clearShowedVariables();
+    Map<String, Triple<String, Boolean, StoryVariables.IStoryVariable>> getVariables();
+    void putVariable(String name, String displayName, boolean isShow, StoryVariables.IStoryVariable value);
+    StoryVariables.IStoryVariable getVariable(String name);
+    void hideVariables();
+    void clearVariables();
 
     ResourceLocation getCurrentStory();
     void setCurrentStory(ResourceLocation story);
+
 }
