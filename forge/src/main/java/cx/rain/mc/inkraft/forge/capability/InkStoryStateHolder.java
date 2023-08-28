@@ -68,6 +68,7 @@ public class InkStoryStateHolder implements IInkStoryStateHolder, INBTSerializab
         setState("");
         setInStory(false);
         setLastMessage("");
+        clearVariables();
     }
 
     /// </editor-fold>

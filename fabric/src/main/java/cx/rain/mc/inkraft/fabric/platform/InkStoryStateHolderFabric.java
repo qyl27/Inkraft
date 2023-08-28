@@ -74,6 +74,7 @@ public class InkStoryStateHolderFabric implements IInkStoryStateHolder {
         setState("");
         setInStory(false);
         setLastMessage("");
+        clearVariables();
     }
 
     @Override
