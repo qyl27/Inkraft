@@ -29,7 +29,7 @@ public class HasItemStackFunction implements StoryFunction {
                 var itemStack = ItemStack.of(TagParser.parseTag(item));
 
                 for (var i : player.getInventory().items) {
-                    if (ItemStack.isSameItem(itemStack, i) && NbtMatchHelper.match(itemStack.getTag(), i.getTag())) {
+                    if (ItemStack.isSameItem(itemStack, i) && itemStack.getCount() <= i.getCount() && NbtMatchHelper.match(itemStack.getTag(), i.getTag())) {
                         return StoryVariables.BoolVar.TRUE;
                     }
                 }
