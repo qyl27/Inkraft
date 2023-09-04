@@ -62,7 +62,8 @@ public class InkraftCommand {
                     .requires(InkraftPlatform.getPermissionManager()::hasContinuePermission)
                     .then(argument("player", EntityArgument.player())
                             .executes(InkraftCommand::onRepeatForOther))
-                    .executes(InkraftCommand::onRepeat));
+                    .executes(InkraftCommand::onRepeat))
+            .then(DebugCommand.INKRAFT_DEBUG);
 
     private static int onVersion(final CommandContext<CommandSourceStack> context) {
         context.getSource().sendSuccess(() ->

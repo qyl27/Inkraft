@@ -61,7 +61,7 @@ public class TextStyleHelper {
 //
 //        var result = parseStyleChars('&', matcher.appendTail(buffer).toString());
         // Todo: qyl27: use hex color?
-        var result = parseStyleChars('&', literalText);
+        var result = parseStyleChars('§', literalText);
         return Component.literal(result);
     }
 
