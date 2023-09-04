@@ -2,7 +2,7 @@
   "message.command.not_a_player": "请使用玩家身份操作！",
   "message.command.success": "操作成功执行！",
   "message.story.continue": "【继续】",
-  "message.story.continue.choice":  "【选项】 %1$s",
+  "message.story.continue.choice":  "%1$s",
   "message.story.hint.continue": "点击继续",
   "message.story.hint.continue.choice":  "点击选择该项",
   "message.story.bad_token": "错误，请选择系统最后提示的按钮。",
