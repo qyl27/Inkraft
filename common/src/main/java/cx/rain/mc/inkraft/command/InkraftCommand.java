@@ -260,10 +260,12 @@ public class InkraftCommand {
         var storiesManager = Inkraft.getInstance().getStoriesManager();
         var story = storiesManager.getStory(player);
 
-        if (choice == -1) {
-            story.continueStoryWithoutChoice();
-        } else {
-            story.continueStoryWithChoice(choice);
+        if (holder.isInStory()) {
+            if (choice == -1) {
+                story.continueStoryWithoutChoice();
+            } else {
+                story.continueStoryWithChoice(choice);
+            }
         }
     }
 

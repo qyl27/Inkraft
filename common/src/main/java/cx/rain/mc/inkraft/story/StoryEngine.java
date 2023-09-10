@@ -109,12 +109,12 @@ public class StoryEngine {
     }
 
     public void sendContinue() {
-        if (!story.canContinue() && story.getCurrentChoices().size() == 0) {
-            return;
-        }
-
         var token = UUID.randomUUID();
         holder.setContinueToken(token);
+
+        if (!story.canContinue() && story.getCurrentChoices().isEmpty()) {
+            return;
+        }
 
         if (hideContinue) {
             return;
