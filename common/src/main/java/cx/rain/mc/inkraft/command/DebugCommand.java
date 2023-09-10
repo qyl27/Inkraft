@@ -14,7 +14,8 @@ import static net.minecraft.commands.Commands.argument;
 import static net.minecraft.commands.Commands.literal;
 
 public class DebugCommand {
-    public static final LiteralArgumentBuilder<CommandSourceStack> INKRAFT_DEBUG = literal("debug")
+    public static final LiteralArgumentBuilder<CommandSourceStack>  INKRAFT_DEBUG = literal("debug")
+            .requires(InkraftPlatform.getPermissionManager()::hasClearPermission)
             .then(literal("variables")
                     .then(literal("get")
                             .then(argument("name", StringArgumentType.word())

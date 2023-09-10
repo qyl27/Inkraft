@@ -52,18 +52,14 @@ public class StoryEngine {
             if (story.canContinue()) {
                 var message = story.Continue().trim();
 
-//                var tags = story.getCurrentTags();
-//                var ops = InkTagCommandHelper.parseTag(tags);
-//                InkTagCommandHelper.runTagCommands(this, ops, player);
-
-                while (message.equals("")) {
+                while (message.isEmpty()) {
                     message = story.Continue().trim();
                 }
 
                 player.sendSystemMessage(TextStyleHelper.parseStyle(message));
 
                 var choices = story.getCurrentChoices();
-                if (choices.size() == 0) {
+                if (choices.isEmpty()) {
                     if (story.canContinue()) {
                         if (canAutoContinue()) {
                             if (!asyncToken.isAsync()) {
@@ -99,7 +95,7 @@ public class StoryEngine {
 
                 save(message, false);
             } else {
-                save(null, story.getCurrentChoices().size() == 0);
+                save(null, story.getCurrentChoices().isEmpty());
             }
             return true;
         } catch (Exception ex) {
@@ -227,7 +223,7 @@ public class StoryEngine {
                         return boolVar.boolResult();
                     }
                     return result;
-                });
+                }, false);
             }
         } catch (Exception ex) {
             ex.printStackTrace();

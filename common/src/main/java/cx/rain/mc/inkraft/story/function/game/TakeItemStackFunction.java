@@ -27,7 +27,8 @@ public class TakeItemStackFunction implements StoryFunction {
             var item = args[0].toString();
             try {
                 var itemStack = ItemStack.of(TagParser.parseTag(item));
-                return new StoryVariables.IntVar(takeItem(player, itemStack));
+                var count = takeItem(player, itemStack);
+                return new StoryVariables.IntVar(count);
             } catch (CommandSyntaxException ex) {
                 ex.printStackTrace();
 
