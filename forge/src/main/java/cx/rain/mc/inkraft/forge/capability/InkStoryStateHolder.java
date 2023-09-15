@@ -113,6 +113,8 @@ public class InkStoryStateHolder implements IInkStoryStateHolder, INBTSerializab
     /// </editor-fold>
 
     private ResourceLocation currentStory = null;
+    private boolean doesAutoContinue = false;
+    private long autoContinueSpeedTicks = -1;
 
     @Override
     public ResourceLocation getCurrentStory() {
@@ -122,6 +124,26 @@ public class InkStoryStateHolder implements IInkStoryStateHolder, INBTSerializab
     @Override
     public void setCurrentStory(ResourceLocation story) {
         currentStory = story;
+    }
+
+    @Override
+    public boolean getCurrentAutoContinue() {
+        return doesAutoContinue;
+    }
+
+    @Override
+    public void setCurrentAutoContinue(boolean autoContinue) {
+        doesAutoContinue = autoContinue;
+    }
+
+    @Override
+    public long getCurrentAutoContinueSpeed() {
+        return autoContinueSpeedTicks;
+    }
+
+    @Override
+    public void setCurrentAutoContinueSpeed(long autoContinueSpeed) {
+        autoContinueSpeedTicks = autoContinueSpeed;
     }
 
     /// <editor-fold desc="NBT (de)serialize.">
@@ -136,6 +158,8 @@ public class InkStoryStateHolder implements IInkStoryStateHolder, INBTSerializab
     public static final String TAG_VARIABLES_SHOW_NAME = "isShow";
     public static final String TAG_VARIABLES_VALUE_NAME = "value";
     public static final String TAG_CURRENT_STORY_NAME = "currentStory";
+    public static final String TAG_AUTO_CONTINUE_ENABLED = "autoContinueEnabled";
+    public static final String TAG_AUTO_CONTINUE_SPEED = "autoContinueSpeed";
 
     @Override
     public CompoundTag serializeNBT() {
@@ -160,6 +184,8 @@ public class InkStoryStateHolder implements IInkStoryStateHolder, INBTSerializab
         var story = getCurrentStory();
         if (story != null) {
             tag.putString(TAG_CURRENT_STORY_NAME, story.toString());
+            tag.putBoolean(TAG_AUTO_CONTINUE_ENABLED, doesAutoContinue);
+            tag.putLong(TAG_AUTO_CONTINUE_SPEED, autoContinueSpeedTicks);
         }
 
         return tag;
@@ -188,6 +214,8 @@ public class InkStoryStateHolder implements IInkStoryStateHolder, INBTSerializab
         var story = tag.getString(TAG_CURRENT_STORY_NAME);
         if (!story.isBlank()) {
             setCurrentStory(new ResourceLocation(story));
+            setCurrentAutoContinue(tag.getBoolean(TAG_AUTO_CONTINUE_ENABLED));
+            setCurrentAutoContinueSpeed(tag.getLong(TAG_AUTO_CONTINUE_SPEED));
         }
     }
 

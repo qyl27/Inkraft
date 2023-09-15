@@ -29,4 +29,8 @@ public interface IPlayerMixin {
     ResourceLocation inkraft$getCurrentStory();
     void inkraft$setCurrentStory(ResourceLocation story);
 
+    boolean inkraft$getCurrentAutoContinue();
+    void inkraft$setCurrentAutoContinue(boolean autoContinue);
+    long inkraft$getCurrentAutoContinueSpeed();
+    void inkraft$setCurrentAutoContinueSpeed(long autoContinueSpeed);
 }

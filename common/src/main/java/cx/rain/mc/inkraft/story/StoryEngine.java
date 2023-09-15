@@ -105,9 +105,6 @@ public class StoryEngine {
     }
 
     public void sendContinue() {
-        var token = UUID.randomUUID();
-        holder.setContinueToken(token);
-
         if (!story.canContinue() && story.getCurrentChoices().isEmpty()) {
             return;
         }
@@ -115,6 +112,9 @@ public class StoryEngine {
         if (hideContinue) {
             return;
         }
+
+        var token = UUID.randomUUID();
+        holder.setContinueToken(token);
 
         if (story.getCurrentChoices().isEmpty()) {
             var component = Component.translatable(Constants.MESSAGE_STORY_CONTINUE).withStyle(ChatFormatting.YELLOW);
@@ -141,6 +141,9 @@ public class StoryEngine {
 
         var message = holder.getLastMessage();
 
+        autoContinue = holder.getCurrentAutoContinue();
+        continueSpeed = holder.getCurrentAutoContinueSpeed();
+
         player.sendSystemMessage(TextStyleHelper.parseStyle(message));
         sendContinue();
     }
@@ -151,7 +154,11 @@ public class StoryEngine {
 
     public boolean continueStoryWithChoice(int choice) {
         try {
-            story.chooseChoiceIndex(choice);
+            if (story.getCurrentChoices().isEmpty()) {
+                story.Continue();
+            } else {
+                story.chooseChoiceIndex(choice);
+            }
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -167,6 +174,9 @@ public class StoryEngine {
 
             holder.setState(story.getState().toJson());
             holder.setInStory(!isStoryEnd);
+
+            holder.setCurrentAutoContinue(autoContinue);
+            holder.setCurrentAutoContinueSpeed(continueSpeed);
         } catch (Exception ex) {
             // qyl27: silent is gold.
         }

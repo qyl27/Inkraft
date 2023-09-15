@@ -22,8 +22,10 @@ public class InkStoryStateHolderFabric implements IInkStoryStateHolder {
     public static final String TAG_VARIABLES_SHOW_NAME = "isShow";
     public static final String TAG_VARIABLES_VALUE_NAME = "value";
     public static final String TAG_CURRENT_STORY_NAME = "currentStory";
+    public static final String TAG_AUTO_CONTINUE_ENABLED = "autoContinueEnabled";
+    public static final String TAG_AUTO_CONTINUE_SPEED = "autoContinueSpeed";
 
-    private Player player;
+    private final Player player;
 
     public InkStoryStateHolderFabric(Player player) {
         this.player = player;
@@ -110,5 +112,25 @@ public class InkStoryStateHolderFabric implements IInkStoryStateHolder {
     @Override
     public void setCurrentStory(ResourceLocation story) {
         ((IPlayerMixin) player).inkraft$setCurrentStory(story);
+    }
+
+    @Override
+    public boolean getCurrentAutoContinue() {
+        return ((IPlayerMixin) player).inkraft$getCurrentAutoContinue();
+    }
+
+    @Override
+    public void setCurrentAutoContinue(boolean autoContinue) {
+        ((IPlayerMixin) player).inkraft$setCurrentAutoContinue(autoContinue);
+    }
+
+    @Override
+    public long getCurrentAutoContinueSpeed() {
+        return ((IPlayerMixin) player).inkraft$getCurrentAutoContinueSpeed();
+    }
+
+    @Override
+    public void setCurrentAutoContinueSpeed(long autoContinueSpeed) {
+        ((IPlayerMixin) player).inkraft$setCurrentAutoContinueSpeed(autoContinueSpeed);
     }
 }

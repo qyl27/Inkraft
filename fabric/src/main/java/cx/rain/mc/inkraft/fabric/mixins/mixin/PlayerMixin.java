@@ -1,6 +1,5 @@
 package cx.rain.mc.inkraft.fabric.mixins.mixin;
 
-import com.mojang.datafixers.util.Pair;
 import cx.rain.mc.inkraft.fabric.mixins.interfaces.IPlayerMixin;
 import cx.rain.mc.inkraft.fabric.platform.InkStoryStateHolderFabric;
 import cx.rain.mc.inkraft.utility.StoryVariables;
@@ -96,7 +95,9 @@ public abstract class PlayerMixin implements IPlayerMixin {
         inkraft$variables.clear();
     }
 
-    private ResourceLocation inkraft$currentStory;
+    private ResourceLocation inkraft$currentStory = null;
+    private boolean inkraft$doesAutoContinue = false;
+    private long inkraft$autoContinueSpeedTicks = -1;
 
     @Override
     public ResourceLocation inkraft$getCurrentStory() {
@@ -106,6 +107,26 @@ public abstract class PlayerMixin implements IPlayerMixin {
     @Override
     public void inkraft$setCurrentStory(ResourceLocation story) {
         inkraft$currentStory = story;
+    }
+
+    @Override
+    public boolean inkraft$getCurrentAutoContinue() {
+        return inkraft$doesAutoContinue;
+    }
+
+    @Override
+    public void inkraft$setCurrentAutoContinue(boolean autoContinue) {
+        inkraft$doesAutoContinue = autoContinue;
+    }
+
+    @Override
+    public long inkraft$getCurrentAutoContinueSpeed() {
+        return inkraft$autoContinueSpeedTicks;
+    }
+
+    @Override
+    public void inkraft$setCurrentAutoContinueSpeed(long autoContinueSpeed) {
+        inkraft$autoContinueSpeedTicks = autoContinueSpeed;
     }
 
     @Inject(at = @At("HEAD"), method = "addAdditionalSaveData")
@@ -130,6 +151,8 @@ public abstract class PlayerMixin implements IPlayerMixin {
 
         if (inkraft$currentStory != null) {
             compound.putString(InkStoryStateHolderFabric.TAG_CURRENT_STORY_NAME, inkraft$currentStory.toString());
+            compound.putBoolean(InkStoryStateHolderFabric.TAG_AUTO_CONTINUE_ENABLED, inkraft$doesAutoContinue);
+            compound.putLong(InkStoryStateHolderFabric.TAG_AUTO_CONTINUE_SPEED, inkraft$autoContinueSpeedTicks);
         }
 
         tag.put(InkStoryStateHolderFabric.TAG_INKRAFT_NAME, compound);
@@ -159,6 +182,8 @@ public abstract class PlayerMixin implements IPlayerMixin {
         var story = compound.getString(InkStoryStateHolderFabric.TAG_CURRENT_STORY_NAME);
         if (!story.isBlank()) {
             inkraft$setCurrentStory(new ResourceLocation(story));
+            inkraft$setCurrentAutoContinue(compound.getBoolean(InkStoryStateHolderFabric.TAG_AUTO_CONTINUE_ENABLED));
+            inkraft$setCurrentAutoContinueSpeed(compound.getLong(InkStoryStateHolderFabric.TAG_AUTO_CONTINUE_SPEED));
         }
     }
 }

@@ -30,5 +30,8 @@ public interface IInkStoryStateHolder {
 
     ResourceLocation getCurrentStory();
     void setCurrentStory(ResourceLocation story);
-
+    boolean getCurrentAutoContinue();
+    void setCurrentAutoContinue(boolean autoContinue);
+    long getCurrentAutoContinueSpeed();
+    void setCurrentAutoContinueSpeed(long autoContinueSpeed);
 }
