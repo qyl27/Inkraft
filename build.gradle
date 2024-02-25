@@ -7,12 +7,6 @@ architectury {
     common(project.enabled_platforms.split(','))
 }
 
-loom {
-    runConfigs.configureEach {
-        ideConfigGenerated = true
-    }
-}
-
 allprojects {
     apply plugin: 'architectury-plugin'
     apply plugin: 'dev.architectury.loom'
@@ -37,7 +31,18 @@ allprojects {
             url = 'https://maven.parchmentmc.org'
         }
 
+        maven {
+            name = 'Mod Menu'
+            url = 'https://maven.terraformersmc.com/releases'
+        }
+
         mavenCentral()
+    }
+
+    loom {
+        runConfigs.configureEach {
+            ideConfigGenerated = true
+        }
     }
 
     dependencies {

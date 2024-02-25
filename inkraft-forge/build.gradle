@@ -16,7 +16,42 @@ loom {
         extraAccessWideners.add loom.accessWidenerPath.get().asFile.name
 
         mixinConfig 'inkraft-common.mixins.json'
-        mixinConfig 'inkraft.mixins.json'
+        mixinConfig 'inkraft-forge.mixins.json'
+    }
+
+    mods {
+        'inkraft' {
+            sourceSet project(':').sourceSets.main
+            sourceSet sourceSets.main
+        }
+
+        'inkraft_test' {
+            sourceSet project(':').sourceSets.test
+        }
+    }
+
+    runs {
+        client {
+            client()
+
+            runDir 'run/client'
+        }
+
+        server {
+            server()
+
+            runDir 'run/server'
+        }
+
+        data {
+            data()
+
+            runDir 'run/data'
+
+            programArgs "--all", "--mod", "inkraft"
+            programArgs "--output", file('../src/generated/resources').absolutePath
+            programArgs "--existing", file('../src/main/resources').absolutePath
+        }
     }
 }
 

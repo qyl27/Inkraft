@@ -5,7 +5,7 @@
   "message.story.continue.choice":  "%1$s",
   "message.story.hint.continue": "Click to continue",
   "message.story.hint.continue.choice":  "Clock to choose",
-  "message.story.bad_token": "Error, please press the latest buttons.",
+  "message.story.bad_token": "Please press the latest buttons.",
   "hud.info": "Information",
   "message.story.logged_in_continue": "[Continue Previous Story]"
 }

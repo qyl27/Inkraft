@@ -1,10 +1,12 @@
 package cx.rain.mc.inkraft.story.function.game;
 
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import cx.rain.mc.inkraft.story.StoryEngine;
 import cx.rain.mc.inkraft.story.function.StoryFunction;
 import cx.rain.mc.inkraft.utility.StoryVariables;
 import net.minecraft.server.level.ServerPlayer;
 
+import java.util.Objects;
 import java.util.function.BiFunction;
 
 public class RunCommandFunction implements StoryFunction {
@@ -21,11 +23,14 @@ public class RunCommandFunction implements StoryFunction {
             }
 
             var command = args[0].toString();
-            var result = player.getServer()
-                    .getCommands()
-                    .performPrefixedCommand(player.createCommandSourceStack()
-                            .withPermission(4), command) == 1;
-            return new StoryVariables.BoolVar(result);
+            var dispatcher = Objects.requireNonNull(player.getServer()).getCommands().getDispatcher();
+            try {
+                boolean result = dispatcher.execute(dispatcher
+                        .parse(command, player.createCommandSourceStack().withPermission(4))) == 1;
+                return new StoryVariables.BoolVar(result);
+            } catch (CommandSyntaxException ex) {
+                return new StoryVariables.BoolVar(false);
+            }
         };
     }
 }

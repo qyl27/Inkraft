@@ -1,0 +1,20 @@
+modLoader = "javafml"
+loaderVersion = "[${forge_loader_version},)"
+issueTrackerURL = "https://github.com/qyl27/Inkraft/issues"
+license = "Apache-2.0"
+
+[[mods]]
+modId = "inkraft_test"
+version = "${mod_version}"
+displayName = "Inkraft Test"
+authors = "qyl27"
+description = '''
+Inkraft test mod.
+'''
+
+[[dependencies.inkraft_test]]
+modId = "inkraft"
+mandatory = true
+versionRange = "[${mod_version},)"
+ordering = "NONE"
+side = "BOTH"

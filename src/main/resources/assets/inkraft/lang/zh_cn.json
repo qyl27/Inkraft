@@ -5,7 +5,7 @@
   "message.story.continue.choice":  "%1$s",
   "message.story.hint.continue": "点击继续",
   "message.story.hint.continue.choice":  "点击选择该项",
-  "message.story.bad_token": "错误，请选择系统最后提示的按钮。",
+  "message.story.bad_token": "请选择系统最后提示的按钮。",
   "hud.info": "信息",
   "message.story.logged_in_continue": "【继续未完成的故事】"
 }
