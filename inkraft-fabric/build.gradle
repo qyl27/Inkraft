@@ -21,8 +21,8 @@ dependencies {
     common(project(path: ':', configuration: 'namedElements')) { transitive = false }
     shadowCommon(project(path: ':', configuration: 'transformProductionFabric')) { transitive = false }
 
-    implementation 'com.bladecoder.ink:blade-ink:1.1.1'
-    shadowCommon 'com.bladecoder.ink:blade-ink:1.1.1'
+    implementation "com.bladecoder.ink:blade-ink:${project.blade_ink_version}"
+    shadowCommon "com.bladecoder.ink:blade-ink:${project.blade_ink_version}"
 }
 
 shadowJar {
