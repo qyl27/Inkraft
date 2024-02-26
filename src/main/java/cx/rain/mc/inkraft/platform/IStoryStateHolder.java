@@ -1,4 +1,4 @@
-package cx.rain.mc.inkraft.story.state;
+package cx.rain.mc.inkraft.platform;
 
 import cx.rain.mc.inkraft.utility.StoryVariables;
 import net.minecraft.resources.ResourceLocation;
@@ -7,7 +7,7 @@ import org.apache.commons.lang3.tuple.Triple;
 import java.util.Map;
 import java.util.UUID;
 
-public interface IInkStoryStateHolder {
+public interface IStoryStateHolder {
     String getState();
     void setState(String state);
 

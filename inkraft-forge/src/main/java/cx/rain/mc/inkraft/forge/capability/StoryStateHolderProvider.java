@@ -8,18 +8,17 @@ import net.minecraftforge.common.util.LazyOptional;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class InkStoryStateHolderProvider implements ICapabilitySerializable<CompoundTag> {
-    private final InkStoryStateHolder inkStoryStateHolder = new InkStoryStateHolder();
-    private final LazyOptional<InkStoryStateHolder> holderOptional = LazyOptional.of(() -> inkStoryStateHolder);
+public class StoryStateHolderProvider implements ICapabilitySerializable<CompoundTag> {
+    private final LazyOptional<StoryStateHolder> optional = LazyOptional.of(StoryStateHolder::new);
 
     public void invalidate() {
-        holderOptional.invalidate();
+        optional.invalidate();
     }
 
     @Override
     public @NotNull <T> LazyOptional<T> getCapability(@NotNull Capability<T> capability, @Nullable Direction arg) {
         if (capability == InkraftCapabilities.INKRAFT_STORY_STATE_HOLDER) {
-            return holderOptional.cast();
+            return optional.cast();
         }
 
         return LazyOptional.empty();
@@ -27,19 +26,19 @@ public class InkStoryStateHolderProvider implements ICapabilitySerializable<Comp
 
     @Override
     public CompoundTag serializeNBT() {
-        if (!holderOptional.isPresent()) {
+        if (!optional.isPresent()) {
             return new CompoundTag();
         }
 
-        return holderOptional.resolve().get().serializeNBT();
+        return optional.resolve().get().serializeNBT();
     }
 
     @Override
     public void deserializeNBT(CompoundTag tag) {
-        if (!holderOptional.isPresent()) {
+        if (!optional.isPresent()) {
             return;
         }
 
-        holderOptional.resolve().get().deserializeNBT(tag);
+        optional.resolve().get().deserializeNBT(tag);
     }
 }

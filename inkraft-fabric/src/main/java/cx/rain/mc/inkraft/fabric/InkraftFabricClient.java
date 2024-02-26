@@ -10,9 +10,9 @@ public class InkraftFabricClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
         HudRenderCallback.EVENT.register(((graphics, delta) -> {
-            if (!InkraftPlatform.getPlayerStoryStateHolder(Minecraft.getInstance().player).getVariables().isEmpty()) {
-                VariableHUD.render(graphics);
-            }
+//            if (!InkraftPlatform.getPlayerStoryStateHolder(Minecraft.getInstance().player).getVariables().isEmpty()) {
+//                VariableHUD.render(graphics);
+//            }
         }));
     }
 }

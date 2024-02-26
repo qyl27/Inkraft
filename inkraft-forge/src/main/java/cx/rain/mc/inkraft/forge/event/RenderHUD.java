@@ -14,14 +14,14 @@ import net.minecraftforge.fml.common.Mod;
 public class RenderHUD {
     @SubscribeEvent
     public static void onPreRenderGuiOverlay(RenderGuiOverlayEvent.Pre event) {
-        var graphics = event.getGuiGraphics();
-
-        if (event.getOverlay() != VanillaGuiOverlay.SCOREBOARD.type()) {
-            return;
-        }
-
-        if (!InkraftPlatform.getPlayerStoryStateHolder(Minecraft.getInstance().player).getVariables().isEmpty()) {
-            VariableHUD.render(graphics);
-        }
+//        var graphics = event.getGuiGraphics();
+//
+//        if (event.getOverlay() != VanillaGuiOverlay.SCOREBOARD.type()) {
+//            return;
+//        }
+//
+//        if (!InkraftPlatform.getPlayerStoryStateHolder(Minecraft.getInstance().player).getVariables().isEmpty()) {
+//            VariableHUD.render(graphics);
+//        }
     }
 }

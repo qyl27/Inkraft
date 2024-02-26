@@ -10,7 +10,7 @@ import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import cx.rain.mc.inkraft.Constants;
 import cx.rain.mc.inkraft.Inkraft;
 import cx.rain.mc.inkraft.InkraftPlatform;
-import cx.rain.mc.inkraft.story.state.IInkStoryStateHolder;
+import cx.rain.mc.inkraft.platform.IStoryStateHolder;
 import cx.rain.mc.inkraft.story.StoryEngine;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
@@ -243,7 +243,7 @@ public class InkraftCommand {
 
     /// <editor-fold desc="Utility methods.">
 
-    private static void startStory(ServerPlayer player, ResourceLocation path, IInkStoryStateHolder stateHolder, boolean isDebug) {
+    private static void startStory(ServerPlayer player, ResourceLocation path, IStoryStateHolder stateHolder, boolean isDebug) {
         var storiesManager = Inkraft.getInstance().getStoriesManager();
 
         StoryEngine story;
@@ -256,7 +256,7 @@ public class InkraftCommand {
         story.startStory(path, isDebug);
     }
 
-    private static void continueStory(ServerPlayer player, IInkStoryStateHolder holder, int choice) {
+    private static void continueStory(ServerPlayer player, IStoryStateHolder holder, int choice) {
         var storiesManager = Inkraft.getInstance().getStoriesManager();
         var story = storiesManager.getStory(player);
 

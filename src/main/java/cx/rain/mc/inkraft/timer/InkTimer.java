@@ -52,7 +52,7 @@ public final class InkTimer {
 
         if (interval == 0) {
             runnable.run();
-            interval = getInitialInterval();
+            interval = initialInterval;
         }
     }
 
@@ -62,22 +62,23 @@ public final class InkTimer {
             return true;
         }
         if (obj instanceof InkTimer that) {
-            return Objects.equals(this.runnable, that.runnable);
+            return Objects.equals(this.runnable, that.runnable)
+                    && initialDelay == that.initialDelay
+                    && initialInterval == that.initialInterval;
         }
         return false;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(runnable);
+        return Objects.hash(runnable) + Objects.hash(initialDelay) + Objects.hash(initialInterval);
     }
 
     @Override
     public String toString() {
         return "InkTimer[" +
                 "runnable=" + runnable + ", " +
-                "delay=" + delay + ", " +
-                "interval=" + interval + ']';
+                "delay=" + initialDelay + ", " +
+                "interval=" + initialInterval + ']';
     }
-
 }

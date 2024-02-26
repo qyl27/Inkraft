@@ -3,7 +3,7 @@ package cx.rain.mc.inkraft.timer;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 
-public interface IInkTimerManager {
+public interface ITimerManager {
     default void addTimer(ServerPlayer player, Runnable runnable) {
         addTimer(player, runnable, 0, -1);
     }

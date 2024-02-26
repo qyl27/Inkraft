@@ -10,22 +10,23 @@ import net.minecraft.server.level.ServerPlayer;
 import java.util.List;
 
 public class InkraftNetworking {
-    private final NetworkChannel channel = NetworkChannel.create(new ResourceLocation(Inkraft.MODID, "channel"));
+    private final NetworkChannel channel = NetworkChannel.create(new ResourceLocation(Inkraft.MODID, "client"));
 
     public InkraftNetworking() {
-        channel.register(S2CShowVariablePacket.class, S2CShowVariablePacket::encode, S2CShowVariablePacket::new, S2CShowVariablePacket::apply);
-        channel.register(S2CHideAllVariablePacket.class, S2CHideAllVariablePacket::encode, S2CHideAllVariablePacket::new, S2CHideAllVariablePacket::apply);
+        // Todo: qyl27: Optional channel?
+//        channel.register(S2CShowVariablePacket.class, S2CShowVariablePacket::encode, S2CShowVariablePacket::new, S2CShowVariablePacket::apply);
+//        channel.register(S2CHideAllVariablePacket.class, S2CHideAllVariablePacket::encode, S2CHideAllVariablePacket::new, S2CHideAllVariablePacket::apply);
     }
 
     public void sendToPlayer(ServerPlayer player, Object msg) {
-        channel.sendToPlayer(player, msg);
+//        channel.sendToPlayer(player, msg);
     }
 
     public void sendToPlayers(List<ServerPlayer> player, Object msg) {
-        channel.sendToPlayers(player, msg);
+//        channel.sendToPlayers(player, msg);
     }
 
     public void sendToServer(Object msg) {
-        channel.sendToServer(msg);
+//        channel.sendToServer(msg);
     }
 }

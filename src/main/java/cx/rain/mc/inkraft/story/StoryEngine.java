@@ -8,7 +8,7 @@ import cx.rain.mc.inkraft.data.StoriesManager;
 import cx.rain.mc.inkraft.networking.packet.S2CHideAllVariablePacket;
 import cx.rain.mc.inkraft.utility.StoryVariables;
 import cx.rain.mc.inkraft.story.function.StoryFunctions;
-import cx.rain.mc.inkraft.story.state.IInkStoryStateHolder;
+import cx.rain.mc.inkraft.platform.IStoryStateHolder;
 import cx.rain.mc.inkraft.utility.TextStyleHelper;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.ClickEvent;
@@ -27,9 +27,9 @@ public class StoryEngine {
 
     private Story story;
     private ServerPlayer player;
-    private IInkStoryStateHolder holder;
+    private IStoryStateHolder holder;
 
-    public StoryEngine(StoriesManager manager, ServerPlayer player, IInkStoryStateHolder holder) {
+    public StoryEngine(StoriesManager manager, ServerPlayer player, IStoryStateHolder holder) {
         this.manager = manager;
         this.player = player;
         this.holder = holder;

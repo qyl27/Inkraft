@@ -1,7 +1,7 @@
 package cx.rain.mc.inkraft.fabric.platform;
 
 import cx.rain.mc.inkraft.fabric.mixins.interfaces.IPlayerMixin;
-import cx.rain.mc.inkraft.story.state.IInkStoryStateHolder;
+import cx.rain.mc.inkraft.platform.IStoryStateHolder;
 import cx.rain.mc.inkraft.utility.StoryVariables;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
@@ -10,7 +10,7 @@ import org.apache.commons.lang3.tuple.Triple;
 import java.util.Map;
 import java.util.UUID;
 
-public class InkStoryStateHolderFabric implements IInkStoryStateHolder {
+public class StoryStateHolder implements IStoryStateHolder {
     public static final String TAG_INKRAFT_NAME = "inkraft";
     public static final String TAG_STATE_NAME = "state";
     public static final String TAG_LAST_MESSAGE_NAME = "lastMessage";
@@ -27,7 +27,7 @@ public class InkStoryStateHolderFabric implements IInkStoryStateHolder {
 
     private final Player player;
 
-    public InkStoryStateHolderFabric(Player player) {
+    public StoryStateHolder(Player player) {
         this.player = player;
     }
 

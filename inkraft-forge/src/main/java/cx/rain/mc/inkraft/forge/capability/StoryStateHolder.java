@@ -1,6 +1,6 @@
 package cx.rain.mc.inkraft.forge.capability;
 
-import cx.rain.mc.inkraft.story.state.IInkStoryStateHolder;
+import cx.rain.mc.inkraft.platform.IStoryStateHolder;
 import cx.rain.mc.inkraft.utility.StoryVariables;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -14,7 +14,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-public class InkStoryStateHolder implements IInkStoryStateHolder, INBTSerializable<CompoundTag> {
+public class StoryStateHolder implements IStoryStateHolder, INBTSerializable<CompoundTag> {
 
     /// <editor-fold desc="State holder.">
 

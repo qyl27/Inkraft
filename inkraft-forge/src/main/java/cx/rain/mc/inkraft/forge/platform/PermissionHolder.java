@@ -1,7 +1,7 @@
 package cx.rain.mc.inkraft.forge.platform;
 
 import cx.rain.mc.inkraft.Inkraft;
-import cx.rain.mc.inkraft.command.IInkPermissionManager;
+import cx.rain.mc.inkraft.platform.IPermissionHolder;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -12,7 +12,7 @@ import net.minecraftforge.server.permission.nodes.PermissionNode;
 import net.minecraftforge.server.permission.nodes.PermissionTypes;
 
 @Mod.EventBusSubscriber(modid = Inkraft.MODID)
-public class InkPermissionManagerForge implements IInkPermissionManager {
+public class PermissionHolder implements IPermissionHolder {
 
     public static final PermissionNode<Boolean> PERMISSION_START = bool("start", 2);
     public static final PermissionNode<Boolean> PERMISSION_CONTINUE = bool("continue", 0);

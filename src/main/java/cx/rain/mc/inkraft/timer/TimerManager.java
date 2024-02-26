@@ -6,9 +6,9 @@ import net.minecraft.server.level.ServerPlayer;
 import java.util.*;
 import java.util.function.Consumer;
 
-public class InkTimerManager implements IInkTimerManager {
+public class TimerManager implements ITimerManager {
     private final Map<UUID, List<InkTimer>> runnableMap = new HashMap<>();
-    private final List<Consumer<InkTimerManager>> doAfter = new ArrayList<>();
+    private final List<Consumer<TimerManager>> doAfter = new ArrayList<>();
 
     public void onTick(MinecraftServer server) {
         for (Map.Entry<UUID, List<InkTimer>> entry : runnableMap.entrySet()) {
