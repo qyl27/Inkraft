@@ -1,7 +1,7 @@
 package cx.rain.mc.inkraft.story.function.system;
 
 import cx.rain.mc.inkraft.InkraftPlatform;
-import cx.rain.mc.inkraft.story.StoryEngine;
+import cx.rain.mc.inkraft.story.PlayerStory;
 import cx.rain.mc.inkraft.story.function.StoryFunction;
 import cx.rain.mc.inkraft.utility.StoryVariables;
 import net.minecraft.server.level.ServerPlayer;
@@ -15,7 +15,7 @@ public class GetVariableFunction implements StoryFunction {
     }
 
     @Override
-    public BiFunction<Object[], ServerPlayer, StoryVariables.IStoryVariable> func(StoryEngine engine) {
+    public BiFunction<Object[], ServerPlayer, StoryVariables.IValue> func(PlayerStory engine) {
         return (args, player) -> {
             if (args.length != 1) {
                 return StoryVariables.BoolVar.FALSE;

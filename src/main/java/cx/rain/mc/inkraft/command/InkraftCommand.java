@@ -10,8 +10,8 @@ import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import cx.rain.mc.inkraft.Constants;
 import cx.rain.mc.inkraft.Inkraft;
 import cx.rain.mc.inkraft.InkraftPlatform;
-import cx.rain.mc.inkraft.platform.IStoryStateHolder;
-import cx.rain.mc.inkraft.story.StoryEngine;
+import cx.rain.mc.inkraft.platform.IStoryHolder;
+import cx.rain.mc.inkraft.story.PlayerStory;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.arguments.EntityArgument;
@@ -243,10 +243,10 @@ public class InkraftCommand {
 
     /// <editor-fold desc="Utility methods.">
 
-    private static void startStory(ServerPlayer player, ResourceLocation path, IStoryStateHolder stateHolder, boolean isDebug) {
+    private static void startStory(ServerPlayer player, ResourceLocation path, IStoryHolder stateHolder, boolean isDebug) {
         var storiesManager = Inkraft.getInstance().getStoriesManager();
 
-        StoryEngine story;
+        PlayerStory story;
         if (!storiesManager.hasCachedStory(player)) {
             story = storiesManager.createStory(player);
         } else {
@@ -256,7 +256,7 @@ public class InkraftCommand {
         story.startStory(path, isDebug);
     }
 
-    private static void continueStory(ServerPlayer player, IStoryStateHolder holder, int choice) {
+    private static void continueStory(ServerPlayer player, IStoryHolder holder, int choice) {
         var storiesManager = Inkraft.getInstance().getStoriesManager();
         var story = storiesManager.getStory(player);
 
@@ -272,7 +272,7 @@ public class InkraftCommand {
     private static void repeatChoices(ServerPlayer player) {
         var storiesManager = Inkraft.getInstance().getStoriesManager();
 
-        StoryEngine story;
+        PlayerStory story;
         if (!storiesManager.hasCachedStory(player)) {
             story = storiesManager.createStory(player);
         } else {
@@ -286,7 +286,7 @@ public class InkraftCommand {
 
     private static CompletableFuture<Suggestions> suggestStart(final CommandContext<CommandSourceStack> context,
                                                                final SuggestionsBuilder builder) throws CommandSyntaxException {
-        for (var story : Inkraft.getInstance().getStoriesManager().getStories()) {
+        for (var story : Inkraft.getInstance().getStoriesManager().getLoadedStories()) {
             builder.suggest(story.toString());
         }
         return builder.buildFuture();

@@ -33,6 +33,6 @@ public class S2CShowVariablePacket {
 
     public void apply(Supplier<NetworkManager.PacketContext> contextSupplier) {
         var context = contextSupplier.get();
-        context.queue(() -> InkraftPlatform.getPlayerStoryStateHolder(context.getPlayer()).putVariable(name, displayName, isShow, StoryVariables.IStoryVariable.fromString(value)));
+        context.queue(() -> InkraftPlatform.getPlayerStoryStateHolder(context.getPlayer()).putVariable(name, displayName, isShow, StoryVariables.IValue.fromString(value)));
     }
 }

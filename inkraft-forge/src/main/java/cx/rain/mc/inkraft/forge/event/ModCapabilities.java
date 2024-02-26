@@ -3,7 +3,7 @@ package cx.rain.mc.inkraft.forge.event;
 import cx.rain.mc.inkraft.Inkraft;
 import cx.rain.mc.inkraft.forge.capability.StoryStateHolderProvider;
 import cx.rain.mc.inkraft.forge.capability.InkraftCapabilities;
-import cx.rain.mc.inkraft.platform.IStoryStateHolder;
+import cx.rain.mc.inkraft.platform.IStoryHolder;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.common.capabilities.RegisterCapabilitiesEvent;
@@ -16,7 +16,7 @@ import net.minecraftforge.fml.common.Mod;
 public class ModCapabilities {
     @SubscribeEvent
     public static void onRegisterCapabilities(RegisterCapabilitiesEvent event) {
-        event.register(IStoryStateHolder.class);
+        event.register(IStoryHolder.class);
     }
 
     @SubscribeEvent

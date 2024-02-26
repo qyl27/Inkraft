@@ -1,7 +1,7 @@
 package cx.rain.mc.inkraft.fabric.platform;
 
 import cx.rain.mc.inkraft.fabric.mixins.interfaces.IPlayerMixin;
-import cx.rain.mc.inkraft.platform.IStoryStateHolder;
+import cx.rain.mc.inkraft.platform.IStoryHolder;
 import cx.rain.mc.inkraft.utility.StoryVariables;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
@@ -10,7 +10,7 @@ import org.apache.commons.lang3.tuple.Triple;
 import java.util.Map;
 import java.util.UUID;
 
-public class StoryStateHolder implements IStoryStateHolder {
+public class StoryHolder implements IStoryHolder {
     public static final String TAG_INKRAFT_NAME = "inkraft";
     public static final String TAG_STATE_NAME = "state";
     public static final String TAG_LAST_MESSAGE_NAME = "lastMessage";
@@ -27,7 +27,7 @@ public class StoryStateHolder implements IStoryStateHolder {
 
     private final Player player;
 
-    public StoryStateHolder(Player player) {
+    public StoryHolder(Player player) {
         this.player = player;
     }
 
@@ -80,17 +80,17 @@ public class StoryStateHolder implements IStoryStateHolder {
     }
 
     @Override
-    public Map<String, Triple<String, Boolean, StoryVariables.IStoryVariable>> getVariables() {
+    public Map<String, Triple<String, Boolean, StoryVariables.IValue>> getVariables() {
         return ((IPlayerMixin) player).inkraft$getVariables();
     }
 
     @Override
-    public void putVariable(String name, String displayName, boolean isShow, StoryVariables.IStoryVariable value) {
+    public void putVariable(String name, String displayName, boolean isShow, StoryVariables.IValue value) {
         ((IPlayerMixin) player).inkraft$putVariable(name, displayName, isShow, value);
     }
 
     @Override
-    public StoryVariables.IStoryVariable getVariable(String name) {
+    public StoryVariables.IValue getVariable(String name) {
         return ((IPlayerMixin) player).inkraft$getVariable(name);
     }
 

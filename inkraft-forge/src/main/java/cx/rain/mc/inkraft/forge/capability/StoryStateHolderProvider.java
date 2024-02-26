@@ -9,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class StoryStateHolderProvider implements ICapabilitySerializable<CompoundTag> {
-    private final LazyOptional<StoryStateHolder> optional = LazyOptional.of(StoryStateHolder::new);
+    private final LazyOptional<StoryHolder> optional = LazyOptional.of(StoryHolder::new);
 
     public void invalidate() {
         optional.invalidate();

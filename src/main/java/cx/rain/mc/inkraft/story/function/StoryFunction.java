@@ -1,16 +1,12 @@
 package cx.rain.mc.inkraft.story.function;
 
-import cx.rain.mc.inkraft.story.StoryEngine;
+import cx.rain.mc.inkraft.story.PlayerStory;
 import cx.rain.mc.inkraft.utility.StoryVariables;
-import net.minecraft.server.level.ServerPlayer;
 
-import java.util.function.BiFunction;
+import java.util.function.Function;
 
-@FunctionalInterface
 public interface StoryFunction {
-    default String getName() {
-        return "";
-    }
+    String getName();
 
-    BiFunction<Object[], ServerPlayer, StoryVariables.IStoryVariable> func(StoryEngine engine);
+    Function<Object[], StoryVariables.IValue> func(PlayerStory engine);
 }

@@ -1,10 +1,12 @@
 package cx.rain.mc.inkraft.utility;
 
 public class StoryVariables {
-    public interface IStoryVariable {
-        String asString();
+    // Todo: qyl27: variable name, display name, etc.
+
+    public interface IValue {
+        String asStringValue();
         
-        static IStoryVariable fromString(String str) {
+        static IValue fromString(String str) {
             if (str.equalsIgnoreCase("false")) {
                 return BoolVar.FALSE;
             } else if (str.equalsIgnoreCase("true")) {
@@ -23,34 +25,34 @@ public class StoryVariables {
         }
     }
 
-    public record StrVar(String stringResult) implements IStoryVariable {
+    public record StrVar(String stringValue) implements IValue {
         @Override
-        public String asString() {
-            return stringResult;
+        public String asStringValue() {
+            return stringValue;
         }
     }
 
-    public record IntVar(int intResult) implements IStoryVariable {
+    public record IntVar(int intValue) implements IValue {
         @Override
-        public String asString() {
-            return Integer.toString(intResult);
+        public String asStringValue() {
+            return Integer.toString(intValue);
         }
     }
 
-    public record DoubleVar(double doubleResult) implements IStoryVariable {
+    public record DoubleVar(double doubleValue) implements IValue {
         @Override
-        public String asString() {
-            return Double.toString(doubleResult);
+        public String asStringValue() {
+            return Double.toString(doubleValue);
         }
     }
 
-    public record BoolVar(boolean boolResult) implements IStoryVariable {
+    public record BoolVar(boolean boolValue) implements IValue {
         public static final BoolVar TRUE = new BoolVar(true);
         public static final BoolVar FALSE = new BoolVar(false);
 
         @Override
-        public String asString() {
-            return Boolean.toString(boolResult);
+        public String asStringValue() {
+            return Boolean.toString(boolValue);
         }
     }
 }

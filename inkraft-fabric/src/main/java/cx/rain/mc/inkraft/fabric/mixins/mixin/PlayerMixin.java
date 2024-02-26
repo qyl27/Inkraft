@@ -1,7 +1,7 @@
 package cx.rain.mc.inkraft.fabric.mixins.mixin;
 
 import cx.rain.mc.inkraft.fabric.mixins.interfaces.IPlayerMixin;
-import cx.rain.mc.inkraft.fabric.platform.StoryStateHolder;
+import cx.rain.mc.inkraft.fabric.platform.StoryHolder;
 import cx.rain.mc.inkraft.utility.StoryVariables;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -25,7 +25,7 @@ public abstract class PlayerMixin implements IPlayerMixin {
     private String inkraft$state = "";
     private String inkraft$lastMessage = "";
     private boolean inkraft$inStory = false;
-    private final Map<String, Triple<String, Boolean, StoryVariables.IStoryVariable>> inkraft$variables = new HashMap<>();
+    private final Map<String, Triple<String, Boolean, StoryVariables.IValue>> inkraft$variables = new HashMap<>();
 
     @Override
     public String inkraft$getState() {
@@ -66,17 +66,17 @@ public abstract class PlayerMixin implements IPlayerMixin {
     }
 
     @Override
-    public Map<String, Triple<String, Boolean, StoryVariables.IStoryVariable>> inkraft$getVariables() {
+    public Map<String, Triple<String, Boolean, StoryVariables.IValue>> inkraft$getVariables() {
         return inkraft$variables;
     }
 
     @Override
-    public void inkraft$putVariable(String name, String displayName, boolean isShow, StoryVariables.IStoryVariable value) {
+    public void inkraft$putVariable(String name, String displayName, boolean isShow, StoryVariables.IValue value) {
         inkraft$variables.put(name, new MutableTriple<>(displayName, isShow, value));
     }
 
     @Override
-    public StoryVariables.IStoryVariable inkraft$getVariable(String name) {
+    public StoryVariables.IValue inkraft$getVariable(String name) {
         return inkraft$variables.get(name).getRight();
     }
 
@@ -132,58 +132,58 @@ public abstract class PlayerMixin implements IPlayerMixin {
     @Inject(at = @At("HEAD"), method = "addAdditionalSaveData")
     private void inkraft$addAdditionalSaveData(CompoundTag tag, CallbackInfo ci) {
         var compound = new CompoundTag();
-        compound.putString(StoryStateHolder.TAG_STATE_NAME, inkraft$getState());
-        compound.putString(StoryStateHolder.TAG_LAST_MESSAGE_NAME, inkraft$getLastMessage());
-        compound.putUUID(StoryStateHolder.TAG_TOKEN_NAME, inkraft$getContinueToken());
-        compound.putBoolean(StoryStateHolder.TAG_IN_STORY_NAME, inkraft$isInStory());
+        compound.putString(StoryHolder.TAG_STATE_NAME, inkraft$getState());
+        compound.putString(StoryHolder.TAG_LAST_MESSAGE_NAME, inkraft$getLastMessage());
+        compound.putUUID(StoryHolder.TAG_TOKEN_NAME, inkraft$getContinueToken());
+        compound.putBoolean(StoryHolder.TAG_IN_STORY_NAME, inkraft$isInStory());
 
         var list = new ListTag();
         for (var entry : inkraft$variables.entrySet()) {
             var compoundTag = new CompoundTag();
-            compoundTag.putString(StoryStateHolder.TAG_VARIABLES_NAME_NAME, entry.getKey());
+            compoundTag.putString(StoryHolder.TAG_VARIABLES_NAME_NAME, entry.getKey());
 
-            compoundTag.putString(StoryStateHolder.TAG_VARIABLES_DISPLAY_NAME, entry.getValue().getLeft());
-            compoundTag.putBoolean(StoryStateHolder.TAG_VARIABLES_SHOW_NAME, entry.getValue().getMiddle());
-            compoundTag.putString(StoryStateHolder.TAG_VARIABLES_VALUE_NAME, entry.getValue().getRight().asString());
+            compoundTag.putString(StoryHolder.TAG_VARIABLES_DISPLAY_NAME, entry.getValue().getLeft());
+            compoundTag.putBoolean(StoryHolder.TAG_VARIABLES_SHOW_NAME, entry.getValue().getMiddle());
+            compoundTag.putString(StoryHolder.TAG_VARIABLES_VALUE_NAME, entry.getValue().getRight().asStringValue());
             list.add(compoundTag);
         }
-        compound.put(StoryStateHolder.TAG_VARIABLES_NAME, list);
+        compound.put(StoryHolder.TAG_VARIABLES_NAME, list);
 
         if (inkraft$currentStory != null) {
-            compound.putString(StoryStateHolder.TAG_CURRENT_STORY_NAME, inkraft$currentStory.toString());
-            compound.putBoolean(StoryStateHolder.TAG_AUTO_CONTINUE_ENABLED, inkraft$doesAutoContinue);
-            compound.putLong(StoryStateHolder.TAG_AUTO_CONTINUE_SPEED, inkraft$autoContinueSpeedTicks);
+            compound.putString(StoryHolder.TAG_CURRENT_STORY_NAME, inkraft$currentStory.toString());
+            compound.putBoolean(StoryHolder.TAG_AUTO_CONTINUE_ENABLED, inkraft$doesAutoContinue);
+            compound.putLong(StoryHolder.TAG_AUTO_CONTINUE_SPEED, inkraft$autoContinueSpeedTicks);
         }
 
-        tag.put(StoryStateHolder.TAG_INKRAFT_NAME, compound);
+        tag.put(StoryHolder.TAG_INKRAFT_NAME, compound);
     }
 
     @Inject(at = @At("HEAD"), method = "readAdditionalSaveData")
     private void inkraft$readAdditionalSaveData(CompoundTag tag, CallbackInfo ci) {
-        var compound = tag.getCompound(StoryStateHolder.TAG_INKRAFT_NAME);
-        inkraft$setState(compound.getString(StoryStateHolder.TAG_STATE_NAME));
-        inkraft$setLastMessage(compound.getString(StoryStateHolder.TAG_LAST_MESSAGE_NAME));
+        var compound = tag.getCompound(StoryHolder.TAG_INKRAFT_NAME);
+        inkraft$setState(compound.getString(StoryHolder.TAG_STATE_NAME));
+        inkraft$setLastMessage(compound.getString(StoryHolder.TAG_LAST_MESSAGE_NAME));
 
-        if (tag.contains(StoryStateHolder.TAG_TOKEN_NAME)) {
-            inkraft$setContinueToken(compound.getUUID(StoryStateHolder.TAG_TOKEN_NAME));
+        if (tag.contains(StoryHolder.TAG_TOKEN_NAME)) {
+            inkraft$setContinueToken(compound.getUUID(StoryHolder.TAG_TOKEN_NAME));
         }
 
-        inkraft$setInStory(compound.getBoolean(StoryStateHolder.TAG_IN_STORY_NAME));
+        inkraft$setInStory(compound.getBoolean(StoryHolder.TAG_IN_STORY_NAME));
 
-        for (var entry : compound.getList(StoryStateHolder.TAG_VARIABLES_NAME, Tag.TAG_COMPOUND)) {
+        for (var entry : compound.getList(StoryHolder.TAG_VARIABLES_NAME, Tag.TAG_COMPOUND)) {
             var compoundTag = (CompoundTag) entry;
-            var name = compoundTag.getString(StoryStateHolder.TAG_VARIABLES_NAME_NAME);
-            var displayName = compoundTag.getString(StoryStateHolder.TAG_VARIABLES_DISPLAY_NAME);
-            var isShow = compoundTag.getBoolean(StoryStateHolder.TAG_VARIABLES_SHOW_NAME);
-            var value = compoundTag.getString(StoryStateHolder.TAG_VARIABLES_VALUE_NAME);
-            inkraft$putVariable(name, displayName, isShow, StoryVariables.IStoryVariable.fromString(value));
+            var name = compoundTag.getString(StoryHolder.TAG_VARIABLES_NAME_NAME);
+            var displayName = compoundTag.getString(StoryHolder.TAG_VARIABLES_DISPLAY_NAME);
+            var isShow = compoundTag.getBoolean(StoryHolder.TAG_VARIABLES_SHOW_NAME);
+            var value = compoundTag.getString(StoryHolder.TAG_VARIABLES_VALUE_NAME);
+            inkraft$putVariable(name, displayName, isShow, StoryVariables.IValue.fromString(value));
         }
 
-        var story = compound.getString(StoryStateHolder.TAG_CURRENT_STORY_NAME);
+        var story = compound.getString(StoryHolder.TAG_CURRENT_STORY_NAME);
         if (!story.isBlank()) {
             inkraft$setCurrentStory(new ResourceLocation(story));
-            inkraft$setCurrentAutoContinue(compound.getBoolean(StoryStateHolder.TAG_AUTO_CONTINUE_ENABLED));
-            inkraft$setCurrentAutoContinueSpeed(compound.getLong(StoryStateHolder.TAG_AUTO_CONTINUE_SPEED));
+            inkraft$setCurrentAutoContinue(compound.getBoolean(StoryHolder.TAG_AUTO_CONTINUE_ENABLED));
+            inkraft$setCurrentAutoContinueSpeed(compound.getLong(StoryHolder.TAG_AUTO_CONTINUE_SPEED));
         }
     }
 }

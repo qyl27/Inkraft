@@ -1,13 +1,13 @@
 package cx.rain.mc.inkraft;
 
 import cx.rain.mc.inkraft.platform.IPermissionHolder;
-import cx.rain.mc.inkraft.platform.IStoryStateHolder;
+import cx.rain.mc.inkraft.platform.IStoryHolder;
 import dev.architectury.injectables.annotations.ExpectPlatform;
 import net.minecraft.world.entity.player.Player;
 
 public class InkraftPlatform {
     @ExpectPlatform
-    public static IStoryStateHolder getPlayerStoryStateHolder(Player player) {
+    public static IStoryHolder getPlayerStoryStateHolder(Player player) {
         throw new RuntimeException();
     }
 

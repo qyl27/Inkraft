@@ -20,9 +20,9 @@ public interface IPlayerMixin {
     boolean inkraft$isInStory();
     void inkraft$setInStory(boolean inStory);
 
-    Map<String, Triple<String, Boolean, StoryVariables.IStoryVariable>> inkraft$getVariables();
-    void inkraft$putVariable(String name, String displayName, boolean isShow, StoryVariables.IStoryVariable value);
-    StoryVariables.IStoryVariable inkraft$getVariable(String name);
+    Map<String, Triple<String, Boolean, StoryVariables.IValue>> inkraft$getVariables();
+    void inkraft$putVariable(String name, String displayName, boolean isShow, StoryVariables.IValue value);
+    StoryVariables.IValue inkraft$getVariable(String name);
     void inkraft$hideVariables();
     void inkraft$clearVariables();
 

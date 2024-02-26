@@ -55,7 +55,7 @@ public class DebugCommand {
         var variable = StringArgumentType.getString(context, "variable");
 
         var holder = InkraftPlatform.getPlayerStoryStateHolder(player);
-        holder.putVariable(name, "", false, StoryVariables.IStoryVariable.fromString(variable));
+        holder.putVariable(name, "", false, StoryVariables.IValue.fromString(variable));
 
         player.sendSystemMessage(Component.translatable(Constants.MESSAGE_COMMAND_SUCCESS)
                 .withStyle(ChatFormatting.LIGHT_PURPLE));

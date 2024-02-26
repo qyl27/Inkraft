@@ -2,9 +2,9 @@ package cx.rain.mc.inkraft;
 
 import cx.rain.mc.inkraft.command.InkraftCommand;
 import cx.rain.mc.inkraft.data.InkReloadListener;
-import cx.rain.mc.inkraft.data.StoriesManager;
+import cx.rain.mc.inkraft.story.StoriesManager;
 import cx.rain.mc.inkraft.data.loot.predicate.InkraftPredicates;
-import cx.rain.mc.inkraft.networking.InkraftNetworking;
+import cx.rain.mc.inkraft.networking.ModNetworking;
 import cx.rain.mc.inkraft.story.function.StoryFunctions;
 import cx.rain.mc.inkraft.timer.ITimerManager;
 import cx.rain.mc.inkraft.timer.TimerManager;
@@ -39,28 +39,20 @@ public class Inkraft {
 
     private static Inkraft INSTANCE;
 
-    private final StoriesManager storiesManager;
-    private final ITimerManager timerManager;
-    private final InkraftNetworking networking;
+    private final StoriesManager storiesManager = new StoriesManager();
+    private final ITimerManager timerManager = new TimerManager();
+    private final ModNetworking networking = new ModNetworking();
 
     private final Logger logger = LoggerFactory.getLogger(MODID);
 
     public Inkraft() {
         INSTANCE = this;
 
-        storiesManager = new StoriesManager();
-        timerManager = new TimerManager();
-        networking = new InkraftNetworking();
-
         logger.info("Initializing Inkraft. Ver: " + VERSION);
     }
 
     public static Inkraft getInstance() {
         return INSTANCE;
-    }
-
-    public Logger getLogger() {
-        return logger;
     }
 
     public void init() {
@@ -96,7 +88,11 @@ public class Inkraft {
         return timerManager;
     }
 
-    public InkraftNetworking getNetworking() {
+    public ModNetworking getNetworking() {
         return networking;
+    }
+
+    public Logger getLogger() {
+        return logger;
     }
 }
