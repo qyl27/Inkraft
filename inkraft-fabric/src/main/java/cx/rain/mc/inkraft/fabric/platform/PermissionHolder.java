@@ -1,6 +1,6 @@
 package cx.rain.mc.inkraft.fabric.platform;
 
-import cx.rain.mc.inkraft.platform.IPermissionHolder;
+import cx.rain.mc.inkraft.mod.platform.IPermissionHolder;
 import net.minecraft.commands.CommandSourceStack;
 
 public class PermissionHolder implements IPermissionHolder {

@@ -1,8 +1,8 @@
 package cx.rain.mc.inkraft.fabric.platform;
 
 import cx.rain.mc.inkraft.fabric.mixins.interfaces.IPlayerMixin;
-import cx.rain.mc.inkraft.platform.IStoryHolder;
-import cx.rain.mc.inkraft.utility.StoryVariables;
+import cx.rain.mc.inkraft.mod.platform.IStoryHolder;
+import cx.rain.mc.inkraft.story.StoryVariables;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 import org.apache.commons.lang3.tuple.Triple;

@@ -1,9 +1,9 @@
 package cx.rain.mc.inkraft.forge.event;
 
-import cx.rain.mc.inkraft.Inkraft;
+import cx.rain.mc.inkraft.mod.InkraftMod;
 import cx.rain.mc.inkraft.forge.capability.StoryStateHolderProvider;
 import cx.rain.mc.inkraft.forge.capability.InkraftCapabilities;
-import cx.rain.mc.inkraft.platform.IStoryHolder;
+import cx.rain.mc.inkraft.mod.platform.IStoryHolder;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.common.capabilities.RegisterCapabilitiesEvent;
@@ -12,7 +12,7 @@ import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
-@Mod.EventBusSubscriber(modid = Inkraft.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
+@Mod.EventBusSubscriber(modid = InkraftMod.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class ModCapabilities {
     @SubscribeEvent
     public static void onRegisterCapabilities(RegisterCapabilitiesEvent event) {

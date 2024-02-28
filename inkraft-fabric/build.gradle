@@ -1,4 +1,6 @@
 plugins {
+    id 'architectury-plugin' version "${architect_plugin_version}"
+    id 'dev.architectury.loom' version "${architectury_loom_version}"
     id 'com.github.johnrengelman.shadow' version "${shadow_plugin_version}"
     id 'me.shedaniel.unified-publishing' version "${unified_publishing_version}"
 }
@@ -9,21 +11,26 @@ architectury {
 }
 
 loom {
-    accessWidenerPath = project(':').loom.accessWidenerPath
+    silentMojangMappingsLicense()
 
-    mods {
-        'inkraft' {
-            sourceSet project(':').sourceSets.main
-            sourceSet sourceSets.main
-        }
+    accessWidenerPath = project(':inkraft-common').loom.accessWidenerPath
+}
 
-        'inkraft_test' {
-            sourceSet project(':').sourceSets.test
-        }
-    }
+configurations {
+    common
+    shadowCommon
+    compileClasspath.extendsFrom common
+    runtimeClasspath.extendsFrom common
+    developmentFabric.extendsFrom common
 }
 
 dependencies {
+    minecraft "com.mojang:minecraft:${project.minecraft_version}"
+    mappings loom.layered() {
+        officialMojangMappings()
+        parchment("org.parchmentmc.data:parchment-${project.parchment_minecraft_version}:${project.parchment_version}@zip")
+    }
+
     modImplementation "net.fabricmc:fabric-loader:${project.fabric_loader_version}"
     modApi "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
 
@@ -31,8 +38,8 @@ dependencies {
 
     modRuntimeOnly "com.terraformersmc:modmenu:${project.mod_menu_version}"
 
-    common(project(path: ':', configuration: 'namedElements')) { transitive = false }
-    shadowCommon(project(path: ':', configuration: 'transformProductionFabric')) { transitive = false }
+    common(project(path: ':inkraft-common', configuration: 'namedElements')) { transitive = false }
+    shadowCommon(project(path: ':inkraft-common', configuration: 'transformProductionFabric')) { transitive = false }
 
     implementation "com.bladecoder.ink:blade-ink:${project.blade_ink_version}"
     shadowCommon "com.bladecoder.ink:blade-ink:${project.blade_ink_version}"
@@ -54,7 +61,7 @@ remapJar {
 }
 
 sourcesJar {
-    def commonSources = project(':').sourcesJar
+    def commonSources = project(':inkraft-common').sourcesJar
     dependsOn commonSources
     from commonSources.archiveFile.map { zipTree(it) }
 }

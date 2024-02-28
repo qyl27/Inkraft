@@ -1,0 +1,32 @@
+plugins {
+    id 'architectury-plugin' version "${architect_plugin_version}"
+    id 'dev.architectury.loom' version "${architectury_loom_version}"
+}
+
+architectury {
+    minecraft = project.minecraft_version
+    common(project.enabled_platforms.split(','))
+}
+
+loom {
+    silentMojangMappingsLicense()
+
+    accessWidenerPath = file('src/main/resources/inkraft.accesswidener')
+
+    runConfigs.configureEach {
+        ideConfigGenerated = true
+    }
+}
+
+dependencies {
+    minecraft "com.mojang:minecraft:${project.minecraft_version}"
+    mappings loom.layered() {
+        officialMojangMappings()
+        parchment("org.parchmentmc.data:parchment-${project.parchment_minecraft_version}:${project.parchment_version}@zip")
+    }
+
+    modImplementation "net.fabricmc:fabric-loader:${project.fabric_loader_version}"
+    modApi "dev.architectury:architectury:${project.architectury_version}"
+
+    implementation project(':')
+}

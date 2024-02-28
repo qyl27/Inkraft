@@ -1,23 +1,23 @@
 package cx.rain.mc.inkraft.forge;
 
-import cx.rain.mc.inkraft.Inkraft;
+import cx.rain.mc.inkraft.mod.InkraftMod;
 import dev.architectury.platform.forge.EventBuses;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
-@Mod(Inkraft.MODID)
+@Mod(InkraftMod.MODID)
 public class InkraftForge {
-    private final Inkraft mod;
+    private final InkraftMod mod;
 
     public InkraftForge() {
         var bus = FMLJavaModLoadingContext.get().getModEventBus();
 
         bus.addListener(this::setup);
 
-        EventBuses.registerModEventBus(Inkraft.MODID, bus);
+        EventBuses.registerModEventBus(InkraftMod.MODID, bus);
 
-        mod = new Inkraft();
+        mod = new InkraftMod();
     }
 
     private void setup(FMLCommonSetupEvent event) {

@@ -1,16 +1,12 @@
 package cx.rain.mc.inkraft.forge.event;
 
-import cx.rain.mc.inkraft.Inkraft;
-import cx.rain.mc.inkraft.InkraftPlatform;
-import cx.rain.mc.inkraft.gui.VariableHUD;
-import net.minecraft.client.Minecraft;
+import cx.rain.mc.inkraft.mod.InkraftMod;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.RenderGuiOverlayEvent;
-import net.minecraftforge.client.gui.overlay.VanillaGuiOverlay;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
-@Mod.EventBusSubscriber(modid = Inkraft.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
+@Mod.EventBusSubscriber(modid = InkraftMod.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
 public class RenderHUD {
     @SubscribeEvent
     public static void onPreRenderGuiOverlay(RenderGuiOverlayEvent.Pre event) {

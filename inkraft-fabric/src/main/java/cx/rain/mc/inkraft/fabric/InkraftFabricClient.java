@@ -1,10 +1,7 @@
 package cx.rain.mc.inkraft.fabric;
 
-import cx.rain.mc.inkraft.InkraftPlatform;
-import cx.rain.mc.inkraft.gui.VariableHUD;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
-import net.minecraft.client.Minecraft;
 
 public class InkraftFabricClient implements ClientModInitializer {
     @Override

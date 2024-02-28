@@ -1,7 +1,7 @@
 package cx.rain.mc.inkraft.forge.capability;
 
-import cx.rain.mc.inkraft.platform.IStoryHolder;
-import cx.rain.mc.inkraft.utility.StoryVariables;
+import cx.rain.mc.inkraft.mod.platform.IStoryHolder;
+import cx.rain.mc.inkraft.story.StoryVariables;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;

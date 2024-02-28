@@ -1,7 +1,7 @@
 package cx.rain.mc.inkraft.forge.platform;
 
-import cx.rain.mc.inkraft.Inkraft;
-import cx.rain.mc.inkraft.platform.IPermissionHolder;
+import cx.rain.mc.inkraft.mod.InkraftMod;
+import cx.rain.mc.inkraft.mod.platform.IPermissionHolder;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -11,7 +11,7 @@ import net.minecraftforge.server.permission.events.PermissionGatherEvent;
 import net.minecraftforge.server.permission.nodes.PermissionNode;
 import net.minecraftforge.server.permission.nodes.PermissionTypes;
 
-@Mod.EventBusSubscriber(modid = Inkraft.MODID)
+@Mod.EventBusSubscriber(modid = InkraftMod.MODID)
 public class PermissionHolder implements IPermissionHolder {
 
     public static final PermissionNode<Boolean> PERMISSION_START = bool("start", 2);
@@ -21,7 +21,7 @@ public class PermissionHolder implements IPermissionHolder {
     public static final PermissionNode<Boolean> PERMISSION_CONTINUE_OTHER = bool("continue.other", 2);
 
     private static PermissionNode<Boolean> bool(String name, int defaultLevel) {
-        return new PermissionNode<>(Inkraft.MODID, name, PermissionTypes.BOOLEAN,
+        return new PermissionNode<>(InkraftMod.MODID, name, PermissionTypes.BOOLEAN,
                 (player, uuid, context) -> player != null && player.hasPermissions(defaultLevel));
     }
 

@@ -1,6 +1,6 @@
 package cx.rain.mc.inkraft.fabric.mixins.interfaces;
 
-import cx.rain.mc.inkraft.utility.StoryVariables;
+import cx.rain.mc.inkraft.story.StoryVariables;
 import net.minecraft.resources.ResourceLocation;
 import org.apache.commons.lang3.tuple.Triple;
 

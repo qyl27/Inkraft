@@ -1,29 +1,26 @@
 plugins {
-    id 'architectury-plugin' version "${architect_plugin_version}"
-    id 'dev.architectury.loom' version "${architectury_loom_version}"
+    id 'java'
+    id 'maven-publish'
+    id 'architectury-plugin' version "${architect_plugin_version}" apply false
+    id 'dev.architectury.loom' version "${architectury_loom_version}" apply false
 }
 
-architectury {
-    common(project.enabled_platforms.split(','))
+publishing {
+    publications {
+        mavenFabric(MavenPublication) {
+            artifactId = project.name
+            version = 'true'.equalsIgnoreCase(System.getenv('MOD_RELEASE')) ? version : "${version}-SNAPSHOT"
+            from components.java
+        }
+    }
 }
 
 allprojects {
-    apply plugin: 'architectury-plugin'
-    apply plugin: 'dev.architectury.loom'
+    apply plugin: 'java'
     apply plugin: 'maven-publish'
 
     group = 'cx.rain.mc'
     version = "${project.mod_version}+mc${project.minecraft_version}"
-
-    architectury {
-        minecraft = project.minecraft_version
-    }
-
-    loom {
-        silentMojangMappingsLicense()
-
-        accessWidenerPath = file('src/main/resources/inkraft.accesswidener')
-    }
 
     repositories {
         maven {
@@ -39,22 +36,7 @@ allprojects {
         mavenCentral()
     }
 
-    loom {
-        runConfigs.configureEach {
-            ideConfigGenerated = true
-        }
-    }
-
     dependencies {
-        minecraft "com.mojang:minecraft:${project.minecraft_version}"
-        mappings loom.layered() {
-            officialMojangMappings()
-            parchment("org.parchmentmc.data:parchment-${project.parchment_minecraft_version}:${project.parchment_version}@zip")
-        }
-
-        modImplementation "net.fabricmc:fabric-loader:${project.fabric_loader_version}"
-        modApi "dev.architectury:architectury:${project.architectury_version}"
-
         implementation "com.bladecoder.ink:blade-ink:${project.blade_ink_version}"
     }
 
@@ -73,19 +55,14 @@ allprojects {
         }
     }
 
-    configurations {
-        common
-        shadowCommon
-        compileClasspath.extendsFrom common
-        runtimeClasspath.extendsFrom common
-        developmentForge.extendsFrom common
-        developmentFabric.extendsFrom common
-        developmentNeoForge.extendsFrom common
-        developmentQuilt.extendsFrom common
-    }
-
     processResources {
-        var resourcesToReplace = ['build.properties', 'META-INF/mods.toml', 'pack.mcmeta', 'fabric.mod.json']
+        var resourcesToReplace = [
+                'build.properties',
+                'META-INF/mods.toml',
+                'pack.mcmeta',
+                'fabric.mod.json',
+                'plugin.yml'
+        ]
 
         var replaceTokens = [
                 mod_version: mod_version,

@@ -9,5 +9,6 @@ pluginManagement {
 
 rootProject.name = 'inkraft'
 
-include(":inkraft-fabric")
-include(":inkraft-forge")
+include(':inkraft-common')
+include(':inkraft-fabric')
+include(':inkraft-forge')

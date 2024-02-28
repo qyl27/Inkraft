@@ -2,7 +2,7 @@ package cx.rain.mc.inkraft.fabric.mixins.mixin;
 
 import cx.rain.mc.inkraft.fabric.mixins.interfaces.IPlayerMixin;
 import cx.rain.mc.inkraft.fabric.platform.StoryHolder;
-import cx.rain.mc.inkraft.utility.StoryVariables;
+import cx.rain.mc.inkraft.story.StoryVariables;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;

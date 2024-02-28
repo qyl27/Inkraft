@@ -1,9 +1,9 @@
 package cx.rain.mc.inkraft.fabric;
 
-import cx.rain.mc.inkraft.platform.IPermissionHolder;
+import cx.rain.mc.inkraft.mod.platform.IPermissionHolder;
 import cx.rain.mc.inkraft.fabric.platform.PermissionHolder;
 import cx.rain.mc.inkraft.fabric.platform.StoryHolder;
-import cx.rain.mc.inkraft.platform.IStoryHolder;
+import cx.rain.mc.inkraft.mod.platform.IStoryHolder;
 import net.minecraft.world.entity.player.Player;
 
 import java.util.HashMap;
