@@ -1,9 +1,9 @@
 package cx.rain.mc.inkraft.story.function.game;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import cx.rain.mc.inkraft.story.PlayerStory;
+import cx.rain.mc.inkraft.story.PlayerStoryState;
 import cx.rain.mc.inkraft.story.function.StoryFunction;
-import cx.rain.mc.inkraft.utility.StoryVariables;
+import cx.rain.mc.inkraft.utility.StoryVariable;
 import cx.rain.mc.inkraft.utility.NbtMatchHelper;
 import net.minecraft.nbt.TagParser;
 import net.minecraft.server.level.ServerPlayer;
@@ -18,10 +18,10 @@ public class CountItemStackFunction implements StoryFunction {
     }
 
     @Override
-    public BiFunction<Object[], ServerPlayer, StoryVariables.IValue> func(PlayerStory engine) {
+    public BiFunction<Object[], ServerPlayer, StoryVariable.IValue> func(PlayerStoryState engine) {
         return (args, player) -> {
             if (args.length != 1) {
-                return new StoryVariables.IntVar(0);
+                return new StoryVariable.IntVar(0);
             }
 
             var item = args[0].toString();
@@ -35,11 +35,11 @@ public class CountItemStackFunction implements StoryFunction {
                     }
                 }
 
-                return new StoryVariables.IntVar(count);
+                return new StoryVariable.IntVar(count);
             } catch (CommandSyntaxException ex) {
                 ex.printStackTrace();
 
-                return new StoryVariables.IntVar(0);
+                return new StoryVariable.IntVar(0);
             }
         };
     }

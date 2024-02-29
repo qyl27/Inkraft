@@ -9,7 +9,7 @@ import net.minecraft.world.entity.player.Player;
 public class InkraftPlatformImpl {
     private static final IPermissionHolder PERMISSION_MANAGER = new PermissionHolder();
 
-    public static IStoryHolder getPlayerStoryStateHolder(Player player) {
+    public static IStoryHolder getPlayerStoryHolder(Player player) {
         var cap = player.getCapability(InkraftCapabilities.INKRAFT_STORY_STATE_HOLDER);
         return cap.orElseThrow(RuntimeException::new);
     }

@@ -1,12 +1,13 @@
 package cx.rain.mc.inkraft.story;
 
-import cx.rain.mc.inkraft.utility.StoryVariables;
+import cx.rain.mc.inkraft.utility.ICompoundSerializable;
+import cx.rain.mc.inkraft.utility.StoryVariable;
 import net.minecraft.resources.ResourceLocation;
 
 import java.util.Map;
 import java.util.UUID;
 
-public interface IPlayerStory {
+public interface IPlayerStoryState extends ICompoundSerializable {
     ResourceLocation getStoryPath();
     void setStoryPath(ResourceLocation path);
 
@@ -37,12 +38,15 @@ public interface IPlayerStory {
     String getPreviousMessage();
     void setPreviousMessage(String message);
 
+    boolean isPausing();
+    void setPausing(boolean pause);
+
     boolean isEnd();
     void setEnd(boolean end);
 
-    Map<String, StoryVariables.IValue> getVariables();
-    void putVariable(String name, StoryVariables.IValue value);
-    StoryVariables.IValue getVariable(String name);
-
+    Map<String, StoryVariable.IValue> getVariables();
+    void putVariable(String name, StoryVariable.IValue value);
+    StoryVariable.IValue getVariable(String name);
+    void removeVariable(String name);
 
 }

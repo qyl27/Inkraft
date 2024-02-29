@@ -16,7 +16,7 @@ public class VariableHUD {
         var maxValueLen = 0;
         var lineCount = 1;
 
-        var entries = InkraftPlatform.getPlayerStoryStateHolder(player).getVariables().entrySet();
+        var entries = InkraftPlatform.getPlayerStoryHolder(player).getVariables().entrySet();
         for (var entry : entries) {
             var value = entry.getValue();
 

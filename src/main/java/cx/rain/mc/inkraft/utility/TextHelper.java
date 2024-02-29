@@ -2,13 +2,10 @@ package cx.rain.mc.inkraft.utility;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextColor;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.regex.Pattern;
 
-public class TextStyleHelper {
+public class TextHelper {
     public static Pattern HEX_COLOR = Pattern.compile("/&([0-9a-fklmnor])|#([0-9a-f]{6})/gmi");
 
     public static Component parseStyle(String literalText) {
@@ -36,5 +33,22 @@ public class TextStyleHelper {
         }
 
         return component;
+    }
+
+    public static int getBufferingTicks(String string) {
+        var result = 0;
+
+        for (var i = 0; i < string.codePointCount(0, string.length()); i++) {
+            var code = string.codePointAt(i);
+            if (Character.isWhitespace(code)) {
+                // Don't add blank in sight buffer time.
+            } else if (Character.isIdeographic(code)) {
+                result += 2;
+            } else {
+                result += 1;
+            }
+        }
+
+        return result / 2;
     }
 }

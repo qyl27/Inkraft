@@ -5,7 +5,7 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import cx.rain.mc.inkraft.Constants;
 import cx.rain.mc.inkraft.InkraftPlatform;
-import cx.rain.mc.inkraft.utility.StoryVariables;
+import cx.rain.mc.inkraft.utility.StoryVariable;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.network.chat.Component;
@@ -15,7 +15,7 @@ import static net.minecraft.commands.Commands.literal;
 
 public class DebugCommand {
     public static final LiteralArgumentBuilder<CommandSourceStack>  INKRAFT_DEBUG = literal("debug")
-            .requires(InkraftPlatform.getPermissionManager()::hasClearPermission)
+            .requires(InkraftPlatform.getPermissionManager()::canClear)
             .then(literal("variables")
                     .then(literal("get")
                             .then(argument("name", StringArgumentType.word())
@@ -35,7 +35,7 @@ public class DebugCommand {
 
         var name = StringArgumentType.getString(context, "name");
 
-        var holder = InkraftPlatform.getPlayerStoryStateHolder(player);
+        var holder = InkraftPlatform.getPlayerStoryHolder(player);
         var variable = holder.getVariable(name);
 
         player.sendSystemMessage(Component.literal("Variable " + name + ": " + variable.asString()));
@@ -54,8 +54,8 @@ public class DebugCommand {
         var name = StringArgumentType.getString(context, "name");
         var variable = StringArgumentType.getString(context, "variable");
 
-        var holder = InkraftPlatform.getPlayerStoryStateHolder(player);
-        holder.putVariable(name, "", false, StoryVariables.IValue.fromString(variable));
+        var holder = InkraftPlatform.getPlayerStoryHolder(player);
+        holder.putVariable(name, "", false, StoryVariable.IValue.fromString(variable));
 
         player.sendSystemMessage(Component.translatable(Constants.MESSAGE_COMMAND_SUCCESS)
                 .withStyle(ChatFormatting.LIGHT_PURPLE));

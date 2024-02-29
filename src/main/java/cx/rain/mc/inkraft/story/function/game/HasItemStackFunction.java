@@ -1,9 +1,9 @@
 package cx.rain.mc.inkraft.story.function.game;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import cx.rain.mc.inkraft.story.PlayerStory;
+import cx.rain.mc.inkraft.story.PlayerStoryState;
 import cx.rain.mc.inkraft.story.function.StoryFunction;
-import cx.rain.mc.inkraft.utility.StoryVariables;
+import cx.rain.mc.inkraft.utility.StoryVariable;
 import cx.rain.mc.inkraft.utility.NbtMatchHelper;
 import net.minecraft.nbt.TagParser;
 import net.minecraft.server.level.ServerPlayer;
@@ -18,10 +18,10 @@ public class HasItemStackFunction implements StoryFunction {
     }
 
     @Override
-    public BiFunction<Object[], ServerPlayer, StoryVariables.IValue> func(PlayerStory engine) {
+    public BiFunction<Object[], ServerPlayer, StoryVariable.IValue> func(PlayerStoryState engine) {
         return (args, player) -> {
             if (args.length != 1) {
-                return new StoryVariables.BoolVar(false);
+                return new StoryVariable.BoolVar(false);
             }
 
             var item = args[0].toString();
@@ -30,15 +30,15 @@ public class HasItemStackFunction implements StoryFunction {
 
                 for (var i : player.getInventory().items) {
                     if (ItemStack.isSameItem(itemStack, i) && itemStack.getCount() <= i.getCount() && NbtMatchHelper.match(itemStack.getTag(), i.getTag())) {
-                        return StoryVariables.BoolVar.TRUE;
+                        return StoryVariable.BoolVar.TRUE;
                     }
                 }
 
-                return StoryVariables.BoolVar.FALSE;
+                return StoryVariable.BoolVar.FALSE;
             } catch (CommandSyntaxException ex) {
                 ex.printStackTrace();
 
-                return StoryVariables.BoolVar.FALSE;
+                return StoryVariable.BoolVar.FALSE;
             }
         };
     }

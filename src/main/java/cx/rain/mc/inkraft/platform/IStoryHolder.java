@@ -1,36 +1,20 @@
 package cx.rain.mc.inkraft.platform;
 
-import cx.rain.mc.inkraft.story.PlayerStory;
+import cx.rain.mc.inkraft.story.IPlayerStoryState;
+
+import java.util.Map;
 
 public interface IStoryHolder {
-    PlayerStory getStory(String id);
-    void addStory(PlayerStory story);
-    void clearStories();
+    boolean hasCurrentStory();
+    void setCurrentStory(String name);
+    void isCurrentStory(String name);
 
-//    String getState();
-//    void setState(String state);
-//
-//    String getLastMessage();
-//    void setLastMessage(String message);
-//
-//    UUID getContinueToken();
-//    void setContinueToken(UUID token);
-//
-//    boolean isInStory();
-//    void setInStory(boolean inStory);
-//
-//    void clearState();
-//
-//    Map<String, Triple<String, Boolean, StoryVariables.IStoryVariable>> getVariables();
-//    void putVariable(String name, String displayName, boolean isShow, StoryVariables.IStoryVariable value);
-//    StoryVariables.IStoryVariable getVariable(String name);
-//    void hideVariables();
-//    void clearVariables();
-//
-//    ResourceLocation getCurrentStory();
-//    void setCurrentStory(ResourceLocation story);
-//    boolean getCurrentAutoContinue();
-//    void setCurrentAutoContinue(boolean autoContinue);
-//    long getCurrentAutoContinueSpeed();
-//    void setCurrentAutoContinueSpeed(long autoContinueSpeed);
+    Map<String, IPlayerStoryState> getStories(String id);
+//    IPlayerStoryState getStory(int index);
+    IPlayerStoryState getStory(String name);
+    void addStory(IPlayerStoryState story);
+    void addStory(String nane, IPlayerStoryState story);
+//    void removeStory(int index);
+    void removeStory(String nane);
+    void clearStories();
 }

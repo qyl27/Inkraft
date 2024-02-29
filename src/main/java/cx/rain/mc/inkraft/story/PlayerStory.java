@@ -1,66 +1,96 @@
 package cx.rain.mc.inkraft.story;
 
 import com.bladecoder.ink.runtime.Story;
-import cx.rain.mc.inkraft.Inkraft;
 import cx.rain.mc.inkraft.Constants;
-import cx.rain.mc.inkraft.utility.StoryVariables;
+import cx.rain.mc.inkraft.Inkraft;
 import cx.rain.mc.inkraft.story.function.StoryFunctions;
-import cx.rain.mc.inkraft.utility.TextStyleHelper;
+import cx.rain.mc.inkraft.utility.StoryVariable;
+import cx.rain.mc.inkraft.utility.TextHelper;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.HoverEvent;
 import net.minecraft.server.level.ServerPlayer;
 
-import java.util.*;
+import java.util.UUID;
 
 public class PlayerStory {
-    private final Story story;
+
+//    public PlayerStory(ServerPlayer player, String name) {
+//        this(player, InkraftPlatform.getPlayerStoryHolder(player).getStory(name));
+//    }
+
     private final ServerPlayer player;
-    private boolean debug = false;
+    private final IPlayerStoryState state;
 
-    public PlayerStory(ServerPlayer player, Story story) {
-        this(player, story, true);
-    }
+    private final Story story;
 
-    public PlayerStory(ServerPlayer player, Story story, boolean debug) {
-        this.story = story;
+    public PlayerStory(ServerPlayer player, IPlayerStoryState state) {
         this.player = player;
-        this.debug = debug;
+        this.state = state;
+
+        story = Inkraft.getInstance().getStoriesManager().createStory(state.getStoryPath());
+        bindStoryFunctions(story);
+        try {
+            story.getState().loadJson(state.getState());
+        } catch (Exception ex) {
+            Inkraft.getInstance().getLogger().error("Failed to load state", ex);
+            throw new RuntimeException(ex);
+        }
+
+
     }
 
-    public ServerPlayer getPlayer() {
-        return player;
+    private void bindStoryFunctions(Story story) {
+        try {
+            for (var funcSupplier : StoryFunctions.FUNCTIONS) {
+                var func = funcSupplier.get();
+                var funcName = func.getName().isBlank() ? funcSupplier.getRegistryId().getPath() : func.getName();
+
+                story.bindExternalFunction(funcName, args -> {
+                    var result = func.func(this).apply(args);
+                    if (result instanceof StoryVariable.StrVar strVar) {
+                        return strVar.stringValue();
+                    } else if (result instanceof StoryVariable.IntVar intVar) {
+                        return intVar.intValue();
+                    } else if (result instanceof StoryVariable.DoubleVar doubleVar) {
+                        return doubleVar.doubleValue();
+                    } else if (result instanceof StoryVariable.BoolVar boolVar) {
+                        return boolVar.boolValue();
+                    }
+                    return result;
+                }, false);
+            }
+        } catch (Exception ex) {
+            Inkraft.getInstance().getLogger().error("Failed to load function", ex);
+            throw new RuntimeException(ex);
+        }
     }
 
-    public boolean isDebug() {
-        return debug;
-    }
-
-    //    public boolean startStory(ResourceLocation path, boolean debug) {
-//        this.debug = debug;
-//
-//        flowTo(path);
-//        bindStoryFunctions();
-//        return continueStory(new AsyncToken());
-//    }
-//
-//    public boolean isDebug() {
-//        return debug;
-//    }
-
-    private boolean continueStory(AsyncToken asyncToken) {
+    public void nextStep() {
         try {
             if (story.canContinue()) {
-                var message = story.Continue().trim();
+                var elapsed = 0;
 
-                while (message.isEmpty()) {
+                String message;
+                do {
                     message = story.Continue().trim();
+                    elapsed += TextHelper.getBufferingTicks(message);
+                } while (message.isEmpty());
+
+                state.setPreviousMessage(message);
+                player.sendSystemMessage(TextHelper.parseStyle(message));
+
+
+                if (!state.isPausing() || state.hasNextStep()) {
+                    var choices = story.getCurrentChoices();
+
+                    if (story.canContinue()) {
+
+                    }
                 }
 
-                player.sendSystemMessage(TextStyleHelper.parseStyle(message));
 
-                var choices = story.getCurrentChoices();
                 if (choices.isEmpty()) {
                     if (story.canContinue()) {
                         if (canAutoContinue()) {
@@ -91,32 +121,24 @@ public class PlayerStory {
                         save(message, true);
                         return true;
                     }
+                    save(message, false);
                 } else {
-                    sendContinue();
+                    save(null, story.getCurrentChoices().isEmpty());
                 }
-
-                save(message, false);
-            } else {
-                save(null, story.getCurrentChoices().isEmpty());
             }
-            return true;
         } catch (Exception ex) {
-            ex.printStackTrace();
-            return false;
+            Inkraft.getInstance().getLogger().error("Failed to get next line", ex);
+            throw new RuntimeException(ex);
         }
     }
 
     public void sendContinue() {
-        if (!story.canContinue() && story.getCurrentChoices().isEmpty()) {
-            return;
-        }
-
-        if (hideContinue) {
+        if (!story.canContinue()) {
             return;
         }
 
         var token = UUID.randomUUID();
-        holder.setContinueToken(token);
+        state.setStepToken(token);
 
         if (story.getCurrentChoices().isEmpty()) {
             var component = Component.translatable(Constants.MESSAGE_STORY_CONTINUE).withStyle(ChatFormatting.YELLOW);
@@ -136,37 +158,71 @@ public class PlayerStory {
         }
     }
 
-    public void repeatContinue() {
-        if (!holder.isInStory()) {
-            return;
-        }
+//    private final Story story;
+//    private final ServerPlayer player;
+//    private boolean debug = false;
+//
+//    public PlayerStory(ServerPlayer player, Story story) {
+//        this(player, story, true);
+//    }
+//
+//    public PlayerStory(ServerPlayer player, Story story, boolean debug) {
+//        this.story = story;
+//        this.player = player;
+//        this.debug = debug;
+//    }
+//
+//    public ServerPlayer getPlayer() {
+//        return player;
+//    }
+//
+//    public boolean isDebug() {
+//        return debug;
+//    }
 
-        var message = holder.getLastMessage();
+    //    public boolean startStory(ResourceLocation path, boolean debug) {
+//        this.debug = debug;
+//
+//        flowTo(path);
+//        bindStoryFunctions();
+//        return continueStory(new AsyncToken());
+//    }
+//
+//    public boolean isDebug() {
+//        return debug;
+//    }
 
-        autoContinue = holder.getCurrentAutoContinue();
-        continueSpeed = holder.getCurrentAutoContinueSpeed();
+//    public void repeatContinue() {
+//        if (!holder.isInStory()) {
+//            return;
+//        }
+//
+//        var message = holder.getLastMessage();
+//
+//        autoContinue = holder.getCurrentAutoContinue();
+//        continueSpeed = holder.getCurrentAutoContinueSpeed();
+//
+//        player.sendSystemMessage(TextStyleHelper.parseStyle(message));
+//        sendContinue();
+//    }
 
-        player.sendSystemMessage(TextStyleHelper.parseStyle(message));
-        sendContinue();
-    }
-
-    public boolean continueStoryWithoutChoice() {
-        return continueStory(new AsyncToken());
-    }
-
-    public boolean continueStoryWithChoice(int choice) {
-        try {
-            if (story.getCurrentChoices().isEmpty()) {
-                story.Continue();
-            } else {
-                story.chooseChoiceIndex(choice);
-            }
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-
-        return continueStory(new AsyncToken());
-    }
+//    public boolean continueStoryWithoutChoice() {
+//        return continueStory(new AsyncToken());
+//    }
+//
+//    public boolean continueStoryWithChoice(int choice) {
+//        try {
+//            if (story.getCurrentChoices().isEmpty()) {
+//                story.Continue();
+//            } else {
+//                story.chooseChoiceIndex(choice);
+//            }
+//        } catch (Exception ex) {
+//            ex.printStackTrace();
+//        }
+//
+//        return continueStory(new AsyncToken());
+//    }
 
 //    public void save(String lastMessage, boolean isStoryEnd) {
 //        try {
@@ -217,30 +273,6 @@ public class PlayerStory {
 //        Inkraft.getInstance().getNetworking().sendToPlayer(player, new S2CHideAllVariablePacket());
 //    }
 
-    private void bindStoryFunctions() {
-        try {
-            for (var funcSupplier : StoryFunctions.FUNCTIONS) {
-                var func = funcSupplier.get();
-                var funcName = func.getName().isBlank() ? funcSupplier.getRegistryId().getPath() : func.getName();
-
-                story.bindExternalFunction(funcName, args -> {
-                    var result = func.func(this).apply(args);
-                    if (result instanceof StoryVariables.StrVar strVar) {
-                        return strVar.stringValue();
-                    } else if (result instanceof StoryVariables.IntVar intVar) {
-                        return intVar.intValue();
-                    } else if (result instanceof StoryVariables.DoubleVar doubleVar) {
-                        return doubleVar.doubleValue();
-                    } else if (result instanceof StoryVariables.BoolVar boolVar) {
-                        return boolVar.boolValue();
-                    }
-                    return result;
-                }, false);
-            }
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-    }
 
 //    public boolean canAutoContinue() {
 //        return autoContinue && story.canContinue();

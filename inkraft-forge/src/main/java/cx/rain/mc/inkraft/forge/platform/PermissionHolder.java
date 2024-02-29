@@ -43,27 +43,27 @@ public class PermissionHolder implements IPermissionHolder {
     }
 
     @Override
-    public boolean hasStartPermission(CommandSourceStack source) {
+    public boolean canStart(CommandSourceStack source) {
         return check(source, PERMISSION_START);
     }
 
     @Override
-    public boolean hasContinuePermission(CommandSourceStack source) {
+    public boolean canNext(CommandSourceStack source) {
         return check(source, PERMISSION_CONTINUE);
     }
 
     @Override
-    public boolean hasClearPermission(CommandSourceStack source) {
+    public boolean canClear(CommandSourceStack source) {
         return check(source, PERMISSION_CLEAR);
     }
 
     @Override
-    public boolean hasStartForOtherPermission(CommandSourceStack source) {
+    public boolean canStartForOther(CommandSourceStack source) {
         return check(source, PERMISSION_START_OTHER);
     }
 
     @Override
-    public boolean hasContinueForOtherPermission(CommandSourceStack source) {
+    public boolean canNextForOther(CommandSourceStack source) {
         return check(source, PERMISSION_CONTINUE_OTHER);
     }
 }

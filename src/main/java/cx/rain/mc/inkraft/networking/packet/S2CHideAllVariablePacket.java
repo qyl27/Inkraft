@@ -18,6 +18,6 @@ public class S2CHideAllVariablePacket {
 
     public void apply(Supplier<NetworkManager.PacketContext> contextSupplier) {
         var context = contextSupplier.get();
-        context.queue(() -> InkraftPlatform.getPlayerStoryStateHolder(context.getPlayer()).hideVariables());
+        context.queue(() -> InkraftPlatform.getPlayerStoryHolder(context.getPlayer()).hideVariables());
     }
 }

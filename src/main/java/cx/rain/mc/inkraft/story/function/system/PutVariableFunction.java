@@ -1,9 +1,9 @@
 package cx.rain.mc.inkraft.story.function.system;
 
 import cx.rain.mc.inkraft.InkraftPlatform;
-import cx.rain.mc.inkraft.story.PlayerStory;
+import cx.rain.mc.inkraft.story.PlayerStoryState;
 import cx.rain.mc.inkraft.story.function.StoryFunction;
-import cx.rain.mc.inkraft.utility.StoryVariables;
+import cx.rain.mc.inkraft.utility.StoryVariable;
 import net.minecraft.server.level.ServerPlayer;
 
 import java.util.function.BiFunction;
@@ -15,18 +15,18 @@ public class PutVariableFunction implements StoryFunction {
     }
 
     @Override
-    public BiFunction<Object[], ServerPlayer, StoryVariables.IValue> func(PlayerStory engine) {
+    public BiFunction<Object[], ServerPlayer, StoryVariable.IValue> func(PlayerStoryState engine) {
         return (args, player) -> {
             if (args.length != 2) {
-                return StoryVariables.BoolVar.FALSE;
+                return StoryVariable.BoolVar.FALSE;
             }
 
             var name = args[0].toString();
             var value = args[1].toString();
 
-            InkraftPlatform.getPlayerStoryStateHolder(player).putVariable(name, "", false, StoryVariables.IValue.fromString(value));
+            InkraftPlatform.getPlayerStoryHolder(player).putVariable(name, "", false, StoryVariable.IValue.fromString(value));
 
-            return StoryVariables.BoolVar.TRUE;
+            return StoryVariable.BoolVar.TRUE;
         };
     }
 }

@@ -37,7 +37,7 @@ public class InStoryCondition implements LootItemCondition {
     public boolean test(LootContext lootContext) {
         var entity = lootContext.getParamOrNull(LootContextParams.THIS_ENTITY);
         if (entity instanceof ServerPlayer player) {
-            return InkraftPlatform.getPlayerStoryStateHolder(player).isInStory() == isInStory;
+            return InkraftPlatform.getPlayerStoryHolder(player).isInStory() == isInStory;
         }
 
         return false;

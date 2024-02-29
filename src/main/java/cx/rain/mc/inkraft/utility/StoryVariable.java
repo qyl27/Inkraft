@@ -1,11 +1,70 @@
 package cx.rain.mc.inkraft.utility;
 
-public class StoryVariables {
-    // Todo: qyl27: variable name, display name, etc.
+import net.minecraft.network.chat.Component;
+
+import java.util.Objects;
+
+public final class StoryVariable {
+    private String name;
+    private Component display;
+    private IValue value;
+
+    public StoryVariable(String name, Component display, IValue value) {
+        this.name = name;
+        this.display = display;
+        this.value = value;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public Component getDisplay() {
+        return display;
+    }
+
+    public void setDisplay(Component display) {
+        this.display = display;
+    }
+
+    public IValue getValue() {
+        return value;
+    }
+
+    public void setValue(IValue value) {
+        this.value = value;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this) return true;
+        if (obj == null || obj.getClass() != this.getClass()) return false;
+        var that = (StoryVariable) obj;
+        return Objects.equals(this.name, that.name) &&
+                Objects.equals(this.display, that.display) &&
+                Objects.equals(this.value, that.value);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, display, value);
+    }
+
+    @Override
+    public String toString() {
+        return "StoryVariable[" +
+                "name=" + name + ", " +
+                "display=" + display + ", " +
+                "value=" + value + ']';
+    }
 
     public interface IValue {
         String asStringValue();
-        
+
         static IValue fromString(String str) {
             if (str.equalsIgnoreCase("false")) {
                 return BoolVar.FALSE;

@@ -1,8 +1,8 @@
 package cx.rain.mc.inkraft.story.function.system;
 
-import cx.rain.mc.inkraft.story.PlayerStory;
+import cx.rain.mc.inkraft.story.PlayerStoryState;
 import cx.rain.mc.inkraft.story.function.StoryFunction;
-import cx.rain.mc.inkraft.utility.StoryVariables;
+import cx.rain.mc.inkraft.utility.StoryVariable;
 import net.minecraft.server.level.ServerPlayer;
 
 import java.util.function.BiFunction;
@@ -14,15 +14,15 @@ public class HideContinueFunction implements StoryFunction {
     }
 
     @Override
-    public BiFunction<Object[], ServerPlayer, StoryVariables.IValue> func(PlayerStory engine) {
+    public BiFunction<Object[], ServerPlayer, StoryVariable.IValue> func(PlayerStoryState engine) {
         return (args, player) -> {
             if (args.length != 1) {
-                return StoryVariables.BoolVar.FALSE;
+                return StoryVariable.BoolVar.FALSE;
             }
 
             var isHide = args[0].toString().equalsIgnoreCase("true");
             engine.setHideContinue(isHide);
-            return StoryVariables.BoolVar.TRUE;
+            return StoryVariable.BoolVar.TRUE;
         };
     }
 }

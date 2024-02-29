@@ -1,7 +1,7 @@
 package cx.rain.mc.inkraft.forge.capability;
 
 import cx.rain.mc.inkraft.platform.IStoryHolder;
-import cx.rain.mc.inkraft.utility.StoryVariables;
+import cx.rain.mc.inkraft.utility.StoryVariable;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
@@ -75,22 +75,22 @@ public class StoryHolder implements IStoryHolder, INBTSerializable<CompoundTag> 
 
     /// <editor-fold desc="Variables show.">
 
-    private final Map<String, Triple<String, Boolean, StoryVariables.IValue>> variables = new HashMap<>();
+    private final Map<String, Triple<String, Boolean, StoryVariable.IValue>> variables = new HashMap<>();
 
     @Override
-    public Map<String, Triple<String, Boolean, StoryVariables.IValue>> getVariables() {
+    public Map<String, Triple<String, Boolean, StoryVariable.IValue>> getVariables() {
         return variables;
     }
 
     @Override
-    public void putVariable(String name, String displayName, boolean isShow, StoryVariables.IValue value) {
+    public void putVariable(String name, String displayName, boolean isShow, StoryVariable.IValue value) {
         variables.put(name, new MutableTriple<>(displayName, isShow, value));
     }
 
     @Override
-    public StoryVariables.IValue getVariable(String name) {
+    public StoryVariable.IValue getVariable(String name) {
         if (!variables.containsKey(name)) {
-            putVariable(name, "", false, StoryVariables.BoolVar.FALSE);
+            putVariable(name, "", false, StoryVariable.BoolVar.FALSE);
         }
         return variables.get(name).getRight();
     }
@@ -208,7 +208,7 @@ public class StoryHolder implements IStoryHolder, INBTSerializable<CompoundTag> 
             var displayName = compoundTag.getString(TAG_VARIABLES_DISPLAY_NAME);
             var isShow = compoundTag.getBoolean(TAG_VARIABLES_SHOW_NAME);
             var value = compoundTag.getString(TAG_VARIABLES_VALUE_NAME);
-            putVariable(name, displayName, isShow, StoryVariables.IValue.fromString(value));
+            putVariable(name, displayName, isShow, StoryVariable.IValue.fromString(value));
         }
 
         var story = tag.getString(TAG_CURRENT_STORY_NAME);

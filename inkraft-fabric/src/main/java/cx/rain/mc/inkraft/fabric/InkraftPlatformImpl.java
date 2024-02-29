@@ -14,7 +14,7 @@ public class InkraftPlatformImpl {
     private static final Map<UUID, StoryHolder> CACHED_PLAYER_HOLDER = new HashMap<>();
     private static final IPermissionHolder PERMISSION_MANAGER = new PermissionHolder();
 
-    public static IStoryHolder getPlayerStoryStateHolder(Player player) {
+    public static IStoryHolder getPlayerStoryHolder(Player player) {
         if (!CACHED_PLAYER_HOLDER.containsKey(player.getUUID())) {
             CACHED_PLAYER_HOLDER.put(player.getUUID(), new StoryHolder(player));
         }

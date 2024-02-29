@@ -6,27 +6,27 @@ import net.minecraft.commands.CommandSourceStack;
 public class PermissionHolder implements IPermissionHolder {
 
     @Override
-    public boolean hasStartPermission(CommandSourceStack source) {
+    public boolean canStart(CommandSourceStack source) {
         return source.hasPermission(2);
     }
 
     @Override
-    public boolean hasContinuePermission(CommandSourceStack source) {
+    public boolean canNext(CommandSourceStack source) {
         return source.hasPermission(0);
     }
 
     @Override
-    public boolean hasClearPermission(CommandSourceStack source) {
+    public boolean canClear(CommandSourceStack source) {
         return source.hasPermission(2);
     }
 
     @Override
-    public boolean hasStartForOtherPermission(CommandSourceStack source) {
+    public boolean canStartForOther(CommandSourceStack source) {
         return source.hasPermission(2);
     }
 
     @Override
-    public boolean hasContinueForOtherPermission(CommandSourceStack source) {
+    public boolean canNextForOther(CommandSourceStack source) {
         return source.hasPermission(2);
     }
 }

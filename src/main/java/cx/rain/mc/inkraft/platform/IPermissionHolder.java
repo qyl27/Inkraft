@@ -1,15 +1,18 @@
 package cx.rain.mc.inkraft.platform;
 
 import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.server.level.ServerPlayer;
 
 public interface IPermissionHolder {
-    boolean hasStartPermission(CommandSourceStack source);
+    boolean canStart(CommandSourceStack source);
 
-    boolean hasContinuePermission(CommandSourceStack source);
+    boolean canNext(CommandSourceStack source);
 
-    boolean hasClearPermission(CommandSourceStack source);
+    boolean canClear(CommandSourceStack source);
 
-    boolean hasStartForOtherPermission(CommandSourceStack source);
+    boolean canStartFor(CommandSourceStack source, ServerPlayer player);
 
-    boolean hasContinueForOtherPermission(CommandSourceStack source);
+    boolean canNextFor(CommandSourceStack source, ServerPlayer player);
+
+    boolean canClearFor(CommandSourceStack source, ServerPlayer player);
 }

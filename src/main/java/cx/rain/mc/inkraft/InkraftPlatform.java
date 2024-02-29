@@ -7,7 +7,7 @@ import net.minecraft.world.entity.player.Player;
 
 public class InkraftPlatform {
     @ExpectPlatform
-    public static IStoryHolder getPlayerStoryStateHolder(Player player) {
+    public static IStoryHolder getPlayerStoryHolder(Player player) {
         throw new RuntimeException();
     }
 

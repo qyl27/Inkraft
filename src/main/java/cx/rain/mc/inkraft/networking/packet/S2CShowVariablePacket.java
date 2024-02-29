@@ -1,7 +1,7 @@
 package cx.rain.mc.inkraft.networking.packet;
 
 import cx.rain.mc.inkraft.InkraftPlatform;
-import cx.rain.mc.inkraft.utility.StoryVariables;
+import cx.rain.mc.inkraft.utility.StoryVariable;
 import dev.architectury.networking.NetworkManager;
 import net.minecraft.network.FriendlyByteBuf;
 
@@ -33,6 +33,6 @@ public class S2CShowVariablePacket {
 
     public void apply(Supplier<NetworkManager.PacketContext> contextSupplier) {
         var context = contextSupplier.get();
-        context.queue(() -> InkraftPlatform.getPlayerStoryStateHolder(context.getPlayer()).putVariable(name, displayName, isShow, StoryVariables.IValue.fromString(value)));
+        context.queue(() -> InkraftPlatform.getPlayerStoryHolder(context.getPlayer()).putVariable(name, displayName, isShow, StoryVariable.IValue.fromString(value)));
     }
 }

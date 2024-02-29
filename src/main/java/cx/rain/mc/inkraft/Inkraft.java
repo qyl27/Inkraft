@@ -62,9 +62,9 @@ public class Inkraft {
         TickEvent.SERVER_POST.register(server -> getTimerManager().onTick(server));
 
         PlayerEvent.PLAYER_JOIN.register(player -> {
-            var holder = InkraftPlatform.getPlayerStoryStateHolder(player);
+            var holder = InkraftPlatform.getPlayerStoryHolder(player);
 
-            if (holder.isInStory()) {
+            if (holder.hasCurrentStory()) {
                 var component = Component.translatable(Constants.MESSAGE_STORY_LOGGED_IN_CONTINUE);
                 component.setStyle(component.getStyle().withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
                         "/inkraft repeat")));

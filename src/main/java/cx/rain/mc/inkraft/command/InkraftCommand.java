@@ -11,7 +11,7 @@ import cx.rain.mc.inkraft.Constants;
 import cx.rain.mc.inkraft.Inkraft;
 import cx.rain.mc.inkraft.InkraftPlatform;
 import cx.rain.mc.inkraft.platform.IStoryHolder;
-import cx.rain.mc.inkraft.story.PlayerStory;
+import cx.rain.mc.inkraft.story.PlayerStoryState;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.arguments.EntityArgument;
@@ -32,7 +32,7 @@ public class InkraftCommand {
             .then(literal("version")
                     .executes(InkraftCommand::onVersion))
             .then(literal("start")
-                    .requires(InkraftPlatform.getPermissionManager()::hasStartPermission)
+                    .requires(InkraftPlatform.getPermissionManager()::canStart)
                     .then(argument("path", ResourceLocationArgument.id())
                             .suggests(InkraftCommand::suggestStart)
                             .then(argument("debug", BoolArgumentType.bool())
@@ -43,23 +43,23 @@ public class InkraftCommand {
                                     .executes(InkraftCommand::onStartForOther))
                             .executes(InkraftCommand::onStart)))
             .then(literal("continue")
-                    .requires(InkraftPlatform.getPermissionManager()::hasContinuePermission)
+                    .requires(InkraftPlatform.getPermissionManager()::canNext)
                     .then(argument("token", UuidArgument.uuid())
                             .then(argument("choice", IntegerArgumentType.integer())
                                     .executes(InkraftCommand::onChoiceContinue))
                             .executes(InkraftCommand::onSimpleContinue))
                     .then(argument("player", EntityArgument.player())
-                            .requires(InkraftPlatform.getPermissionManager()::hasContinueForOtherPermission)
+                            .requires(InkraftPlatform.getPermissionManager()::canNextForOther)
                             .then(argument("choice", IntegerArgumentType.integer())
                                     .executes(InkraftCommand::onChoiceContinueForOther))
                             .executes(InkraftCommand::onSimpleContinueForOther)))
             .then(literal("clear")
-                    .requires(InkraftPlatform.getPermissionManager()::hasClearPermission)
+                    .requires(InkraftPlatform.getPermissionManager()::canClear)
                     .then(argument("player", EntityArgument.player())
                             .executes(InkraftCommand::onClearStateForOther))
                     .executes(InkraftCommand::onClearState))
             .then(literal("repeat")
-                    .requires(InkraftPlatform.getPermissionManager()::hasContinuePermission)
+                    .requires(InkraftPlatform.getPermissionManager()::canNext)
                     .then(argument("player", EntityArgument.player())
                             .executes(InkraftCommand::onRepeatForOther))
                     .executes(InkraftCommand::onRepeat))
@@ -80,7 +80,7 @@ public class InkraftCommand {
 
         var player = context.getSource().getPlayer();
         var path = ResourceLocationArgument.getId(context, "path");
-        var stateHolder = InkraftPlatform.getPlayerStoryStateHolder(player);
+        var stateHolder = InkraftPlatform.getPlayerStoryHolder(player);
 
         startStory(player, path, stateHolder, false);
 
@@ -95,7 +95,7 @@ public class InkraftCommand {
         var player = context.getSource().getPlayer();
         var path = ResourceLocationArgument.getId(context, "path");
         var debug = BoolArgumentType.getBool(context, "debug");
-        var stateHolder = InkraftPlatform.getPlayerStoryStateHolder(player);
+        var stateHolder = InkraftPlatform.getPlayerStoryHolder(player);
 
         startStory(player, path, stateHolder, debug);
 
@@ -105,7 +105,7 @@ public class InkraftCommand {
     private static int onStartForOther(final CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
         var player = EntityArgument.getPlayer(context, "player");
         var path = ResourceLocationArgument.getId(context, "path");
-        var stateHolder = InkraftPlatform.getPlayerStoryStateHolder(player);
+        var stateHolder = InkraftPlatform.getPlayerStoryHolder(player);
 
         startStory(player, path, stateHolder, false);
 
@@ -116,7 +116,7 @@ public class InkraftCommand {
         var player = EntityArgument.getPlayer(context, "player");
         var path = ResourceLocationArgument.getId(context, "path");
         var debug = BoolArgumentType.getBool(context, "debug");
-        var stateHolder = InkraftPlatform.getPlayerStoryStateHolder(player);
+        var stateHolder = InkraftPlatform.getPlayerStoryHolder(player);
 
         startStory(player, path, stateHolder, debug);
         return 1;
@@ -133,7 +133,7 @@ public class InkraftCommand {
 
         var player = context.getSource().getPlayer();
         var token = UuidArgument.getUuid(context, "token");
-        var stateHolder = InkraftPlatform.getPlayerStoryStateHolder(player);
+        var stateHolder = InkraftPlatform.getPlayerStoryHolder(player);
 
         if (stateHolder.getContinueToken() != null && stateHolder.getContinueToken().equals(token)) {
             continueStory(player, stateHolder, -1);
@@ -153,7 +153,7 @@ public class InkraftCommand {
         var player = context.getSource().getPlayer();
         var token = UuidArgument.getUuid(context, "token");
         var choice = IntegerArgumentType.getInteger(context, "choice");
-        var stateHolder = InkraftPlatform.getPlayerStoryStateHolder(player);
+        var stateHolder = InkraftPlatform.getPlayerStoryHolder(player);
 
         if (stateHolder.getContinueToken() != null && stateHolder.getContinueToken().equals(token)) {
             continueStory(player, stateHolder, choice);
@@ -168,7 +168,7 @@ public class InkraftCommand {
 
     private static int onSimpleContinueForOther(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
         var player = EntityArgument.getPlayer(context, "player");
-        var stateHolder = InkraftPlatform.getPlayerStoryStateHolder(player);
+        var stateHolder = InkraftPlatform.getPlayerStoryHolder(player);
 
         continueStory(player, stateHolder, -1);
         return 1;
@@ -176,7 +176,7 @@ public class InkraftCommand {
 
     private static int onChoiceContinueForOther(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
         var player = EntityArgument.getPlayer(context, "player");
-        var stateHolder = InkraftPlatform.getPlayerStoryStateHolder(player);
+        var stateHolder = InkraftPlatform.getPlayerStoryHolder(player);
         var choice = IntegerArgumentType.getInteger(context, "choice");
 
         continueStory(player, stateHolder, choice);
@@ -193,7 +193,7 @@ public class InkraftCommand {
         }
 
         var player = context.getSource().getPlayer();
-        var stateHolder = InkraftPlatform.getPlayerStoryStateHolder(player);
+        var stateHolder = InkraftPlatform.getPlayerStoryHolder(player);
 
         stateHolder.clearState();
         Inkraft.getInstance().getStoriesManager().refreshStory(player);
@@ -205,7 +205,7 @@ public class InkraftCommand {
 
     private static int onClearStateForOther(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
         var player = EntityArgument.getPlayer(context, "player");
-        var stateHolder = InkraftPlatform.getPlayerStoryStateHolder(player);
+        var stateHolder = InkraftPlatform.getPlayerStoryHolder(player);
 
         stateHolder.clearState();
         Inkraft.getInstance().getStoriesManager().refreshStory(player);
@@ -246,7 +246,7 @@ public class InkraftCommand {
     private static void startStory(ServerPlayer player, ResourceLocation path, IStoryHolder stateHolder, boolean isDebug) {
         var storiesManager = Inkraft.getInstance().getStoriesManager();
 
-        PlayerStory story;
+        PlayerStoryState story;
         if (!storiesManager.hasCachedStory(player)) {
             story = storiesManager.createStory(player);
         } else {
@@ -272,14 +272,14 @@ public class InkraftCommand {
     private static void repeatChoices(ServerPlayer player) {
         var storiesManager = Inkraft.getInstance().getStoriesManager();
 
-        PlayerStory story;
+        PlayerStoryState story;
         if (!storiesManager.hasCachedStory(player)) {
             story = storiesManager.createStory(player);
         } else {
             story = storiesManager.getStory(player);
         }
 
-        var holder = InkraftPlatform.getPlayerStoryStateHolder(player);
+        var holder = InkraftPlatform.getPlayerStoryHolder(player);
         story.load(holder.getCurrentStory());
         story.repeatContinue();
     }

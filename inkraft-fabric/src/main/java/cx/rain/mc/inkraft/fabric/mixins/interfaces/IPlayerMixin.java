@@ -1,6 +1,6 @@
 package cx.rain.mc.inkraft.fabric.mixins.interfaces;
 
-import cx.rain.mc.inkraft.utility.StoryVariables;
+import cx.rain.mc.inkraft.utility.StoryVariable;
 import net.minecraft.resources.ResourceLocation;
 import org.apache.commons.lang3.tuple.Triple;
 
@@ -20,9 +20,9 @@ public interface IPlayerMixin {
     boolean inkraft$isInStory();
     void inkraft$setInStory(boolean inStory);
 
-    Map<String, Triple<String, Boolean, StoryVariables.IValue>> inkraft$getVariables();
-    void inkraft$putVariable(String name, String displayName, boolean isShow, StoryVariables.IValue value);
-    StoryVariables.IValue inkraft$getVariable(String name);
+    Map<String, Triple<String, Boolean, StoryVariable.IValue>> inkraft$getVariables();
+    void inkraft$putVariable(String name, String displayName, boolean isShow, StoryVariable.IValue value);
+    StoryVariable.IValue inkraft$getVariable(String name);
     void inkraft$hideVariables();
     void inkraft$clearVariables();
 

@@ -1,8 +1,8 @@
 package cx.rain.mc.inkraft.story.function.game;
 
-import cx.rain.mc.inkraft.story.PlayerStory;
+import cx.rain.mc.inkraft.story.PlayerStoryState;
 import cx.rain.mc.inkraft.story.function.StoryFunction;
-import cx.rain.mc.inkraft.utility.StoryVariables;
+import cx.rain.mc.inkraft.utility.StoryVariable;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
@@ -16,10 +16,10 @@ public class GiveItemFunction implements StoryFunction {
     }
 
     @Override
-    public BiFunction<Object[], ServerPlayer, StoryVariables.IValue> func(PlayerStory engine) {
+    public BiFunction<Object[], ServerPlayer, StoryVariable.IValue> func(PlayerStoryState engine) {
         return (args, player) -> {
             if (args.length != 2) {
-                return new StoryVariables.BoolVar(false);
+                return new StoryVariable.BoolVar(false);
             }
 
             try {
@@ -27,7 +27,7 @@ public class GiveItemFunction implements StoryFunction {
                 var count = Byte.parseByte(args[1].toString());
 
                 if (count < 1 || count > 64) {
-                    return new StoryVariables.BoolVar(false);
+                    return new StoryVariable.BoolVar(false);
                 }
 
                 var tag = new CompoundTag();
@@ -37,11 +37,11 @@ public class GiveItemFunction implements StoryFunction {
                 var itemStack = ItemStack.of(tag);
                 giveItem(player, itemStack);
 
-                return new StoryVariables.BoolVar(true);
+                return new StoryVariable.BoolVar(true);
             } catch (RuntimeException ex) {
                 ex.printStackTrace();
 
-                return new StoryVariables.BoolVar(false);
+                return new StoryVariable.BoolVar(false);
             }
         };
     }

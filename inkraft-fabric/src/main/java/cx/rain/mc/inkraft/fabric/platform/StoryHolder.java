@@ -2,7 +2,7 @@ package cx.rain.mc.inkraft.fabric.platform;
 
 import cx.rain.mc.inkraft.fabric.mixins.interfaces.IPlayerMixin;
 import cx.rain.mc.inkraft.platform.IStoryHolder;
-import cx.rain.mc.inkraft.utility.StoryVariables;
+import cx.rain.mc.inkraft.utility.StoryVariable;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 import org.apache.commons.lang3.tuple.Triple;
@@ -80,17 +80,17 @@ public class StoryHolder implements IStoryHolder {
     }
 
     @Override
-    public Map<String, Triple<String, Boolean, StoryVariables.IValue>> getVariables() {
+    public Map<String, Triple<String, Boolean, StoryVariable.IValue>> getVariables() {
         return ((IPlayerMixin) player).inkraft$getVariables();
     }
 
     @Override
-    public void putVariable(String name, String displayName, boolean isShow, StoryVariables.IValue value) {
+    public void putVariable(String name, String displayName, boolean isShow, StoryVariable.IValue value) {
         ((IPlayerMixin) player).inkraft$putVariable(name, displayName, isShow, value);
     }
 
     @Override
-    public StoryVariables.IValue getVariable(String name) {
+    public StoryVariable.IValue getVariable(String name) {
         return ((IPlayerMixin) player).inkraft$getVariable(name);
     }
 
