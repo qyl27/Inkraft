@@ -3,8 +3,9 @@ package cx.rain.mc.inkraft;
 import cx.rain.mc.inkraft.command.InkraftCommand;
 import cx.rain.mc.inkraft.data.story.StoryReloadListener;
 import cx.rain.mc.inkraft.data.story.StoryRegistry;
-import cx.rain.mc.inkraft.data.loot.predicate.InkraftPredicates;
+import cx.rain.mc.inkraft.data.loot.condition.ModConditions;
 import cx.rain.mc.inkraft.networking.InkraftNetworking;
+import cx.rain.mc.inkraft.story.StoriesManager;
 import cx.rain.mc.inkraft.story.function.StoryFunctions;
 import cx.rain.mc.inkraft.timer.ITaskManager;
 import cx.rain.mc.inkraft.timer.TaskManager;
@@ -43,6 +44,7 @@ public class Inkraft {
 
     private final StoryRegistry storyRegistry;
     private final ITaskManager timerManager;
+    private final StoriesManager storiesManager;
 
     private final Logger logger = LoggerFactory.getLogger(MODID);
 
@@ -51,6 +53,7 @@ public class Inkraft {
 
         storyRegistry = new StoryRegistry();
         timerManager = new TaskManager();
+        storiesManager = new StoriesManager(logger, storyRegistry, timerManager, true);
 
         logger.info("Initializing Inkraft. Ver: {}, Build at: {}", VERSION, BUILD_TIME != null ? BUILD_TIME : "B.C. 3200");
     }
@@ -84,7 +87,7 @@ public class Inkraft {
 
         InkraftNetworking.register();
         StoryFunctions.register();
-        InkraftPredicates.register();
+        ModConditions.register();
     }
 
     public Logger getLogger() {
@@ -97,5 +100,9 @@ public class Inkraft {
 
     public ITaskManager getTimerManager() {
         return timerManager;
+    }
+
+    public StoriesManager getStoriesManager() {
+        return storiesManager;
     }
 }

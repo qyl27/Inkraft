@@ -1,6 +1,9 @@
 package cx.rain.mc.inkraft.platform;
 
+import cx.rain.mc.inkraft.ModConstants;
 import cx.rain.mc.inkraft.story.IStoryVariable;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -52,5 +55,48 @@ public interface IInkPlayerData {
             return ((T) v).getValue();
         }
         return null;
+    }
+
+    default CompoundTag serialize() {
+        var tag = new CompoundTag();
+
+        var story = getStory();
+        if (story != null) {
+            tag.putString(ModConstants.Tags.STORY, story.toString());
+        }
+
+        var state = getState();
+        if (state != null) {
+            tag.putString(ModConstants.Tags.STATE, state);
+        }
+
+        var list = new ListTag();
+        for (var entry : getVariables().entrySet()) {
+            var item = new CompoundTag();
+            item.putString(ModConstants.Tags.VARIABLE_ITEM_NAME, entry.getKey());
+            item.putString(ModConstants.Tags.VARIABLE_ITEM_VALUE, entry.getValue().getValue().toString());
+            list.add(item);
+        }
+        tag.put(ModConstants.Tags.VARIABLES, list);
+        return tag;
+    }
+
+    default void deserialize(CompoundTag tag) {
+        if (tag.contains(ModConstants.Tags.STORY)) {
+            setStory(ResourceLocation.parse(tag.getString(ModConstants.Tags.STORY)));
+        }
+
+        if (tag.contains(ModConstants.Tags.STATE)) {
+            setState(tag.getString(ModConstants.Tags.STATE));
+        }
+
+        var list = tag.getList(ModConstants.Tags.VARIABLES, ListTag.TAG_COMPOUND);
+        for (var entry : list) {
+            if (entry instanceof CompoundTag compound) {
+                var name = compound.getString(ModConstants.Tags.VARIABLE_ITEM_NAME);
+                var value = IStoryVariable.fromString(compound.getString(ModConstants.Tags.VARIABLE_ITEM_VALUE));
+                setVariable(name, value);
+            }
+        }
     }
 }

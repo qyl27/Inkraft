@@ -3,7 +3,7 @@ package cx.rain.mc.inkraft.command;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
-import cx.rain.mc.inkraft.Constants;
+import cx.rain.mc.inkraft.ModConstants;
 import cx.rain.mc.inkraft.InkraftPlatform;
 import cx.rain.mc.inkraft.story.IStoryVariable;
 import net.minecraft.ChatFormatting;
@@ -29,13 +29,13 @@ public class DebugCommand {
         var source = context.getSource();
         var player = source.getPlayer();
         if (player == null) {
-            source.sendFailure(Component.translatable(Constants.MESSAGE_COMMAND_NOT_PLAYER).withStyle(ChatFormatting.RED));
+            source.sendFailure(Component.translatable(ModConstants.MESSAGE_COMMAND_NOT_PLAYER).withStyle(ChatFormatting.RED));
             return 0;
         }
 
         var name = StringArgumentType.getString(context, "name");
 
-        var holder = InkraftPlatform.getPlayerStoryStateHolder(player);
+        var holder = InkraftPlatform.getPlayerData(player);
         var variable = holder.getVariable(name);
 
         player.sendSystemMessage(Component.literal("Variable " + name + ": " + variable.asString()));
@@ -47,17 +47,17 @@ public class DebugCommand {
         var source = context.getSource();
         var player = source.getPlayer();
         if (player == null) {
-            source.sendFailure(Component.translatable(Constants.MESSAGE_COMMAND_NOT_PLAYER).withStyle(ChatFormatting.RED));
+            source.sendFailure(Component.translatable(ModConstants.MESSAGE_COMMAND_NOT_PLAYER).withStyle(ChatFormatting.RED));
             return 0;
         }
 
         var name = StringArgumentType.getString(context, "name");
         var variable = StringArgumentType.getString(context, "variable");
 
-        var holder = InkraftPlatform.getPlayerStoryStateHolder(player);
+        var holder = InkraftPlatform.getPlayerData(player);
         holder.putVariable(name, "", false, IStoryVariable.IStoryVariable.fromString(variable));
 
-        player.sendSystemMessage(Component.translatable(Constants.MESSAGE_COMMAND_SUCCESS)
+        player.sendSystemMessage(Component.translatable(ModConstants.MESSAGE_COMMAND_SUCCESS)
                 .withStyle(ChatFormatting.LIGHT_PURPLE));
 
         return 1;

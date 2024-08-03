@@ -1,20 +1,20 @@
-package cx.rain.mc.inkraft.story.function.system.line;
+package cx.rain.mc.inkraft.story.function.system.flow;
 
-import cx.rain.mc.inkraft.ModConstants;
 import cx.rain.mc.inkraft.story.IStoryVariable;
 import cx.rain.mc.inkraft.story.StoryInstance;
 import cx.rain.mc.inkraft.story.function.StoryFunction;
 
-public class UnsetLineTicksFunction implements StoryFunction {
+public class NewFlowFunction implements StoryFunction {
     @Override
     public String getName() {
-        return "unsetLineTicks";
+        return "newFlow";
     }
 
     @Override
     public IStoryVariable.Bool apply(StoryInstance instance, Object... args) {
-        instance.getData().unsetVariable(ModConstants.Variables.LINE_PAUSE_TICKS);
-        instance.getCancellationToken().cancel();
+        var name = args[0].toString();
+        var knot = args[1].toString();
+        instance.addFlow(name, knot);
         return IStoryVariable.Bool.TRUE;
     }
 }

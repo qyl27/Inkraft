@@ -1,6 +1,6 @@
 package cx.rain.mc.inkraft;
 
-public class Constants {
+public class ModConstants {
     public static final String MESSAGE_COMMAND_NOT_PLAYER = "message.command.not_a_player";
     public static final String MESSAGE_COMMAND_SUCCESS = "message.command.success";
 
@@ -15,5 +15,18 @@ public class Constants {
 
     public static class Variables {
         public static final String LINE_PAUSE_TICKS = "line_pause_ticks";
+    }
+
+    public static class Values {
+        public static final int DEFAULT_PAUSE_TICKS = 30;
+    }
+
+    public static class Tags {
+        public static final String STORY = "story";
+        public static final String STATE = "state";
+        public static final String VARIABLES = "variables";
+        public static final String VARIABLE_ITEM_NAME = "name";
+        public static final String VARIABLE_ITEM_VALUE = "value";
+        public static final String FABRIC_TAG_NAME = "inkraft";
     }
 }

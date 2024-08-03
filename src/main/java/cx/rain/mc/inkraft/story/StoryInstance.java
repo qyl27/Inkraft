@@ -2,8 +2,7 @@ package cx.rain.mc.inkraft.story;
 
 import com.bladecoder.ink.runtime.Choice;
 import com.bladecoder.ink.runtime.Story;
-import cx.rain.mc.inkraft.Constants;
-import cx.rain.mc.inkraft.Inkraft;
+import cx.rain.mc.inkraft.ModConstants;
 import cx.rain.mc.inkraft.data.story.StoryRegistry;
 import cx.rain.mc.inkraft.timer.ITaskManager;
 import cx.rain.mc.inkraft.story.function.StoryFunctions;
@@ -114,9 +113,9 @@ public class StoryInstance {
     /// <editor-fold desc="Game control.">
 
     public void start() {
-        int pause = 20;
-        if (data.hasVariable(Constants.Variables.LINE_PAUSE_TICKS)) {
-            var v = data.getVariable(Constants.Variables.LINE_PAUSE_TICKS, IStoryVariable.Int.class);
+        int pause = ModConstants.Values.DEFAULT_PAUSE_TICKS;
+        if (data.hasVariable(ModConstants.Variables.LINE_PAUSE_TICKS)) {
+            var v = data.getVariable(ModConstants.Variables.LINE_PAUSE_TICKS, IStoryVariable.Int.class);
             if (v != null) {
                 pause = v;
             }
@@ -154,9 +153,9 @@ public class StoryInstance {
         var choices = getChoices();
         for (int i = 0; i < choices.size(); i++) {
             var choice = choices.get(i);
-            var component = Component.translatable(Constants.MESSAGE_STORY_CONTINUE_CHOICE, choice.getText()).withStyle(ChatFormatting.YELLOW);
+            var component = Component.translatable(ModConstants.MESSAGE_STORY_CONTINUE_CHOICE, choice.getText()).withStyle(ChatFormatting.YELLOW);
             component.setStyle(component.getStyle().withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/inkraft next " + token + " " + i)));
-            component.setStyle(component.getStyle().withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.translatable(Constants.MESSAGE_STORY_HINT_CONTINUE_CHOICE).withStyle(ChatFormatting.GREEN))));
+            component.setStyle(component.getStyle().withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.translatable(ModConstants.MESSAGE_STORY_HINT_CONTINUE_CHOICE).withStyle(ChatFormatting.GREEN))));
             player.sendSystemMessage(component);
         }
     }
@@ -164,9 +163,9 @@ public class StoryInstance {
     private void showClickToNext() {
         var token = UUID.randomUUID();
         data.setContinuousToken(token);
-        var component = Component.translatable(Constants.MESSAGE_STORY_CONTINUE).withStyle(ChatFormatting.YELLOW);
+        var component = Component.translatable(ModConstants.MESSAGE_STORY_CONTINUE).withStyle(ChatFormatting.YELLOW);
         component.setStyle(component.getStyle().withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/inkraft continue " + token)));
-        component.setStyle(component.getStyle().withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.translatable(Constants.MESSAGE_STORY_HINT_CONTINUE).withStyle(ChatFormatting.GREEN))));
+        component.setStyle(component.getStyle().withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.translatable(ModConstants.MESSAGE_STORY_HINT_CONTINUE).withStyle(ChatFormatting.GREEN))));
         player.sendSystemMessage(component);
     }
 

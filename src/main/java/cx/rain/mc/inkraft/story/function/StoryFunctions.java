@@ -2,10 +2,7 @@ package cx.rain.mc.inkraft.story.function;
 
 import cx.rain.mc.inkraft.Inkraft;
 import cx.rain.mc.inkraft.story.function.system.*;
-import cx.rain.mc.inkraft.story.function.system.flow.FlowToDefaultFunction;
-import cx.rain.mc.inkraft.story.function.system.flow.FlowToFunction;
-import cx.rain.mc.inkraft.story.function.system.flow.IsInDefaultFlowFunction;
-import cx.rain.mc.inkraft.story.function.system.flow.IsInFlowFunction;
+import cx.rain.mc.inkraft.story.function.system.flow.*;
 import cx.rain.mc.inkraft.story.function.system.line.IsEndedFunction;
 import cx.rain.mc.inkraft.story.function.system.line.PauseFunction;
 import cx.rain.mc.inkraft.story.function.system.line.SetLineTicksFunction;
@@ -32,6 +29,8 @@ public class StoryFunctions {
 
     public static final RegistrySupplier<StoryFunction> IS_DEBUG = FUNCTIONS.register("is_debug", IsDebugFunction::new);
 
+    public static final RegistrySupplier<StoryFunction> NEW_FLOW = FUNCTIONS.register("new_flow", NewFlowFunction::new);
+    public static final RegistrySupplier<StoryFunction> REMOVE_FLOW = FUNCTIONS.register("remove_flow", RemoveFlowFunction::new);
     public static final RegistrySupplier<StoryFunction> FLOW_TO = FUNCTIONS.register("flow_to", FlowToFunction::new);
     public static final RegistrySupplier<StoryFunction> FLOW_TO_DEFAULT = FUNCTIONS.register("flow_to_default", FlowToDefaultFunction::new);
     public static final RegistrySupplier<StoryFunction> IS_IN_FLOW = FUNCTIONS.register("is_in_flow", IsInFlowFunction::new);

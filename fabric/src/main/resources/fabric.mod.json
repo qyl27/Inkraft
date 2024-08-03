@@ -15,9 +15,6 @@
     "entrypoints": {
         "main": [
             "cx.rain.mc.inkraft.fabric.InkraftFabric"
-        ],
-        "client": [
-            "cx.rain.mc.inkraft.fabric.InkraftFabricClient"
         ]
     },
     "mixins": [
