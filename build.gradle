@@ -1,19 +1,44 @@
+import java.time.ZonedDateTime
+
 plugins {
-    id 'architectury-plugin' version "${architect_plugin_version}"
+    id 'java'
+    id 'maven-publish'
+    id 'architectury-plugin' version "${architectury_plugin_version}"
     id 'dev.architectury.loom' version "${architectury_loom_version}"
+    id 'com.github.johnrengelman.shadow' version "${shadow_plugin_version}" apply false
+    id 'me.shedaniel.unified-publishing' version "${unified_publishing_version}" apply false
+}
+
+def ENV = System.getenv()
+
+base {
+    archivesName = rootProject.archive_base_name
 }
 
 architectury {
     common(project.enabled_platforms.split(','))
 }
 
+loom {
+    accessWidenerPath = file('src/main/resources/inkraft.accesswidener')
+}
+
+sourceSets {
+    main {
+        resources {
+            srcDir file('src/generated/resources')
+        }
+    }
+}
+
 allprojects {
+    apply plugin: 'java'
+    apply plugin: 'maven-publish'
     apply plugin: 'architectury-plugin'
     apply plugin: 'dev.architectury.loom'
-    apply plugin: 'maven-publish'
 
-    group = 'cx.rain.mc'
-    version = "${project.mod_version}+mc${project.minecraft_version}"
+    group = rootProject.maven_group
+    version = "${rootProject.mod_version}+mc${project.minecraft_version}"
 
     architectury {
         minecraft = project.minecraft_version
@@ -21,8 +46,6 @@ allprojects {
 
     loom {
         silentMojangMappingsLicense()
-
-        accessWidenerPath = file('src/main/resources/inkraft.accesswidener')
     }
 
     repositories {
@@ -36,31 +59,30 @@ allprojects {
             url = 'https://maven.terraformersmc.com/releases'
         }
 
+        maven {
+            name = 'NeoForged'
+            url = 'https://maven.neoforged.net/releases/'
+        }
+
         mavenCentral()
     }
 
-    loom {
-        runConfigs.configureEach {
-            ideConfigGenerated = true
-        }
-    }
-
     dependencies {
-        minecraft "com.mojang:minecraft:${project.minecraft_version}"
+        minecraft "com.mojang:minecraft:${rootProject.minecraft_version}"
         mappings loom.layered() {
             officialMojangMappings()
-            parchment("org.parchmentmc.data:parchment-${project.parchment_minecraft_version}:${project.parchment_version}@zip")
+            parchment("org.parchmentmc.data:parchment-${rootProject.parchment_minecraft_version}:${rootProject.parchment_version}@zip")
         }
 
-        modImplementation "net.fabricmc:fabric-loader:${project.fabric_loader_version}"
-        modApi "dev.architectury:architectury:${project.architectury_version}"
+        modImplementation "net.fabricmc:fabric-loader:${rootProject.fabric_loader_version}"
+        modApi "dev.architectury:architectury:${rootProject.architectury_version}"
 
-        implementation "com.bladecoder.ink:blade-ink:${project.blade_ink_version}"
+        implementation "com.bladecoder.ink:blade-ink:${rootProject.blade_ink_version}"
     }
 
     tasks.withType(JavaCompile) {
         options.encoding = 'UTF-8'
-        options.release = 17
+        options.release = 21
     }
 
     java {
@@ -73,21 +95,69 @@ allprojects {
         }
     }
 
+    publishing {
+        repositories {
+            mavenLocal()
+
+            maven {
+                name = 'YuluoMaven'
+
+                def releaseUrl = 'https://maven.yuluo.dev/repository/maven-releases/'
+                def snapshotUrl = 'https://maven.yuluo.dev/repository/maven-snapshots/'
+                url = ENV.MOD_RELEASE ? releaseUrl : snapshotUrl
+
+                credentials {
+                    username ENV.MOD_MAVEN_USER
+                    password ENV.MOD_MAVEN_PASS
+                }
+            }
+        }
+
+        publications {
+            maven(MavenPublication) {
+                from components.java
+            }
+        }
+    }
+}
+
+subprojects {
+    apply plugin: 'com.github.johnrengelman.shadow'
+    apply plugin: 'me.shedaniel.unified-publishing'
+
+    base {
+        archivesName = "$rootProject.archive_base_name-$project.name"
+    }
+
+    loom {
+        accessWidenerPath = project(':').loom.accessWidenerPath
+    }
+
     configurations {
-        common
-        shadowCommon
+        common {
+            canBeResolved = true
+            canBeConsumed = false
+        }
+
         compileClasspath.extendsFrom common
         runtimeClasspath.extendsFrom common
-        developmentForge.extendsFrom common
         developmentFabric.extendsFrom common
-        developmentNeoForge.extendsFrom common
-        developmentQuilt.extendsFrom common
+
+        shadowBundle {
+            canBeResolved = true
+            canBeConsumed = false
+        }
+    }
+
+    dependencies {
+        shadowBundle "com.bladecoder.ink:blade-ink:${rootProject.blade_ink_version}"
     }
 
     processResources {
-        var resourcesToReplace = ['build.properties', 'META-INF/mods.toml', 'pack.mcmeta', 'fabric.mod.json']
+        var resourcesToReplace = ['build.properties', 'META-INF/mods.toml', 'META-INF/neoforge.mods.toml', 'pack.mcmeta', 'fabric.mod.json']
 
         var replaceTokens = [
+                build_time: ZonedDateTime.now().toEpochSecond(),
                 mod_version: mod_version,
                 minecraft_version: minecraft_version,
                 forge_loader_version: forge_loader_version,
@@ -107,24 +177,27 @@ allprojects {
         }
     }
 
-    publishing {
-        repositories {
-            mavenLocal()
+    shadowJar {
+        exclude 'architectury.common.json'
+        configurations = [project.configurations.shadowBundle]
+        archiveClassifier = 'dev-shadow'
 
-            maven {
-                name = 'YuluoMaven'
+        relocate 'com.bladecoder.ink', 'cx.rain.mc.inkraft.libs.com.bladecoder.ink'
+    }
 
-                def ENV = System.getenv();
+    remapJar {
+        input.set shadowJar.archiveFile
+    }
 
-                def releaseUrl = 'https://maven.yuluo.dev/repository/maven-releases/'
-                def snapshotUrl = 'https://maven.yuluo.dev/repository/maven-snapshots/'
-                url = ENV.MOD_RELEASE ? releaseUrl : snapshotUrl
+    sourcesJar {
+        def commonSources = rootProject.sourcesJar
+        dependsOn commonSources
+        from commonSources.archiveFile.map { zipTree(it) }
+    }
 
-                credentials {
-                    username ENV.MOD_MAVEN_USER
-                    password ENV.MOD_MAVEN_PASS
-                }
-            }
+    components.java {
+        withVariantsFromConfiguration(project.configurations.shadowRuntimeElements) {
+            skip()
         }
     }
 }

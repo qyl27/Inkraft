@@ -1,17 +1,10 @@
 package cx.rain.mc.inkraft.networking;
 
-import cx.rain.mc.inkraft.Inkraft;
-import cx.rain.mc.inkraft.networking.packet.S2CHideAllVariablePacket;
-import cx.rain.mc.inkraft.networking.packet.S2CShowVariablePacket;
-import dev.architectury.networking.NetworkChannel;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 
 import java.util.List;
 
 public class InkraftNetworking {
-    private final NetworkChannel channel = NetworkChannel.create(new ResourceLocation(Inkraft.MODID, "client"));
-
     public InkraftNetworking() {
         // Todo: qyl27: Optional channel?
 //        channel.register(S2CShowVariablePacket.class, S2CShowVariablePacket::encode, S2CShowVariablePacket::new, S2CShowVariablePacket::apply);

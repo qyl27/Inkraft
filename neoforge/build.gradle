@@ -1,0 +1,40 @@
+architectury {
+    platformSetupLoomIde()
+    neoForge()
+}
+
+loom {
+    runs {
+        client {
+            client()
+
+            runDir 'run/client'
+        }
+
+        server {
+            server()
+
+            runDir 'run/server'
+        }
+
+        data {
+            data()
+
+            programArgs '--all', '--mod', 'inkraft'
+            programArgs '--output', file('../src/generated/resources').absolutePath
+            programArgs '--existing', file('../src/main/resources').absolutePath
+        }
+    }
+}
+
+dependencies {
+    neoForge "net.neoforged:neoforge:${rootProject.neoforge_version}"
+    modApi "dev.architectury:architectury-neoforge:${rootProject.architectury_version}"
+
+    common(project(path: ':', configuration: 'namedElements')) { transitive false }
+    shadowBundle project(path: ':', configuration: 'transformProductionNeoForge')
+}
+
+remapJar {
+    atAccessWideners.add(loom.accessWidenerPath.get().asFile.name)
+}

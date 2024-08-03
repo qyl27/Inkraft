@@ -1,4 +1,4 @@
-modLoader = "javafml"
+modLoader = "lowcodefml"
 loaderVersion = "[${forge_loader_version},)"
 issueTrackerURL = "https://github.com/qyl27/Inkraft/issues"
 license = "Apache-2.0"

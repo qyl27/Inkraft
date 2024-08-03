@@ -26,7 +26,7 @@ public class CountItemStackFunction implements StoryFunction {
 
             var item = args[0].toString();
             try {
-                var itemStack = ItemStack.of(TagParser.parseTag(item));
+                var itemStack = ItemStack.parseOptional(TagParser.parseTag(item));
                 var count = 0;
 
                 for (var i : player.getInventory().items) {
