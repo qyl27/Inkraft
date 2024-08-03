@@ -1,9 +1,9 @@
 package cx.rain.mc.inkraft.timer.cancellation;
 
-public class CancellationToken implements ICancellationToken {
+public class CancellableToken implements ICancellationToken {
     private boolean cancelled = false;
 
-    public CancellationToken() {
+    public CancellableToken() {
     }
 
     public void cancel() {
@@ -15,7 +15,7 @@ public class CancellationToken implements ICancellationToken {
         return cancelled;
     }
 
-    public static CancellationToken create() {
-        return new CancellationToken();
+    public static CancellableToken create() {
+        return new CancellableToken();
     }
 }

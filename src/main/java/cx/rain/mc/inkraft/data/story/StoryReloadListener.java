@@ -28,12 +28,12 @@ public class StoryReloadListener implements PreparableReloadListener {
                                                    ProfilerFiller preparationsProfiler, ProfilerFiller reloadProfiler,
                                                    Executor backgroundExecutor, Executor gameExecutor) {
         return CompletableFuture
-                .supplyAsync(() -> scan(resourceManager, preparationsProfiler), backgroundExecutor)
+                .supplyAsync(() -> prepare(resourceManager, preparationsProfiler), backgroundExecutor)
                 .thenCompose(preparationBarrier::wait)
                 .thenAcceptAsync(stories -> apply(stories, reloadProfiler), gameExecutor);
     }
 
-    private Map<ResourceLocation, String> scan(ResourceManager resourceManager, ProfilerFiller preparationsProfiler) {
+    private Map<ResourceLocation, String> prepare(ResourceManager resourceManager, ProfilerFiller preparationsProfiler) {
         preparationsProfiler.startTick();
         preparationsProfiler.push("inkraft");
 

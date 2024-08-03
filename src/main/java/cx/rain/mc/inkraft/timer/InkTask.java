@@ -14,24 +14,12 @@ public final class InkTask {
     private long delayRemain;
     private long intervalRemain;
 
-    public InkTask(Runnable runnable) {
-        this(runnable, 0, -1);
-    }
-
-    public InkTask(Runnable runnable, long interval) {
-        this(runnable, 0, interval);
-    }
-
-    public InkTask(Runnable runnable, long delay, long interval) {
-        this(runnable, () -> true, delay, interval);
-    }
-
     /**
      * A task runs with a delay and an interval.
      * @param runnable Task runnable.
      * @param cancellationToken Task cancellation token.
-     * @param delay Task run delay, 0 for run instant.
-     * @param interval Task run interval, -1 for one-shot.
+     * @param delay Task run delay, 0 for run instant, positive for after N ticks to run.
+     * @param interval Task run interval, -1 for one-shot, positive for run again after N ticks.
      */
     public InkTask(Runnable runnable, ICancellationToken cancellationToken, long delay, long interval) {
         this.runnable = runnable;
@@ -40,7 +28,7 @@ public final class InkTask {
         this.initialInterval = interval;
 
         this.delayRemain = delay;
-        this.intervalRemain = interval;
+        this.intervalRemain = interval == -1 ? 0 : interval;
     }
 
     public void tick() {

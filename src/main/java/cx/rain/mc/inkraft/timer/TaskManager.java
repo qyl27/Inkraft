@@ -1,10 +1,8 @@
 package cx.rain.mc.inkraft.timer;
 
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.level.ServerPlayer;
 
 import java.util.*;
-import java.util.function.Consumer;
 
 public class TaskManager implements ITaskManager {
     private final List<InkTask> tasks = new ArrayList<>();
@@ -21,7 +19,7 @@ public class TaskManager implements ITaskManager {
         var it = tasks.iterator();
         while (it.hasNext()) {
             var task = it.next();
-            task.tick();
+            server.execute(task::tick);
 
             if (task.isStopped()) {
                 it.remove();
