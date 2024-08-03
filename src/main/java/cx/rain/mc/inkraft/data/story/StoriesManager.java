@@ -1,4 +1,4 @@
-package cx.rain.mc.inkraft.data;
+package cx.rain.mc.inkraft.data.story;
 
 import cx.rain.mc.inkraft.Inkraft;
 import cx.rain.mc.inkraft.InkraftPlatform;

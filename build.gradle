@@ -154,10 +154,11 @@ subprojects {
     }
 
     processResources {
-        var resourcesToReplace = ['build.properties', 'META-INF/mods.toml', 'META-INF/neoforge.mods.toml', 'pack.mcmeta', 'fabric.mod.json']
+        var resourcesToReplace = ['build.properties', 'META-INF/mods.toml', 'META-INF/neoforge.mods.toml',
+                                  'pack.mcmeta', 'fabric.mod.json']
 
         var replaceTokens = [
-                build_time: ZonedDateTime.now().toEpochSecond(),
+                build_time: ZonedDateTime.now().toString(),
                 mod_version: mod_version,
                 minecraft_version: minecraft_version,
                 forge_loader_version: forge_loader_version,

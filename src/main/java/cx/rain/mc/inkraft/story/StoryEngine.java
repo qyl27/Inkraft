@@ -4,7 +4,7 @@ import com.bladecoder.ink.runtime.Story;
 import com.bladecoder.ink.runtime.VariablesState;
 import cx.rain.mc.inkraft.Inkraft;
 import cx.rain.mc.inkraft.Constants;
-import cx.rain.mc.inkraft.data.StoriesManager;
+import cx.rain.mc.inkraft.data.story.StoriesManager;
 import cx.rain.mc.inkraft.networking.packet.S2CHideAllVariablePacket;
 import cx.rain.mc.inkraft.utility.StoryVariables;
 import cx.rain.mc.inkraft.story.function.StoryFunctions;
@@ -63,9 +63,9 @@ public class StoryEngine {
                     if (story.canContinue()) {
                         if (canAutoContinue()) {
                             if (!asyncToken.isAsync()) {
-                                Inkraft.getInstance().getTimerManager().addTimer(player, () -> {
+                                Inkraft.getInstance().getTimerManager().addTask(player, () -> {
                                     if (asyncToken.isCanceled()) {
-                                        Inkraft.getInstance().getTimerManager().removeTimers(player);
+                                        Inkraft.getInstance().getTimerManager().removeTask(player);
                                         return;
                                     }
 
@@ -255,7 +255,7 @@ public class StoryEngine {
         }
 
         if (!autoContinue) {
-            Inkraft.getInstance().getTimerManager().removeTimers(player);
+            Inkraft.getInstance().getTimerManager().removeTask(player);
         }
     }
 
