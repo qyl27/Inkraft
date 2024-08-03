@@ -1,17 +1,18 @@
-package cx.rain.mc.inkraft.story.function.system;
+package cx.rain.mc.inkraft.story.function.system.flow;
 
 import cx.rain.mc.inkraft.story.StoryInstance;
 import cx.rain.mc.inkraft.story.function.StoryFunction;
 import cx.rain.mc.inkraft.story.IStoryVariable;
 
-public class IsDebugFunction implements StoryFunction {
+public class IsInFlowFunction implements StoryFunction {
     @Override
     public String getName() {
-        return "isDebug";
+        return "isInFlow";
     }
 
     @Override
     public IStoryVariable.Bool apply(StoryInstance instance, Object... args) {
-        return new IStoryVariable.Bool(instance.getManager().isDebug());
+        var name = args[0].toString();
+        return new IStoryVariable.Bool(instance.getFlowName().equals(name));
     }
 }

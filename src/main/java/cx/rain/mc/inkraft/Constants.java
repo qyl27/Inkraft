@@ -12,4 +12,8 @@ public class Constants {
 
     public static final String HUD_INFO = "hud.info";
     public static final String MESSAGE_STORY_LOGGED_IN_CONTINUE = "message.story.logged_in_continue";
+
+    public static class Variables {
+        public static final String LINE_PAUSE_TICKS = "line_pause_ticks";
+    }
 }

@@ -3,6 +3,7 @@ package cx.rain.mc.inkraft.story;
 import com.bladecoder.ink.runtime.Choice;
 import com.bladecoder.ink.runtime.Story;
 import cx.rain.mc.inkraft.Constants;
+import cx.rain.mc.inkraft.Inkraft;
 import cx.rain.mc.inkraft.data.story.StoryRegistry;
 import cx.rain.mc.inkraft.timer.ITaskManager;
 import cx.rain.mc.inkraft.story.function.StoryFunctions;
@@ -15,10 +16,12 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.HoverEvent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
+import org.slf4j.Logger;
 
 import java.util.*;
 
 public class StoryInstance {
+    private final Logger logger;
     private final StoriesManager manager;
     private final StoryRegistry registry;
     private final ITaskManager taskManager;
@@ -29,8 +32,9 @@ public class StoryInstance {
     private Story story;
     private CancellableToken cancellationToken;
 
-    public StoryInstance(StoriesManager manager, StoryRegistry registry, ITaskManager taskManager,
+    public StoryInstance(Logger logger, StoriesManager manager, StoryRegistry registry, ITaskManager taskManager,
                          ServerPlayer player, IInkPlayerData data) {
+        this.logger = logger;
         this.manager = manager;
         this.registry = registry;
         this.taskManager = taskManager;
@@ -39,6 +43,10 @@ public class StoryInstance {
     }
 
     /// <editor-fold desc="Dependencies.">
+
+    public Logger getLogger() {
+        return logger;
+    }
 
     public StoriesManager getManager() {
         return manager;
@@ -107,8 +115,8 @@ public class StoryInstance {
 
     public void start() {
         int pause = 20;
-        if (data.hasVariable("line_pause_ticks")) {
-            var v = data.getVariable("line_pause_ticks", IStoryVariable.Int.class);
+        if (data.hasVariable(Constants.Variables.LINE_PAUSE_TICKS)) {
+            var v = data.getVariable(Constants.Variables.LINE_PAUSE_TICKS, IStoryVariable.Int.class);
             if (v != null) {
                 pause = v;
             }
@@ -166,11 +174,11 @@ public class StoryInstance {
 
     /// <editor-fold desc="Safe story.">
 
-    private boolean isStoryEnded() {
+    public boolean isStoryEnded() {
         return story == null || (!story.canContinue() && !hasChoice());
     }
 
-    private String currentLine() {
+    public String currentLine() {
         try {
             return story.getCurrentText();
         } catch (Exception ex) {
@@ -178,11 +186,11 @@ public class StoryInstance {
         }
     }
 
-    private boolean hasNextLine() {
+    public boolean hasNextLine() {
         return story != null && (story.canContinue() || hasChoice());
     }
 
-    private void nextLine() {
+    public void nextLine() {
         try {
             var message = story.Continue().trim();
             while (message.isBlank()) {
@@ -193,11 +201,11 @@ public class StoryInstance {
         }
     }
 
-    private boolean hasChoice() {
+    public boolean hasChoice() {
         return story != null && !story.getCurrentChoices().isEmpty();
     }
 
-    private List<Choice> getChoices() {
+    public List<Choice> getChoices() {
         return story.getCurrentChoices();
     }
 
@@ -260,17 +268,22 @@ public class StoryInstance {
                 var func = entry.get();
 
                 story.bindExternalFunction(func.getName(), args -> {
-                    var result = func.apply(this, args);
-                    if (result instanceof IStoryVariable.Str strVar) {
-                        return strVar.value();
-                    } else if (result instanceof IStoryVariable.Int intVar) {
-                        return intVar.value();
-                    } else if (result instanceof IStoryVariable.Float doubleVar) {
-                        return doubleVar.value();
-                    } else if (result instanceof IStoryVariable.Bool boolVar) {
-                        return boolVar.value();
+                    try {
+                        var result = func.apply(this, args);
+                        if (result instanceof IStoryVariable.Str strVar) {
+                            return strVar.value();
+                        } else if (result instanceof IStoryVariable.Int intVar) {
+                            return intVar.value();
+                        } else if (result instanceof IStoryVariable.Float doubleVar) {
+                            return doubleVar.value();
+                        } else if (result instanceof IStoryVariable.Bool boolVar) {
+                            return boolVar.value();
+                        }
+                        return result;
+                    } catch (RuntimeException ex) {
+                        logger.error("Running function {}", func.getName(), ex);
+                        return IStoryVariable.Bool.FALSE;
                     }
-                    return result;
                 }, false);
             }
         } catch (Exception ex) {

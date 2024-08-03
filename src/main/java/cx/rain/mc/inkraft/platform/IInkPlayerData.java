@@ -23,10 +23,10 @@ public interface IInkPlayerData {
 
     boolean hasVariable(@NotNull String name);
     @Nullable
-    IStoryVariable getVariable(@NotNull String name);
-    void setVariable(@NotNull String name, @NotNull IStoryVariable value);
+    IStoryVariable<?> getVariable(@NotNull String name);
+    void setVariable(@NotNull String name, @NotNull IStoryVariable<?> value);
     void unsetVariable(@NotNull String name);
-    @NotNull Map<String, IStoryVariable> getVariables();
+    @NotNull Map<String, IStoryVariable<?>> getVariables();
     void clearVariables();
 
     default boolean hasData() {

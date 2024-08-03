@@ -15,7 +15,7 @@ public class InkPlayerData implements IInkPlayerData {
     private ResourceLocation story;
     private String state;
     private UUID continuousToken;
-    private final Map<String, IStoryVariable> variables = new HashMap<>();
+    private final Map<String, IStoryVariable<?>> variables = new HashMap<>();
 
     @Override
     public @Nullable ResourceLocation getStory() {
@@ -53,12 +53,12 @@ public class InkPlayerData implements IInkPlayerData {
     }
 
     @Override
-    public @Nullable IStoryVariable getVariable(@NotNull String name) {
+    public @Nullable IStoryVariable<?> getVariable(@NotNull String name) {
         return variables.get(name);
     }
 
     @Override
-    public void setVariable(@NotNull String name, @NotNull IStoryVariable value) {
+    public void setVariable(@NotNull String name, @NotNull IStoryVariable<?> value) {
         variables.put(name, value);
     }
 
@@ -68,7 +68,7 @@ public class InkPlayerData implements IInkPlayerData {
     }
 
     @Override
-    public @NotNull Map<String, IStoryVariable> getVariables() {
+    public @NotNull Map<String, IStoryVariable<?>> getVariables() {
         return ImmutableMap.copyOf(variables);
     }
 
