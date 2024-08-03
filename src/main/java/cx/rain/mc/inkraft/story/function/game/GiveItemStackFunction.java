@@ -1,9 +1,9 @@
 package cx.rain.mc.inkraft.story.function.game;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import cx.rain.mc.inkraft.story.StoryEngine;
+import cx.rain.mc.inkraft.story.StoryInstance;
 import cx.rain.mc.inkraft.story.function.StoryFunction;
-import cx.rain.mc.inkraft.utility.StoryVariables;
+import cx.rain.mc.inkraft.story.IStoryVariable;
 import net.minecraft.nbt.TagParser;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
@@ -17,10 +17,10 @@ public class GiveItemStackFunction implements StoryFunction {
     }
 
     @Override
-    public BiFunction<Object[], ServerPlayer, StoryVariables.IStoryVariable> func(StoryEngine engine) {
+    public BiFunction<Object[], ServerPlayer, IStoryVariable.IStoryVariable> apply(StoryInstance engine, Object... args) {
         return (args, player) -> {
             if (args.length != 1) {
-                return new StoryVariables.BoolVar(false);
+                return new IStoryVariable.Bool(false);
             }
 
             var item = args[0].toString();
@@ -28,11 +28,11 @@ public class GiveItemStackFunction implements StoryFunction {
                 var itemStack = ItemStack.of(TagParser.parseTag(item));
                 giveItem(player, itemStack);
 
-                return new StoryVariables.BoolVar(true);
+                return new IStoryVariable.Bool(true);
             } catch (CommandSyntaxException ex) {
                 ex.printStackTrace();
 
-                return new StoryVariables.BoolVar(false);
+                return new IStoryVariable.Bool(false);
             }
         };
     }

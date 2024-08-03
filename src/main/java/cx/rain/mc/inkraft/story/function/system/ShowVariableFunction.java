@@ -1,9 +1,9 @@
 package cx.rain.mc.inkraft.story.function.system;
 
 import cx.rain.mc.inkraft.InkraftPlatform;
-import cx.rain.mc.inkraft.story.StoryEngine;
+import cx.rain.mc.inkraft.story.StoryInstance;
 import cx.rain.mc.inkraft.story.function.StoryFunction;
-import cx.rain.mc.inkraft.utility.StoryVariables;
+import cx.rain.mc.inkraft.story.IStoryVariable;
 import cx.rain.mc.inkraft.utility.ShowVariableHelper;
 import net.minecraft.server.level.ServerPlayer;
 
@@ -17,10 +17,10 @@ public class ShowVariableFunction implements StoryFunction {
     }
 
     @Override
-    public BiFunction<Object[], ServerPlayer, StoryVariables.IStoryVariable> func(StoryEngine engine) {
+    public BiFunction<Object[], ServerPlayer, IStoryVariable.IStoryVariable> apply(StoryInstance engine, Object... args) {
         return (args, player) -> {
             if (args.length != 3) {
-                return StoryVariables.BoolVar.FALSE;
+                return IStoryVariable.Bool.FALSE;
             }
 
             var name = args[0].toString();
@@ -37,7 +37,7 @@ public class ShowVariableFunction implements StoryFunction {
                 }));
             }
 
-            return StoryVariables.BoolVar.TRUE;
+            return IStoryVariable.Bool.TRUE;
         };
     }
 }

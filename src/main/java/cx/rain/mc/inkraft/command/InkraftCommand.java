@@ -10,8 +10,8 @@ import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import cx.rain.mc.inkraft.Constants;
 import cx.rain.mc.inkraft.Inkraft;
 import cx.rain.mc.inkraft.InkraftPlatform;
-import cx.rain.mc.inkraft.platform.IStoryStateHolder;
-import cx.rain.mc.inkraft.story.StoryEngine;
+import cx.rain.mc.inkraft.platform.IInkPlayerData;
+import cx.rain.mc.inkraft.story.StoryInstance;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.arguments.EntityArgument;
@@ -195,8 +195,8 @@ public class InkraftCommand {
         var player = context.getSource().getPlayer();
         var stateHolder = InkraftPlatform.getPlayerStoryStateHolder(player);
 
-        stateHolder.clearState();
-        Inkraft.getInstance().getStoriesManager().refreshStory(player);
+        stateHolder.clearData();
+        Inkraft.getInstance().getStoryRegistry().refreshStory(player);
 
         player.sendSystemMessage(Component.translatable(Constants.MESSAGE_COMMAND_SUCCESS)
                 .withStyle(ChatFormatting.LIGHT_PURPLE));
@@ -207,8 +207,8 @@ public class InkraftCommand {
         var player = EntityArgument.getPlayer(context, "player");
         var stateHolder = InkraftPlatform.getPlayerStoryStateHolder(player);
 
-        stateHolder.clearState();
-        Inkraft.getInstance().getStoriesManager().refreshStory(player);
+        stateHolder.clearData();
+        Inkraft.getInstance().getStoryRegistry().refreshStory(player);
 
         context.getSource().sendSystemMessage(Component.translatable(Constants.MESSAGE_COMMAND_SUCCESS)
                 .withStyle(ChatFormatting.LIGHT_PURPLE));
@@ -243,10 +243,10 @@ public class InkraftCommand {
 
     /// <editor-fold desc="Utility methods.">
 
-    private static void startStory(ServerPlayer player, ResourceLocation path, IStoryStateHolder stateHolder, boolean isDebug) {
-        var storiesManager = Inkraft.getInstance().getStoriesManager();
+    private static void startStory(ServerPlayer player, ResourceLocation path, IInkPlayerData stateHolder, boolean isDebug) {
+        var storiesManager = Inkraft.getInstance().getStoryRegistry();
 
-        StoryEngine story;
+        StoryInstance story;
         if (!storiesManager.hasCachedStory(player)) {
             story = storiesManager.createStory(player);
         } else {
@@ -256,8 +256,8 @@ public class InkraftCommand {
         story.startStory(path, isDebug);
     }
 
-    private static void continueStory(ServerPlayer player, IStoryStateHolder holder, int choice) {
-        var storiesManager = Inkraft.getInstance().getStoriesManager();
+    private static void continueStory(ServerPlayer player, IInkPlayerData holder, int choice) {
+        var storiesManager = Inkraft.getInstance().getStoryRegistry();
         var story = storiesManager.getStory(player);
 
         if (holder.isInStory()) {
@@ -270,9 +270,9 @@ public class InkraftCommand {
     }
 
     private static void repeatChoices(ServerPlayer player) {
-        var storiesManager = Inkraft.getInstance().getStoriesManager();
+        var storiesManager = Inkraft.getInstance().getStoryRegistry();
 
-        StoryEngine story;
+        StoryInstance story;
         if (!storiesManager.hasCachedStory(player)) {
             story = storiesManager.createStory(player);
         } else {
@@ -286,7 +286,7 @@ public class InkraftCommand {
 
     private static CompletableFuture<Suggestions> suggestStart(final CommandContext<CommandSourceStack> context,
                                                                final SuggestionsBuilder builder) throws CommandSyntaxException {
-        for (var story : Inkraft.getInstance().getStoriesManager().getStories()) {
+        for (var story : Inkraft.getInstance().getStoryRegistry().getStories()) {
             builder.suggest(story.toString());
         }
         return builder.buildFuture();

@@ -49,14 +49,15 @@ public final class InkTask {
         if (delayRemain == 0 && intervalRemain == 0) {
             runnable.run();
             intervalRemain = initialInterval;
+            delayRemain = -1;
         }
     }
 
     public boolean isStopped() {
         if (initialInterval == -1) {
-            return delayRemain == 0 || cancellationToken.isCancelled();
+            return cancellationToken.isCancelled() || intervalRemain == -1;
         } else {
-            return delayRemain == 0 && cancellationToken.isCancelled();
+            return cancellationToken.isCancelled() || delayRemain == -1;
         }
     }
 

@@ -2,7 +2,7 @@ package cx.rain.mc.inkraft;
 
 import cx.rain.mc.inkraft.command.InkraftCommand;
 import cx.rain.mc.inkraft.data.story.StoryReloadListener;
-import cx.rain.mc.inkraft.data.story.StoriesManager;
+import cx.rain.mc.inkraft.data.story.StoryRegistry;
 import cx.rain.mc.inkraft.data.loot.predicate.InkraftPredicates;
 import cx.rain.mc.inkraft.networking.InkraftNetworking;
 import cx.rain.mc.inkraft.story.function.StoryFunctions;
@@ -41,7 +41,7 @@ public class Inkraft {
 
     private static Inkraft INSTANCE;
 
-    private final StoriesManager storiesManager;
+    private final StoryRegistry storyRegistry;
     private final ITaskManager timerManager;
 
     private final Logger logger = LoggerFactory.getLogger(MODID);
@@ -49,18 +49,14 @@ public class Inkraft {
     public Inkraft() {
         INSTANCE = this;
 
-        storiesManager = new StoriesManager();
+        storyRegistry = new StoryRegistry();
         timerManager = new TaskManager();
 
-        logger.info("Initializing Inkraft. Ver: {}, Build at: {}", VERSION, BUILD_TIME != null ? BUILD_TIME : "BC 3200");
+        logger.info("Initializing Inkraft. Ver: {}, Build at: {}", VERSION, BUILD_TIME != null ? BUILD_TIME : "B.C. 3200");
     }
 
     public static Inkraft getInstance() {
         return INSTANCE;
-    }
-
-    public Logger getLogger() {
-        return logger;
     }
 
     public void init() {
@@ -70,7 +66,10 @@ public class Inkraft {
             }
         });
 
-        TickEvent.SERVER_POST.register(server -> getTimerManager().tick(server));
+        TickEvent.SERVER_POST.register(timerManager::tick);
+
+        ReloadListenerRegistry.register(PackType.SERVER_DATA, new StoryReloadListener(storyRegistry),
+                StoryReloadListener.INKRAFT_STORY_LOADER);
 
 //        PlayerEvent.PLAYER_JOIN.register(player -> {
 //            var holder = InkraftPlatform.getPlayerStoryStateHolder(player);
@@ -83,16 +82,17 @@ public class Inkraft {
 //            }
 //        });
 
-        ReloadListenerRegistry.register(PackType.SERVER_DATA, new StoryReloadListener(),
-                StoryReloadListener.INKRAFT_STORY_LOADER);
-
         InkraftNetworking.register();
         StoryFunctions.register();
         InkraftPredicates.register();
     }
 
-    public StoriesManager getStoriesManager() {
-        return storiesManager;
+    public Logger getLogger() {
+        return logger;
+    }
+
+    public StoryRegistry getStoryRegistry() {
+        return storyRegistry;
     }
 
     public ITaskManager getTimerManager() {

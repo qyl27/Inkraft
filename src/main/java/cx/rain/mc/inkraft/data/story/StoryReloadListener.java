@@ -22,6 +22,12 @@ public class StoryReloadListener implements PreparableReloadListener {
     public static final String STORY_PATH = "inkraft/stories";
     public static final FileToIdConverter FILE_TO_ID_CONVERTER = new FileToIdConverter(STORY_PATH, ".ink.json");
 
+    private final IDataRegistry<ResourceLocation, String> registry;
+
+    public StoryReloadListener(IDataRegistry<ResourceLocation, String> registry) {
+        this.registry = registry;
+    }
+
     @Override
     public @NotNull CompletableFuture<Void> reload(PreparationBarrier preparationBarrier,
                                                    ResourceManager resourceManager,
@@ -56,9 +62,8 @@ public class StoryReloadListener implements PreparableReloadListener {
         reloadProfiler.startTick();
         reloadProfiler.push("inkraft");
 
-        var manager = Inkraft.getInstance().getStoriesManager();
-        manager.clearStories();
-        stories.forEach(manager::addStory);
+        registry.clear();
+        stories.forEach(registry::add);
 
         reloadProfiler.pop();
         reloadProfiler.endTick();

@@ -2,7 +2,7 @@ package cx.rain.mc.inkraft.fabric.mixins.mixin;
 
 import cx.rain.mc.inkraft.fabric.mixins.interfaces.IPlayerMixin;
 import cx.rain.mc.inkraft.fabric.platform.StoryStateHolder;
-import cx.rain.mc.inkraft.utility.StoryVariables;
+import cx.rain.mc.inkraft.story.IStoryVariable;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
@@ -25,7 +25,7 @@ public abstract class PlayerMixin implements IPlayerMixin {
     private String inkraft$state = "";
     private String inkraft$lastMessage = "";
     private boolean inkraft$inStory = false;
-    private final Map<String, Triple<String, Boolean, StoryVariables.IStoryVariable>> inkraft$variables = new HashMap<>();
+    private final Map<String, Triple<String, Boolean, IStoryVariable.IStoryVariable>> inkraft$variables = new HashMap<>();
 
     @Override
     public String inkraft$getState() {
@@ -66,17 +66,17 @@ public abstract class PlayerMixin implements IPlayerMixin {
     }
 
     @Override
-    public Map<String, Triple<String, Boolean, StoryVariables.IStoryVariable>> inkraft$getVariables() {
+    public Map<String, Triple<String, Boolean, IStoryVariable.IStoryVariable>> inkraft$getVariables() {
         return inkraft$variables;
     }
 
     @Override
-    public void inkraft$putVariable(String name, String displayName, boolean isShow, StoryVariables.IStoryVariable value) {
+    public void inkraft$putVariable(String name, String displayName, boolean isShow, IStoryVariable.IStoryVariable value) {
         inkraft$variables.put(name, new MutableTriple<>(displayName, isShow, value));
     }
 
     @Override
-    public StoryVariables.IStoryVariable inkraft$getVariable(String name) {
+    public IStoryVariable.IStoryVariable inkraft$getVariable(String name) {
         return inkraft$variables.get(name).getRight();
     }
 
@@ -176,7 +176,7 @@ public abstract class PlayerMixin implements IPlayerMixin {
             var displayName = compoundTag.getString(StoryStateHolder.TAG_VARIABLES_DISPLAY_NAME);
             var isShow = compoundTag.getBoolean(StoryStateHolder.TAG_VARIABLES_SHOW_NAME);
             var value = compoundTag.getString(StoryStateHolder.TAG_VARIABLES_VALUE_NAME);
-            inkraft$putVariable(name, displayName, isShow, StoryVariables.IStoryVariable.fromString(value));
+            inkraft$putVariable(name, displayName, isShow, IStoryVariable.IStoryVariable.fromString(value));
         }
 
         var story = compound.getString(StoryStateHolder.TAG_CURRENT_STORY_NAME);

@@ -5,7 +5,7 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import cx.rain.mc.inkraft.Constants;
 import cx.rain.mc.inkraft.InkraftPlatform;
-import cx.rain.mc.inkraft.utility.StoryVariables;
+import cx.rain.mc.inkraft.story.IStoryVariable;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.network.chat.Component;
@@ -55,7 +55,7 @@ public class DebugCommand {
         var variable = StringArgumentType.getString(context, "variable");
 
         var holder = InkraftPlatform.getPlayerStoryStateHolder(player);
-        holder.putVariable(name, "", false, StoryVariables.IStoryVariable.fromString(variable));
+        holder.putVariable(name, "", false, IStoryVariable.IStoryVariable.fromString(variable));
 
         player.sendSystemMessage(Component.translatable(Constants.MESSAGE_COMMAND_SUCCESS)
                 .withStyle(ChatFormatting.LIGHT_PURPLE));
