@@ -12,6 +12,8 @@ import cx.rain.mc.inkraft.story.function.system.variable.GetVariableFunction;
 import cx.rain.mc.inkraft.story.function.system.variable.SetVariableFunction;
 import cx.rain.mc.inkraft.story.function.system.variable.UnsetVariableFunction;
 import dev.architectury.registry.registries.DeferredRegister;
+import dev.architectury.registry.registries.Registrar;
+import dev.architectury.registry.registries.RegistrarManager;
 import dev.architectury.registry.registries.RegistrySupplier;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
@@ -20,6 +22,7 @@ import net.minecraft.resources.ResourceLocation;
 public class StoryFunctions {
     public static final ResourceLocation REGISTRY_NAME = ResourceLocation.fromNamespaceAndPath(Inkraft.MODID, "functions");
     public static final ResourceKey<Registry<StoryFunction>> REGISTRY_KEY = ResourceKey.createRegistryKey(REGISTRY_NAME);
+    public static final Registrar<StoryFunction> REGISTRAR = RegistrarManager.get(Inkraft.MODID).<StoryFunction>builder(REGISTRY_NAME).build(); // qyl27: Architectury API needs this line to create registry.
 
     public static final DeferredRegister<StoryFunction> FUNCTIONS = DeferredRegister.create(Inkraft.MODID, REGISTRY_KEY);
 

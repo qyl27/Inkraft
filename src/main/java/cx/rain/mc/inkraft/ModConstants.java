@@ -18,7 +18,7 @@ public class ModConstants {
     }
 
     public static class Values {
-        public static final int DEFAULT_PAUSE_TICKS = 30;
+        public static final int DEFAULT_PAUSE_TICKS = 15;
     }
 
     public static class Tags {

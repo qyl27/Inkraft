@@ -19,6 +19,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeParseException;
 import java.util.Properties;
 
 public class Inkraft {
@@ -28,13 +29,15 @@ public class Inkraft {
 
     static {
         var properties = new Properties();
-        String version = "Unknown";
-        ZonedDateTime buildTime = null;
+        String version;
+        ZonedDateTime buildTime;
         try {
             properties.load(Inkraft.class.getResourceAsStream("/build.properties"));
             version = properties.getProperty("mod_version") + "+mc" + properties.getProperty("minecraft_version");
             buildTime = ZonedDateTime.parse(properties.getProperty("build_time"));
-        } catch (IOException ignored) {
+        } catch (Exception ignored) {
+            version = "Unknown";
+            buildTime = null;
         }
         BUILD_TIME = buildTime;
         VERSION = version;
@@ -63,11 +66,8 @@ public class Inkraft {
     }
 
     public void init() {
-        CommandRegistrationEvent.EVENT.register((dispatcher, registry, selection) -> {
-            if (selection == Commands.CommandSelection.ALL) {
-                dispatcher.register(InkraftCommand.INKRAFT);
-            }
-        });
+        CommandRegistrationEvent.EVENT.register((dispatcher, registry, selection) ->
+                dispatcher.register(InkraftCommand.INKRAFT));
 
         TickEvent.SERVER_POST.register(timerManager::tick);
 

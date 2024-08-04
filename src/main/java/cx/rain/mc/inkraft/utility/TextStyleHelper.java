@@ -16,6 +16,11 @@ public class TextStyleHelper {
         var matcher = HEX_COLOR.matcher(literalText);
 
         var cursor = 0;
+
+        if (!matcher.hasMatch()) {
+            return Component.literal(literalText);
+        }
+
         while (matcher.find()) {
             var index = matcher.start(0);
             var text = Component.literal(literalText.substring(cursor, index));

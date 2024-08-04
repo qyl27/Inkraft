@@ -80,6 +80,7 @@ public class StoryInstance {
     /// <editor-fold desc="Init.">
 
     public void newStory(ResourceLocation path) {
+        stop();
         data.setStory(path);
         data.resetState();
         var str = registry.get(path);
@@ -129,6 +130,7 @@ public class StoryInstance {
         var finalPause = pause;
         taskManager.run(() -> {
             if (currentLine().isBlank()) {
+                nextLine();
                 return;
             }
 
@@ -148,6 +150,8 @@ public class StoryInstance {
 
             if (hasNextLine()) {
                 nextLine();
+            } else {
+                cancellationToken.cancel();
             }
         }, cancellationToken, 0, pause);
     }

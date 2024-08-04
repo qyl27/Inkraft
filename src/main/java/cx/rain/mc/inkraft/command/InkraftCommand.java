@@ -85,10 +85,7 @@ public class InkraftCommand {
             doStart(object, id);
             context.getSource().sendSuccess(() -> Component.literal("Success"), true);  // Todo.
             return 1;
-        } catch (CommandSyntaxException ex) {
-            throw ex;
-        } catch (IllegalStateException ex) {
-            ex.printStackTrace();
+        } catch (IllegalArgumentException ignored) {
         }
 
         doStart(player, id);
@@ -103,10 +100,7 @@ public class InkraftCommand {
             doNext(object);
             context.getSource().sendSuccess(() -> Component.literal("Success"), true);  // Todo.
             return 1;
-        } catch (CommandSyntaxException ex) {
-            throw ex;
-        } catch (IllegalStateException ex) {
-            ex.printStackTrace();
+        } catch (IllegalArgumentException ignored) {
         }
 
         doNext(player);
@@ -122,10 +116,7 @@ public class InkraftCommand {
             doChoice(object, choice);
             context.getSource().sendSuccess(() -> Component.literal("Success"), true);  // Todo.
             return 1;
-        } catch (CommandSyntaxException ex) {
-            throw ex;
-        } catch (IllegalStateException ex) {
-            ex.printStackTrace();
+        } catch (IllegalArgumentException ignored) {
         }
 
         doChoice(player, choice);
@@ -140,10 +131,7 @@ public class InkraftCommand {
             doCurrent(object);
             context.getSource().sendSuccess(() -> Component.literal("Success"), true);  // Todo.
             return 1;
-        } catch (CommandSyntaxException ex) {
-            throw ex;
-        } catch (IllegalStateException ex) {
-            ex.printStackTrace();
+        } catch (IllegalArgumentException ignored) {
         }
 
         doCurrent(player);
@@ -158,10 +146,7 @@ public class InkraftCommand {
             doReset(object);
             context.getSource().sendSuccess(() -> Component.literal("Success"), true);  // Todo.
             return 1;
-        } catch (CommandSyntaxException ex) {
-            throw ex;
-        } catch (IllegalStateException ex) {
-            ex.printStackTrace();
+        } catch (IllegalArgumentException ignored) {
         }
 
         doReset(player);

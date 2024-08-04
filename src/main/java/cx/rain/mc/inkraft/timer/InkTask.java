@@ -49,7 +49,6 @@ public final class InkTask {
         if (delayRemain == 0 && intervalRemain == 0) {
             runnable.run();
             intervalRemain = initialInterval;
-            delayRemain = -1;
         }
     }
 
@@ -57,7 +56,7 @@ public final class InkTask {
         if (initialInterval == -1) {
             return cancellationToken.isCancelled() || intervalRemain == -1;
         } else {
-            return cancellationToken.isCancelled() || delayRemain == -1;
+            return cancellationToken.isCancelled();
         }
     }
 
