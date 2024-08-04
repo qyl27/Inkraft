@@ -1,17 +1,20 @@
 package cx.rain.mc.inkraft;
 
 public class ModConstants {
-    public static final String MESSAGE_COMMAND_NOT_PLAYER = "message.command.not_a_player";
-    public static final String MESSAGE_COMMAND_SUCCESS = "message.command.success";
+    public static class Messages {
+        public static final String COMMAND_VERSION = "message.command.version";
+        public static final String COMMAND_SUCCESS = "message.command.success";
+        public static final String COMMAND_VARIABLE = "message.command.variable";
 
-    public static final String MESSAGE_STORY_CONTINUE = "message.story.continue";
-    public static final String MESSAGE_STORY_CONTINUE_CHOICE = "message.story.continue.choice";
-    public static final String MESSAGE_STORY_HINT_CONTINUE = "message.story.hint.continue";
-    public static final String MESSAGE_STORY_HINT_CONTINUE_CHOICE = "message.story.hint.continue.choice";
-    public static final String MESSAGE_STORY_BAD_TOKEN = "message.story.bad_token";
+        public static final String STORY_OPTION_OUTDATED = "message.story.option_outdated";
+        public static final String STORY_NEXT = "message.story.next";
+        public static final String STORY_NEXT_CHOICE = "message.story.next.choice";
+        public static final String STORY_NEXT_HINT = "message.story.next.hint";
+        public static final String STORY_NEXT_CHOICE_HINT = "message.story.next.choice.hint";
 
-    public static final String HUD_INFO = "hud.info";
-    public static final String MESSAGE_STORY_LOGGED_IN_CONTINUE = "message.story.logged_in_continue";
+        public static final String STORY_RESUME = "message.story.resume";
+        public static final String STORY_RESUME_HINT = "message.story.resume.hint";
+    }
 
     public static class Variables {
         public static final String LINE_PAUSE_TICKS = "line_pause_ticks";

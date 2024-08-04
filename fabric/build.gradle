@@ -28,7 +28,6 @@ dependencies {
 
     common(project(path: ':', configuration: 'namedElements')) { transitive false }
     shadowBundle project(path: ':', configuration: 'transformProductionFabric')
-
 }
 
 remapJar {

@@ -39,6 +39,8 @@ public class StoryInstance {
         this.taskManager = taskManager;
         this.player = player;
         this.data = data;
+
+        loadStory();
     }
 
     /// <editor-fold desc="Dependencies.">
@@ -93,9 +95,14 @@ public class StoryInstance {
     }
 
     public void loadStory() {
-        newStory(data.getStory());
+        if (data.getStory() != null) {
+            newStory(data.getStory());
+        }
+
         try {
-            story.getState().loadJson(data.getState());
+            if (data.getState() != null) {
+                story.getState().loadJson(data.getState());
+            }
         } catch (Exception ex) {
             throw new RuntimeException(ex);
         }
@@ -176,9 +183,9 @@ public class StoryInstance {
         var choices = getChoices();
         for (int i = 0; i < choices.size(); i++) {
             var choice = choices.get(i);
-            var component = Component.translatable(ModConstants.MESSAGE_STORY_CONTINUE_CHOICE, choice.getText()).withStyle(ChatFormatting.GREEN);
+            var component = Component.translatable(ModConstants.Messages.STORY_NEXT_CHOICE, choice.getText()).withStyle(ChatFormatting.GREEN);
             component.setStyle(component.getStyle().withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/inkraft next " + token + " " + i)));
-            component.setStyle(component.getStyle().withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.translatable(ModConstants.MESSAGE_STORY_HINT_CONTINUE_CHOICE).withStyle(ChatFormatting.YELLOW))));
+            component.setStyle(component.getStyle().withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.translatable(ModConstants.Messages.STORY_NEXT_CHOICE_HINT).withStyle(ChatFormatting.YELLOW))));
             player.sendSystemMessage(component);
         }
     }
@@ -186,9 +193,9 @@ public class StoryInstance {
     private void showClickToNext() {
         var token = UUID.randomUUID();
         data.setContinuousToken(token);
-        var component = Component.translatable(ModConstants.MESSAGE_STORY_CONTINUE).withStyle(ChatFormatting.GREEN);
-        component.setStyle(component.getStyle().withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/inkraft continue " + token)));
-        component.setStyle(component.getStyle().withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.translatable(ModConstants.MESSAGE_STORY_HINT_CONTINUE).withStyle(ChatFormatting.YELLOW))));
+        var component = Component.translatable(ModConstants.Messages.STORY_NEXT).withStyle(ChatFormatting.GREEN);
+        component.setStyle(component.getStyle().withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/inkraft next " + token)));
+        component.setStyle(component.getStyle().withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.translatable(ModConstants.Messages.STORY_NEXT_HINT).withStyle(ChatFormatting.YELLOW))));
         player.sendSystemMessage(component);
     }
 

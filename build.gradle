@@ -23,6 +23,11 @@ loom {
     accessWidenerPath = file('src/main/resources/inkraft.accesswidener')
 }
 
+dependencies {
+    modImplementation "net.fabricmc:fabric-loader:${rootProject.fabric_loader_version}"
+    modApi "dev.architectury:architectury:${rootProject.architectury_version}"
+}
+
 sourceSets {
     main {
         resources {
@@ -73,9 +78,6 @@ allprojects {
             officialMojangMappings()
             parchment("org.parchmentmc.data:parchment-${rootProject.parchment_minecraft_version}:${rootProject.parchment_version}@zip")
         }
-
-        modImplementation "net.fabricmc:fabric-loader:${rootProject.fabric_loader_version}"
-        modApi "dev.architectury:architectury:${rootProject.architectury_version}"
 
         implementation "com.bladecoder.ink:blade-ink:${rootProject.blade_ink_version}"
     }

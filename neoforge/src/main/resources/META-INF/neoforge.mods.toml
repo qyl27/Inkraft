@@ -36,4 +36,6 @@ side = "BOTH"
 
 [[mixins]]
 config = "inkraft.mixins.json"
+
+[[mixins]]
 config = "inkraft-neoforge.mixins.json"

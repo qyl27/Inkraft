@@ -10,9 +10,14 @@ import cx.rain.mc.inkraft.story.function.StoryFunctions;
 import cx.rain.mc.inkraft.timer.ITaskManager;
 import cx.rain.mc.inkraft.timer.TaskManager;
 import dev.architectury.event.events.common.CommandRegistrationEvent;
+import dev.architectury.event.events.common.PlayerEvent;
 import dev.architectury.event.events.common.TickEvent;
 import dev.architectury.registry.ReloadListenerRegistry;
+import net.minecraft.ChatFormatting;
 import net.minecraft.commands.Commands;
+import net.minecraft.network.chat.ClickEvent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.HoverEvent;
 import net.minecraft.server.packs.PackType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,11 +59,15 @@ public class Inkraft {
     public Inkraft() {
         INSTANCE = this;
 
+        logger.info("Initializing Inkraft. Ver: {}, Build at: {}", VERSION, BUILD_TIME != null ? BUILD_TIME : "B.C. 3200");
+
         storyRegistry = new StoryRegistry();
         timerManager = new TaskManager();
         storiesManager = new StoriesManager(logger, storyRegistry, timerManager, true);
 
-        logger.info("Initializing Inkraft. Ver: {}, Build at: {}", VERSION, BUILD_TIME != null ? BUILD_TIME : "B.C. 3200");
+        InkraftNetworking.register();
+        StoryFunctions.register();
+        ModConditions.register();
     }
 
     public static Inkraft getInstance() {
@@ -74,20 +83,16 @@ public class Inkraft {
         ReloadListenerRegistry.register(PackType.SERVER_DATA, new StoryReloadListener(storyRegistry),
                 StoryReloadListener.INKRAFT_STORY_LOADER);
 
-//        PlayerEvent.PLAYER_JOIN.register(player -> {
-//            var holder = InkraftPlatform.getPlayerStoryStateHolder(player);
-//
-//            if (holder.isInStory()) {
-//                var component = Component.translatable(Constants.MESSAGE_STORY_LOGGED_IN_CONTINUE);
-//                component.setStyle(component.getStyle().withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
-//                        "/inkraft repeat")));
-//                player.sendSystemMessage(component);
-//            }
-//        });
+        PlayerEvent.PLAYER_JOIN.register(player -> {
+            var story = storiesManager.get(player);
 
-        InkraftNetworking.register();
-        StoryFunctions.register();
-        ModConditions.register();
+            if (!story.isStoryEnded()) {
+                var component = Component.translatable(ModConstants.Messages.STORY_RESUME);
+                component.setStyle(component.getStyle().withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/inkraft current")));
+                component.setStyle(component.getStyle().withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.translatable(ModConstants.Messages.STORY_RESUME_HINT).withStyle(ChatFormatting.YELLOW))));
+                player.sendSystemMessage(component);
+            }
+        });
     }
 
     public Logger getLogger() {
