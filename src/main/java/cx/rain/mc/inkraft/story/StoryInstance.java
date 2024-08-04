@@ -121,10 +121,19 @@ public class StoryInstance {
             }
         }
 
+        if (cancellationToken != null) {
+            cancellationToken.cancel();
+        }
+
         cancellationToken = new CancellableToken();
         var finalPause = pause;
         taskManager.run(() -> {
+            if (currentLine().isBlank()) {
+                return;
+            }
+
             showLine();
+
             if (hasChoice()) {
                 showChoices();
                 cancellationToken.cancel();
@@ -141,6 +150,16 @@ public class StoryInstance {
                 nextLine();
             }
         }, cancellationToken, 0, pause);
+    }
+
+    public void stop() {
+        if (isStoryRunning()) {
+            cancellationToken.cancel();
+        }
+    }
+
+    public boolean isStoryRunning() {
+        return story != null && cancellationToken != null && !cancellationToken.isCancelled();
     }
 
     private void showLine() {
@@ -191,10 +210,8 @@ public class StoryInstance {
 
     public void nextLine() {
         try {
-            var message = story.Continue().trim();
-            while (message.isBlank()) {
-                message = story.Continue().trim();
-            }
+            story.Continue();
+            saveStory();
         } catch (Exception ex) {
             throw new RuntimeException(ex);
         }
@@ -202,6 +219,15 @@ public class StoryInstance {
 
     public boolean hasChoice() {
         return story != null && !story.getCurrentChoices().isEmpty();
+    }
+
+    public void choose(int index) {
+        try {
+            story.chooseChoiceIndex(index);
+            saveStory();
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
+        }
     }
 
     public List<Choice> getChoices() {

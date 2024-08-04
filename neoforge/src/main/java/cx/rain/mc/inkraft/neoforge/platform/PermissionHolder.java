@@ -13,12 +13,8 @@ import net.neoforged.neoforge.server.permission.nodes.PermissionTypes;
 
 @EventBusSubscriber(modid = Inkraft.MODID)
 public class PermissionHolder implements IPermissionHolder {
-
-    public static final PermissionNode<Boolean> PERMISSION_START = bool("start", 2);
-    public static final PermissionNode<Boolean> PERMISSION_CONTINUE = bool("continue", 0);
-    public static final PermissionNode<Boolean> PERMISSION_CLEAR = bool("clear", 2);
-    public static final PermissionNode<Boolean> PERMISSION_START_OTHER = bool("start.other", 2);
-    public static final PermissionNode<Boolean> PERMISSION_CONTINUE_OTHER = bool("continue.other", 2);
+    public static final PermissionNode<Boolean> PERMISSION_USE = bool("use", 0);
+    public static final PermissionNode<Boolean> PERMISSION_ADMIN = bool("admin", 2);
 
     private static PermissionNode<Boolean> bool(String name, int defaultLevel) {
         return new PermissionNode<>(Inkraft.MODID, name, PermissionTypes.BOOLEAN,
@@ -27,43 +23,33 @@ public class PermissionHolder implements IPermissionHolder {
 
     @SubscribeEvent
     public static void registerPermission(PermissionGatherEvent.Nodes event) {
-        event.addNodes(PERMISSION_START);
-        event.addNodes(PERMISSION_CONTINUE);
-        event.addNodes(PERMISSION_CLEAR);
-        event.addNodes(PERMISSION_START_OTHER);
-        event.addNodes(PERMISSION_CONTINUE_OTHER);
+        event.addNodes(PERMISSION_USE);
+        event.addNodes(PERMISSION_ADMIN);
     }
 
     private boolean check(CommandSourceStack source, PermissionNode<Boolean> node) {
         if (source.getEntity() instanceof ServerPlayer player) {
             return PermissionAPI.getPermission(player, node);
         } else {
-            return true;
+            if (node == PERMISSION_USE) {
+                return source.hasPermission(0);
+            }
+
+            if (node == PERMISSION_ADMIN) {
+                return source.hasPermission(2);
+            }
         }
+
+        return false;
     }
 
     @Override
-    public boolean hasStartPermission(CommandSourceStack source) {
-        return check(source, PERMISSION_START);
+    public boolean couldUse(CommandSourceStack source) {
+        return check(source, PERMISSION_USE);
     }
 
     @Override
-    public boolean hasContinuePermission(CommandSourceStack source) {
-        return check(source, PERMISSION_CONTINUE);
-    }
-
-    @Override
-    public boolean hasClearPermission(CommandSourceStack source) {
-        return check(source, PERMISSION_CLEAR);
-    }
-
-    @Override
-    public boolean hasStartForOtherPermission(CommandSourceStack source) {
-        return check(source, PERMISSION_START_OTHER);
-    }
-
-    @Override
-    public boolean hasContinueForOtherPermission(CommandSourceStack source) {
-        return check(source, PERMISSION_CONTINUE_OTHER);
+    public boolean isAdmin(CommandSourceStack source) {
+        return check(source, PERMISSION_ADMIN);
     }
 }
