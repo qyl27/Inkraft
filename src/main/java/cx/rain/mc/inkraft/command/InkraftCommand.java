@@ -27,7 +27,7 @@ public class InkraftCommand {
     public static final String ARGUMENT_ID = "id";
     public static final String ARGUMENT_PLAYER = "player";
     public static final String ARGUMENT_TOKEN = "token";
-    public static final String ARGUMENT_CHOICE = "choice";
+    public static final String ARGUMENT_CHOICE = "optionIndex";
 
     public static final LiteralArgumentBuilder<CommandSourceStack> INKRAFT = literal("inkraft")
             .then(literal("version")
