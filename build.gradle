@@ -169,6 +169,7 @@ subprojects {
         compileClasspath.extendsFrom common
         runtimeClasspath.extendsFrom common
         developmentFabric.extendsFrom common
+        developmentNeoForge.extendsFrom common
 
         shadowBundle {
             canBeResolved = true
