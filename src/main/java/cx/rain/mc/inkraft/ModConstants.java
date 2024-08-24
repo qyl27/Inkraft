@@ -6,14 +6,17 @@ public class ModConstants {
         public static final String COMMAND_SUCCESS = "message.command.success";
         public static final String COMMAND_VARIABLE = "message.command.variable";
 
+        public static final String STORY_ALREADY_END = "message.story.already_end";
         public static final String STORY_OPTION_OUTDATED = "message.story.option_outdated";
+
         public static final String STORY_NEXT = "message.story.next";
         public static final String STORY_NEXT_CHOICE = "message.story.next.choice";
         public static final String STORY_NEXT_HINT = "message.story.next.hint";
         public static final String STORY_NEXT_CHOICE_HINT = "message.story.next.choice.hint";
-
         public static final String STORY_RESUME = "message.story.resume";
         public static final String STORY_RESUME_HINT = "message.story.resume.hint";
+
+        public static final String STORY_END = "message.story.end";
     }
 
     public static class Variables {

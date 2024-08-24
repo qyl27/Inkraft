@@ -5,18 +5,6 @@ architectury {
 
 loom {
     runs {
-        client {
-            client()
-
-            runDir 'run/client'
-        }
-
-        server {
-            server()
-
-            runDir 'run/server'
-        }
-
         data {
             data()
 
@@ -30,6 +18,8 @@ loom {
 dependencies {
     neoForge "net.neoforged:neoforge:${rootProject.neoforge_version}"
     modApi "dev.architectury:architectury-neoforge:${rootProject.architectury_version}"
+    implementation "com.bladecoder.ink:blade-ink:${rootProject.blade_ink_version}"
+    forgeRuntimeLibrary "com.bladecoder.ink:blade-ink:${rootProject.blade_ink_version}"
 
     common(project(path: ':', configuration: 'namedElements')) { transitive false }
     shadowBundle project(path: ':', configuration: 'transformProductionNeoForge')

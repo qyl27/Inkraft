@@ -5,5 +5,5 @@ import cx.rain.mc.inkraft.story.IStoryVariable;
 
 public interface StoryFunction {
     String getName();
-    IStoryVariable apply(StoryInstance instance, Object... args);
+    IStoryVariable<?> apply(StoryInstance instance, Object... args);
 }

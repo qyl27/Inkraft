@@ -16,6 +16,7 @@ public class EnUsProvider extends LanguageProvider {
         add(ModConstants.Messages.COMMAND_SUCCESS, "Command successful.");
         add(ModConstants.Messages.COMMAND_VARIABLE, "Variable name: %1$s, value: %2$s");
 
+        add(ModConstants.Messages.STORY_ALREADY_END, "Error! The story is over.");
         add(ModConstants.Messages.STORY_OPTION_OUTDATED, "Error! This option is outdated.");
 
         add(ModConstants.Messages.STORY_NEXT, "[Continue]");
@@ -24,5 +25,6 @@ public class EnUsProvider extends LanguageProvider {
         add(ModConstants.Messages.STORY_NEXT_CHOICE_HINT, "Click to choose this option");
         add(ModConstants.Messages.STORY_RESUME, "[You have unfinished story]");
         add(ModConstants.Messages.STORY_RESUME_HINT, "Click to continue");
+        add(ModConstants.Messages.STORY_END, "[Story over]");
     }
 }

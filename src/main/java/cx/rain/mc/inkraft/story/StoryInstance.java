@@ -121,6 +121,11 @@ public class StoryInstance {
     /// <editor-fold desc="Game control.">
 
     public void start() {
+        if (isStoryEnded()) {
+            player.sendSystemMessage(Component.translatable(ModConstants.Messages.STORY_ALREADY_END).withStyle(ChatFormatting.RED));
+            return;
+        }
+
         int pause = ModConstants.Values.DEFAULT_PAUSE_TICKS;
         if (data.hasVariable(ModConstants.Variables.LINE_PAUSE_TICKS)) {
             var v = data.getVariable(ModConstants.Variables.LINE_PAUSE_TICKS, IStoryVariable.Int.class);
@@ -158,6 +163,7 @@ public class StoryInstance {
             if (hasNextLine()) {
                 nextLine();
             } else {
+                showStoryEnd();
                 cancellationToken.cancel();
             }
         }, cancellationToken, 0, pause);
@@ -196,6 +202,11 @@ public class StoryInstance {
         var component = Component.translatable(ModConstants.Messages.STORY_NEXT).withStyle(ChatFormatting.GREEN);
         component.setStyle(component.getStyle().withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/inkraft next " + token)));
         component.setStyle(component.getStyle().withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.translatable(ModConstants.Messages.STORY_NEXT_HINT).withStyle(ChatFormatting.YELLOW))));
+        player.sendSystemMessage(component);
+    }
+
+    private void showStoryEnd() {
+        var component = Component.translatable(ModConstants.Messages.STORY_END).withStyle(ChatFormatting.GREEN);
         player.sendSystemMessage(component);
     }
 

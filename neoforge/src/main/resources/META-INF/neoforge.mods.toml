@@ -1,7 +1,7 @@
 modLoader = "javafml"
 loaderVersion = "[${neoforge_loader_version},)"
 issueTrackerURL = "https://github.com/qyl27/Inkraft/issues"
-license = "Apache-2.0"
+license = "ARR"
 
 [[mods]]
 modId = "inkraft"

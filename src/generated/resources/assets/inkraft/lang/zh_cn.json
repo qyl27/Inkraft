@@ -2,6 +2,8 @@
   "message.command.success": "操作成功完成。",
   "message.command.variable": "变量名：%1$s，值：%2$s",
   "message.command.version": "Inkraft 版本：%1$s，构建于 %2$s。",
+  "message.story.already_end": "错误！剧情已结束。",
+  "message.story.end": "【剧情结束】",
   "message.story.next": "【继续】",
   "message.story.next.choice": "【选项】%1$s",
   "message.story.next.choice.hint": "点击选择",

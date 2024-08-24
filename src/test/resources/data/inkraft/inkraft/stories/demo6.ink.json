@@ -1,1 +1,0 @@
-{"inkVersion":21,"root":[["#","^title: Demo6","/#","#","^author: qyl27","/#","ev",true,{"x()":"setAutoContinue","exArgs":1},"pop","/ev","\n","ev",30,{"x()":"setAutoContinueSpeed","exArgs":1},"pop","/ev","\n","^&a你会编程吗？","\n","^&b略懂，略懂。","\n","^&aJava还是C++？","\n","^&b命令方块！","\n",["done",{"#f":5,"#n":"g-0"}],null],"done",{"#f":1}],"listDefs":{}}

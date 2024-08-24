@@ -10,7 +10,7 @@
     "contact": {
         "sources": "https://github.com/qyl27/inkraft"
     },
-    "license": "Apache-2.0",
+    "license": "ARR",
     "environment": "*",
     "entrypoints": {
         "main": [

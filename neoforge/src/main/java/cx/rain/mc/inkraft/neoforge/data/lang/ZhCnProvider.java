@@ -16,6 +16,7 @@ public class ZhCnProvider extends LanguageProvider {
         add(ModConstants.Messages.COMMAND_SUCCESS, "操作成功完成。");
         add(ModConstants.Messages.COMMAND_VARIABLE, "变量名：%1$s，值：%2$s");
 
+        add(ModConstants.Messages.STORY_ALREADY_END, "错误！剧情已结束。");
         add(ModConstants.Messages.STORY_OPTION_OUTDATED, "错误！选项已过期。");
 
         add(ModConstants.Messages.STORY_NEXT, "【继续】");
@@ -24,5 +25,6 @@ public class ZhCnProvider extends LanguageProvider {
         add(ModConstants.Messages.STORY_NEXT_CHOICE_HINT, "点击选择");
         add(ModConstants.Messages.STORY_RESUME, "【你还在一段剧情中】");
         add(ModConstants.Messages.STORY_RESUME_HINT, "点击继续");
+        add(ModConstants.Messages.STORY_END, "【剧情结束】");
     }
 }

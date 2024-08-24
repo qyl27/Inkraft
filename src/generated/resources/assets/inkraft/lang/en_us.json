@@ -2,6 +2,8 @@
   "message.command.success": "Command successful.",
   "message.command.variable": "Variable name: %1$s, value: %2$s",
   "message.command.version": "Inkraft ver: %1$s, build at %2$s.",
+  "message.story.already_end": "Error! The story is over.",
+  "message.story.end": "[Story over]",
   "message.story.next": "[Continue]",
   "message.story.next.choice": "[Option] 1$s",
   "message.story.next.choice.hint": "Click to choose this option",
