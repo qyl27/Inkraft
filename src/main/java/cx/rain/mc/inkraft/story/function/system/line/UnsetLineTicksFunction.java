@@ -14,7 +14,8 @@ public class UnsetLineTicksFunction implements StoryFunction {
     @Override
     public IStoryVariable.Bool apply(StoryInstance instance, Object... args) {
         instance.getData().unsetVariable(ModConstants.Variables.LINE_PAUSE_TICKS);
-        instance.stop();
+        instance.stop(false);
+        instance.start();
         return IStoryVariable.Bool.TRUE;
     }
 }

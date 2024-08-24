@@ -92,22 +92,15 @@ public class InkraftCommand {
     }
 
     private static int onNext(final CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
-        var token = UuidArgument.getUuid(context, ARGUMENT_TOKEN);
-
         try {
             var object = EntityArgument.getPlayer(context, ARGUMENT_PLAYER);
-            var data = InkraftPlatform.getPlayerData(object);
-            if (!data.getContinuousToken().equals(token)) {
-                context.getSource().sendFailure(Component.translatable(ModConstants.Messages.STORY_OPTION_OUTDATED).withStyle(ChatFormatting.RED));
-                return 0;
-            }
-
             doNext(object);
             context.getSource().sendSuccess(() -> Component.translatable(ModConstants.Messages.COMMAND_SUCCESS).withStyle(ChatFormatting.LIGHT_PURPLE), true);
             return 1;
         } catch (IllegalArgumentException ignored) {
         }
 
+        var token = UuidArgument.getUuid(context, ARGUMENT_TOKEN);
         var player = context.getSource().getPlayerOrException();
         var data = InkraftPlatform.getPlayerData(player);
         if (!data.getContinuousToken().equals(token)) {
@@ -120,23 +113,17 @@ public class InkraftCommand {
     }
 
     private static int onNextChoose(final CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
-        var token = UuidArgument.getUuid(context, ARGUMENT_TOKEN);
         var choice = IntegerArgumentType.getInteger(context, ARGUMENT_CHOICE);
 
         try {
             var object = EntityArgument.getPlayer(context, ARGUMENT_PLAYER);
-            var data = InkraftPlatform.getPlayerData(object);
-            if (!data.getContinuousToken().equals(token)) {
-                context.getSource().sendFailure(Component.translatable(ModConstants.Messages.STORY_OPTION_OUTDATED).withStyle(ChatFormatting.RED));
-                return 0;
-            }
-
             doChoice(object, choice);
             context.getSource().sendSuccess(() -> Component.translatable(ModConstants.Messages.COMMAND_SUCCESS).withStyle(ChatFormatting.LIGHT_PURPLE), true);
             return 1;
         } catch (IllegalArgumentException ignored) {
         }
 
+        var token = UuidArgument.getUuid(context, ARGUMENT_TOKEN);
         var player = context.getSource().getPlayerOrException();
         var data = InkraftPlatform.getPlayerData(player);
         if (!data.getContinuousToken().equals(token)) {

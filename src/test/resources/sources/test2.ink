@@ -1,18 +1,18 @@
 INCLUDE test.common.ink
 
 Inkraft 测试剧本二，系统函数：
+准备好了吗？
+~ pause()
 
 一
 二
 三
-
-接下来暂停，放慢速度说一遍！
+接下来，放慢速度说一遍！
 ~ setLineTicks(25)
 
 一
 二
 三
-
 ~ unsetLineTicks()
 
 设置一个全局变量~

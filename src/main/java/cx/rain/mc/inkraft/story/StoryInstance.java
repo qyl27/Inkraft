@@ -84,7 +84,6 @@ public class StoryInstance {
     public void newStory(ResourceLocation path) {
         stop();
         data.setStory(path);
-        data.resetState();
 
         var str = registry.get(path);
         try {
@@ -168,6 +167,7 @@ public class StoryInstance {
             if (hasNextLine()) {
                 if (!cancellationToken.isCancelled()) {
                     nextLine();
+                    System.out.println(currentLine());
                 }
             } else {
                 showStoryEnd();
@@ -177,14 +177,18 @@ public class StoryInstance {
         }, cancellationToken, 0, pause);
     }
 
-    public void stop() {
+    public void stop(boolean showContinue) {
         if (isStoryRunning()) {
             cancellationToken.cancel();
-
-            if (!isStoryEnded()) {
-                showClickToNext();
-            }
         }
+
+        if (showContinue && !isStoryEnded()) {
+            showClickToCurrent();
+        }
+    }
+
+    public void stop() {
+        stop(false);
     }
 
     public boolean isStoryRunning() {
@@ -213,6 +217,15 @@ public class StoryInstance {
         data.setContinuousToken(token);
         var component = Component.translatable(ModConstants.Messages.STORY_NEXT).withStyle(ChatFormatting.GREEN);
         component.setStyle(component.getStyle().withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/inkraft next " + token)));
+        component.setStyle(component.getStyle().withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.translatable(ModConstants.Messages.STORY_NEXT_HINT).withStyle(ChatFormatting.YELLOW))));
+        player.sendSystemMessage(component);
+    }
+
+    private void showClickToCurrent() {
+        var token = UUID.randomUUID();
+        data.setContinuousToken(token);
+        var component = Component.translatable(ModConstants.Messages.STORY_NEXT).withStyle(ChatFormatting.GREEN);
+        component.setStyle(component.getStyle().withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/inkraft current")));
         component.setStyle(component.getStyle().withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.translatable(ModConstants.Messages.STORY_NEXT_HINT).withStyle(ChatFormatting.YELLOW))));
         player.sendSystemMessage(component);
     }
@@ -259,7 +272,6 @@ public class StoryInstance {
         try {
             story.chooseChoiceIndex(index);
             nextLine();
-            saveStory();
         } catch (Exception ex) {
             throw new RuntimeException(ex);
         }

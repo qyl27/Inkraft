@@ -15,7 +15,8 @@ public class SetLineTicksFunction implements StoryFunction {
     public IStoryVariable.Bool apply(StoryInstance instance, Object... args) {
         var ticks = Integer.parseInt(args[0].toString());
         instance.getData().setVariable(ModConstants.Variables.LINE_PAUSE_TICKS, new IStoryVariable.Int(ticks));
-        instance.stop();
+        instance.stop(false);
+        instance.start();
         return IStoryVariable.Bool.TRUE;
     }
 }

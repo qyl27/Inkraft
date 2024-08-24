@@ -86,18 +86,18 @@ public interface IInkPlayerData {
         if (tag.contains(ModConstants.Tags.STORY)) {
             var str = tag.getString(ModConstants.Tags.STORY);
             if (str.isBlank()) {
-                setStory(ResourceLocation.parse(str));
-            } else {
                 setStory(null);
+            } else {
+                setStory(ResourceLocation.parse(str));
             }
         }
 
         if (tag.contains(ModConstants.Tags.STATE)) {
             var str = tag.getString(ModConstants.Tags.STATE);
             if (str.isBlank()) {
-                setState(str);
-            } else {
                 setState(null);
+            } else {
+                setState(str);
             }
         }
 

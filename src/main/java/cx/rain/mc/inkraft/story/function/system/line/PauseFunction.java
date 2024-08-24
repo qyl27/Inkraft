@@ -12,7 +12,7 @@ public class PauseFunction implements StoryFunction {
 
     @Override
     public IStoryVariable.Bool apply(StoryInstance instance, Object... args) {
-        instance.stop();
+        instance.stop(true);
         return IStoryVariable.Bool.TRUE;
     }
 }
