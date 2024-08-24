@@ -1,10 +1,10 @@
 package cx.rain.mc.inkraft.story.function.system.variable;
 
 import cx.rain.mc.inkraft.story.StoryInstance;
-import cx.rain.mc.inkraft.story.function.StoryFunction;
+import cx.rain.mc.inkraft.story.function.IStoryFunction;
 import cx.rain.mc.inkraft.story.IStoryVariable;
 
-public class SetVariableFunction implements StoryFunction {
+public class SetVariableFunction implements IStoryFunction {
     @Override
     public String getName() {
         return "setVariable";

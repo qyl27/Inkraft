@@ -1,6 +1,7 @@
-// title: engine_functions_include
+// title: engine_functions_include.ink
 // author: qyl27
-// version: 2024.8.6
+// license: CC0
+// version: 2024.8.24
 
 EXTERNAL isDebug()
 
@@ -22,11 +23,21 @@ EXTERNAL setVariable(name, value)
 EXTERNAL unsetVariable(name)
 EXTERNAL clearVariables()
 
+EXTERNAL logDebug(message)
+EXTERNAL logInfo(message)
+EXTERNAL logWarn(message)
+EXTERNAL logError(message)
+
+EXTERNAL getPlayerName()
+EXTERNAL runCommand(command)
+EXTERNAL runUnlimitedCommand(command)
+EXTERNAL runServerCommand(command)
+
+
 === function isDebug() ===
     ~ return true
 
 
-// Todo: parallel flow simulations.
 === function isInFlow(name) ===
     ~ return true
     
@@ -59,7 +70,6 @@ EXTERNAL clearVariables()
     ~ return true
 
 
-// Todo: variable simulations.
 === function hasVariable(name) ===
     ~ return true
 
@@ -74,3 +84,30 @@ EXTERNAL clearVariables()
 	
 === function clearVariables() ===
     ~ return true
+
+
+=== function logDebug(message) ===
+    ~ return true
+
+=== function logInfo(message) ===
+    ~ return true
+
+=== function logWarn(message) ===
+    ~ return true
+
+=== function logError(message) ===
+    ~ return true
+
+
+=== function getPlayerName() ===
+    ~ return "PlayerName"
+
+=== function runCommand(command) ===
+    ~ return 1
+
+=== function runUnlimitedCommand(command) ===
+    ~ return 1
+
+=== function runServerCommand(command) ===
+    ~ return 1
+

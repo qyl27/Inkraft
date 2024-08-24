@@ -1,19 +1,20 @@
-package cx.rain.mc.inkraft.story.function.system.flow;
+package cx.rain.mc.inkraft.story.function.system.logging;
 
+import cx.rain.mc.inkraft.Inkraft;
 import cx.rain.mc.inkraft.story.IStoryVariable;
 import cx.rain.mc.inkraft.story.StoryInstance;
 import cx.rain.mc.inkraft.story.function.IStoryFunction;
 
-public class FlowToFunction implements IStoryFunction {
+public class LogDebugFunction implements IStoryFunction {
     @Override
     public String getName() {
-        return "flowTo";
+        return "logDebug";
     }
 
     @Override
     public IStoryVariable.Bool apply(StoryInstance instance, Object... args) {
-        var name = args[0].toString();
-        instance.flowTo(name);
+        var message = args[0].toString();
+        Inkraft.getInstance().getLogger().debug(message);
         return IStoryVariable.Bool.TRUE;
     }
 }

@@ -60,7 +60,7 @@ public class Inkraft {
 
         storyRegistry = new StoryRegistry();
         timerManager = new TaskManager();
-        storiesManager = new StoriesManager(logger, storyRegistry, timerManager, true);
+        storiesManager = new StoriesManager(logger, storyRegistry, timerManager, "true".equalsIgnoreCase(System.getProperty("inkraft.debug")));
 
         InkraftNetworking.register();
         StoryFunctions.register();

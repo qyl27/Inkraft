@@ -2,9 +2,9 @@ package cx.rain.mc.inkraft.story.function.system.line;
 
 import cx.rain.mc.inkraft.story.IStoryVariable;
 import cx.rain.mc.inkraft.story.StoryInstance;
-import cx.rain.mc.inkraft.story.function.StoryFunction;
+import cx.rain.mc.inkraft.story.function.IStoryFunction;
 
-public class PauseFunction implements StoryFunction {
+public class PauseFunction implements IStoryFunction {
     @Override
     public String getName() {
         return "pause";
