@@ -31,4 +31,9 @@ public class StoryRegistry implements IDataRegistry<ResourceLocation, String> {
     public String get(ResourceLocation path) {
         return stories.get(path);
     }
+
+    @Override
+    public boolean has(ResourceLocation path) {
+        return stories.containsKey(path);
+    }
 }

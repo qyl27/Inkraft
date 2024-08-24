@@ -211,8 +211,8 @@ public class InkraftCommand {
 
     private static void doReset(ServerPlayer player) {
         var story = Inkraft.getInstance().getStoriesManager().get(player);
-        story.stop();
         story.getData().clearData();
+        story.stop();
     }
 
     /// </editor-fold>

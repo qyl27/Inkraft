@@ -85,6 +85,7 @@ public class StoryInstance {
         stop();
         data.setStory(path);
         data.resetState();
+
         var str = registry.get(path);
         try {
             story = new Story(str);
@@ -95,14 +96,21 @@ public class StoryInstance {
     }
 
     public void loadStory() {
-        if (data.getStory() != null) {
-            newStory(data.getStory());
+        if (!data.hasData()) {
+            return;
         }
 
+        var storyId = data.getStory();
+        if (!registry.has(storyId)) {
+            data.resetState();
+            logger.warn("Story {} is no longer exists.", storyId);
+            return;
+        }
+
+        newStory(storyId);
+
         try {
-            if (data.getState() != null) {
-                story.getState().loadJson(data.getState());
-            }
+            story.getState().loadJson(data.getState());
         } catch (Exception ex) {
             throw new RuntimeException(ex);
         }
@@ -141,10 +149,7 @@ public class StoryInstance {
         cancellationToken = new CancellableToken();
         var finalPause = pause;
         taskManager.run(() -> {
-            if (currentLine().isBlank()) {
-                nextLine();
-                return;
-            } else {
+            if (!currentLine().isBlank()) {
                 showLine();
             }
 
@@ -161,9 +166,12 @@ public class StoryInstance {
             }
 
             if (hasNextLine()) {
-                nextLine();
+                if (!cancellationToken.isCancelled()) {
+                    nextLine();
+                }
             } else {
                 showStoryEnd();
+                data.resetState();
                 cancellationToken.cancel();
             }
         }, cancellationToken, 0, pause);
@@ -172,6 +180,10 @@ public class StoryInstance {
     public void stop() {
         if (isStoryRunning()) {
             cancellationToken.cancel();
+
+            if (!isStoryEnded()) {
+                showClickToNext();
+            }
         }
     }
 

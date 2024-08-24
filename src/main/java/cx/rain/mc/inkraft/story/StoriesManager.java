@@ -26,8 +26,20 @@ public class StoriesManager {
         this.debug = debug;
     }
 
+    public void remove(ServerPlayer player) {
+        playerStories.remove(player.getUUID());
+    }
+
     public StoryInstance get(ServerPlayer player) {
-        return playerStories.computeIfAbsent(player.getUUID(), uuid -> new StoryInstance(logger, this,
+        var uuid = player.getUUID();
+        if (playerStories.containsKey(uuid)) {
+            var story = playerStories.get(uuid);
+            if (story.getPlayer() != player) {  // Joining game again, new player entity.
+                remove(player);
+            }
+        }
+
+        return playerStories.computeIfAbsent(uuid, __ -> new StoryInstance(logger, this,
                 registry, taskManager, player, InkraftPlatform.getPlayerData(player)));
     }
 

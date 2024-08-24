@@ -7,10 +7,7 @@ import cx.rain.mc.inkraft.story.function.system.line.IsEndedFunction;
 import cx.rain.mc.inkraft.story.function.system.line.PauseFunction;
 import cx.rain.mc.inkraft.story.function.system.line.SetLineTicksFunction;
 import cx.rain.mc.inkraft.story.function.system.line.UnsetLineTicksFunction;
-import cx.rain.mc.inkraft.story.function.system.variable.ClearVariableFunction;
-import cx.rain.mc.inkraft.story.function.system.variable.GetVariableFunction;
-import cx.rain.mc.inkraft.story.function.system.variable.SetVariableFunction;
-import cx.rain.mc.inkraft.story.function.system.variable.UnsetVariableFunction;
+import cx.rain.mc.inkraft.story.function.system.variable.*;
 import dev.architectury.registry.registries.DeferredRegister;
 import dev.architectury.registry.registries.Registrar;
 import dev.architectury.registry.registries.RegistrarManager;
@@ -44,6 +41,7 @@ public class StoryFunctions {
     public static final RegistrySupplier<StoryFunction> SET_LINE_TICKS = FUNCTIONS.register("set_line_ticks", SetLineTicksFunction::new);
     public static final RegistrySupplier<StoryFunction> UNSET_LINE_TICKS = FUNCTIONS.register("unset_line_ticks", UnsetLineTicksFunction::new);
 
+    public static final RegistrySupplier<StoryFunction> HAS_VARIABLE = FUNCTIONS.register("has_variable", HasVariableFunction::new);
     public static final RegistrySupplier<StoryFunction> GET_VARIABLE = FUNCTIONS.register("get_variable", GetVariableFunction::new);
     public static final RegistrySupplier<StoryFunction> SET_VARIABLE = FUNCTIONS.register("set_variable", SetVariableFunction::new);
     public static final RegistrySupplier<StoryFunction> UNSET_VARIABLE = FUNCTIONS.register("unset_variable", UnsetVariableFunction::new);

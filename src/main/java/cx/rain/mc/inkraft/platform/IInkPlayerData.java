@@ -9,6 +9,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 
 public interface IInkPlayerData {
@@ -63,12 +64,12 @@ public interface IInkPlayerData {
         var story = getStory();
         if (story != null) {
             tag.putString(ModConstants.Tags.STORY, story.toString());
+        } else {
+            tag.putString(ModConstants.Tags.STORY, "");
         }
 
         var state = getState();
-        if (state != null) {
-            tag.putString(ModConstants.Tags.STATE, state);
-        }
+        tag.putString(ModConstants.Tags.STATE, Objects.requireNonNullElse(state, ""));
 
         var list = new ListTag();
         for (var entry : getVariables().entrySet()) {
@@ -83,11 +84,21 @@ public interface IInkPlayerData {
 
     default void deserialize(CompoundTag tag) {
         if (tag.contains(ModConstants.Tags.STORY)) {
-            setStory(ResourceLocation.parse(tag.getString(ModConstants.Tags.STORY)));
+            var str = tag.getString(ModConstants.Tags.STORY);
+            if (str.isBlank()) {
+                setStory(ResourceLocation.parse(str));
+            } else {
+                setStory(null);
+            }
         }
 
         if (tag.contains(ModConstants.Tags.STATE)) {
-            setState(tag.getString(ModConstants.Tags.STATE));
+            var str = tag.getString(ModConstants.Tags.STATE);
+            if (str.isBlank()) {
+                setState(str);
+            } else {
+                setState(null);
+            }
         }
 
         var list = tag.getList(ModConstants.Tags.VARIABLES, ListTag.TAG_COMPOUND);

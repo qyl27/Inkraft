@@ -82,6 +82,7 @@ public class Inkraft {
 
         PlayerEvent.PLAYER_JOIN.register(player -> {
             var story = storiesManager.get(player);
+            story.loadStory();
 
             if (!story.isStoryEnded()) {
                 var component = Component.translatable(ModConstants.Messages.STORY_RESUME).withStyle(ChatFormatting.GREEN);
@@ -90,6 +91,8 @@ public class Inkraft {
                 player.sendSystemMessage(component);
             }
         });
+
+        PlayerEvent.PLAYER_QUIT.register(storiesManager::remove);
     }
 
     public Logger getLogger() {
