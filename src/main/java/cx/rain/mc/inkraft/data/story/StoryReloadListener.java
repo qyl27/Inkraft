@@ -19,7 +19,7 @@ import java.util.concurrent.Executor;
 public class StoryReloadListener implements PreparableReloadListener {
     public static final ResourceLocation INKRAFT_STORY_LOADER = ResourceLocation.fromNamespaceAndPath(Inkraft.MODID, "story_loader");
 
-    public static final String STORY_PATH = "inkraft/stories";
+    public static final String STORY_PATH = "inkraft_story";
     public static final FileToIdConverter FILE_TO_ID_CONVERTER = new FileToIdConverter(STORY_PATH, ".ink.json");
 
     private final IDataRegistry<ResourceLocation, String> registry;

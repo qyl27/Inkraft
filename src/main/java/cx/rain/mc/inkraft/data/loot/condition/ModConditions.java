@@ -13,5 +13,5 @@ public class ModConditions {
         CONDITIONS.register();
     }
 
-    public static final RegistrySupplier<LootItemConditionType> IN_STORY = CONDITIONS.register("in_story", () -> InStoryCondition.TYPE);
+    public static final RegistrySupplier<LootItemConditionType> STORY = CONDITIONS.register("story", () -> StoryCondition.TYPE);
 }
