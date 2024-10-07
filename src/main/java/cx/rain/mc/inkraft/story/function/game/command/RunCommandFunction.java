@@ -6,20 +6,29 @@ import cx.rain.mc.inkraft.story.function.IStoryFunction;
 import net.minecraft.commands.CommandResultCallback;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerPlayer;
 
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Function;
 
 public class RunCommandFunction implements IStoryFunction {
+    private final String name;
+    private final Function<ServerPlayer, CommandSourceStack> function;
+
+    public RunCommandFunction(String name, Function<ServerPlayer, CommandSourceStack> function) {
+        this.name = name;
+        this.function = function;
+    }
 
     @Override
     public String getName() {
-        return "runCommand";
+        return name;
     }
 
     @Override
     public IStoryVariable.Int apply(StoryInstance instance, Object... args) {
         var command = args[0].toString();
-        var source = instance.getPlayer().createCommandSourceStack();
+        var source = function.apply(instance.getPlayer());
         var server = instance.getPlayer().getServer();
         assert server != null;
         return new IStoryVariable.Int(execute(command, server, source));
@@ -30,39 +39,5 @@ public class RunCommandFunction implements IStoryFunction {
         commandSourceStack.withCallback((success, ret) -> result.set(ret), CommandResultCallback::chain);
         server.getCommands().performPrefixedCommand(commandSourceStack, command);
         return result.get();
-    }
-
-    public static class UnlimitedCommand implements IStoryFunction {
-
-        @Override
-        public String getName() {
-            return "runUnlimitedCommand";
-        }
-
-        @Override
-        public IStoryVariable.Int apply(StoryInstance instance, Object... args) {
-            var command = args[0].toString();
-            var source = instance.getPlayer().createCommandSourceStack().withPermission(4);
-            var server = instance.getPlayer().getServer();
-            assert server != null;
-            return new IStoryVariable.Int(execute(command, server, source));
-        }
-    }
-
-    public static class ServerCommand implements IStoryFunction {
-
-        @Override
-        public String getName() {
-            return "runServerCommand";
-        }
-
-        @Override
-        public IStoryVariable.Int apply(StoryInstance instance, Object... args) {
-            var command = args[0].toString();
-            var server = instance.getPlayer().getServer();
-            assert server != null;
-            var source = server.createCommandSourceStack();
-            return new IStoryVariable.Int(execute(command, server, source));
-        }
     }
 }

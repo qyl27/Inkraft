@@ -1,6 +1,8 @@
 package cx.rain.mc.inkraft.story.function;
 
 import cx.rain.mc.inkraft.Inkraft;
+import cx.rain.mc.inkraft.story.function.game.RealTimeFunction;
+import cx.rain.mc.inkraft.story.function.game.WorldTimeFunction;
 import cx.rain.mc.inkraft.story.function.game.command.RunCommandFunction;
 import cx.rain.mc.inkraft.story.function.game.player.GetPlayerNameFunction;
 import cx.rain.mc.inkraft.story.function.system.*;
@@ -21,6 +23,7 @@ import dev.architectury.registry.registries.RegistrySupplier;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.Entity;
 
 public class StoryFunctions {
     public static final ResourceLocation REGISTRY_NAME = ResourceLocation.fromNamespaceAndPath(Inkraft.MODID, "functions");
@@ -64,10 +67,14 @@ public class StoryFunctions {
 
     /// <editor-fold desc="Game functions.">
     public static final RegistrySupplier<IStoryFunction> GET_PLAYER_NAME = FUNCTIONS.register("get_player_name", GetPlayerNameFunction::new);
+    public static final RegistrySupplier<IStoryFunction> GET_WORLD_DAY_TIME = FUNCTIONS.register("get_world_day_time", () -> new WorldTimeFunction("getWorldDayTime", level -> (int)(level.getDayTime() % 24000L)));
+    public static final RegistrySupplier<IStoryFunction> GET_WORLD_GAME_TIME = FUNCTIONS.register("get_world_game_time", () -> new WorldTimeFunction("getWorldGameTime", level -> (int)(level.getGameTime() % Integer.MAX_VALUE)));
+    public static final RegistrySupplier<IStoryFunction> GET_WORLD_DAY = FUNCTIONS.register("get_world_day", () -> new WorldTimeFunction("getWorldDay", level -> (int)(level.getDayTime() / 24000L % Integer.MAX_VALUE)));
+    public static final RegistrySupplier<IStoryFunction> GET_REAL_TIME = FUNCTIONS.register("get_real_time", RealTimeFunction::new);
 
-    public static final RegistrySupplier<IStoryFunction> RUN_COMMAND = FUNCTIONS.register("run_command", RunCommandFunction::new);
-    public static final RegistrySupplier<IStoryFunction> RUN_UNLIMITED_COMMAND = FUNCTIONS.register("run_unlimited_command", RunCommandFunction.UnlimitedCommand::new);
-    public static final RegistrySupplier<IStoryFunction> RUN_SERVER_COMMAND = FUNCTIONS.register("run_server_command", RunCommandFunction.ServerCommand::new);
+    public static final RegistrySupplier<IStoryFunction> RUN_COMMAND = FUNCTIONS.register("run_command", () -> new RunCommandFunction("runCommand", Entity::createCommandSourceStack));
+    public static final RegistrySupplier<IStoryFunction> RUN_UNLIMITED_COMMAND = FUNCTIONS.register("run_unlimited_command", () -> new RunCommandFunction("runUnlimitedCommand", player -> player.createCommandSourceStack().withPermission(4)));
+    public static final RegistrySupplier<IStoryFunction> RUN_SERVER_COMMAND = FUNCTIONS.register("run_server_command", () -> new RunCommandFunction("runServerCommand", player -> player.server.createCommandSourceStack()));
 
 //    public static final RegistrySupplier<StoryFunction> GIVE_ITEM = FUNCTIONS.register("give_item", GiveItemFunction::new);
 //    public static final RegistrySupplier<StoryFunction> GIVE_ITEM_STACK = FUNCTIONS.register("give_item_stack", GiveItemStackFunction::new);
