@@ -6,10 +6,10 @@ import cx.rain.mc.inkraft.story.function.IStoryFunction;
 import cx.rain.mc.inkraft.utility.ArgumentParseHelper;
 import cx.rain.mc.inkraft.utility.ItemStackHelper;
 
-public class HasItemFunction implements IStoryFunction {
+public class TakeItemFunction implements IStoryFunction {
     @Override
     public String getName() {
-        return "hasItem";
+        return "takeItem";
     }
 
     @Override
@@ -18,14 +18,7 @@ public class HasItemFunction implements IStoryFunction {
         var registries = player.registryAccess();
         var predicate = ItemStackHelper.parsePredicate(registries, args, 0, 2);
         var count = ArgumentParseHelper.parseCount(args, 1);
-        var result = ItemStackHelper.match(player, predicate);
-        while (count > 0 && !result.isEmpty()) {
-            var s = result.removeFirst();
-            count -= s.getCount();
-            if (count <= 0) {
-                return IStoryVariable.Bool.TRUE;
-            }
-        }
-        return IStoryVariable.Bool.FALSE;
+        var took = player.getInventory().clearOrCountMatchingItems(predicate, count, player.getInventory());
+        return new IStoryVariable.Bool(count == took);
     }
 }

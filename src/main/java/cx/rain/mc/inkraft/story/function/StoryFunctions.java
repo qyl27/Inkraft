@@ -4,6 +4,10 @@ import cx.rain.mc.inkraft.Inkraft;
 import cx.rain.mc.inkraft.story.function.game.RealTimeFunction;
 import cx.rain.mc.inkraft.story.function.game.WorldTimeFunction;
 import cx.rain.mc.inkraft.story.function.game.command.RunCommandFunction;
+import cx.rain.mc.inkraft.story.function.game.inventory.CountItemFunction;
+import cx.rain.mc.inkraft.story.function.game.inventory.GiveItemFunction;
+import cx.rain.mc.inkraft.story.function.game.inventory.HasItemFunction;
+import cx.rain.mc.inkraft.story.function.game.inventory.TakeItemFunction;
 import cx.rain.mc.inkraft.story.function.game.player.GetPlayerNameFunction;
 import cx.rain.mc.inkraft.story.function.system.*;
 import cx.rain.mc.inkraft.story.function.system.flow.*;
@@ -76,11 +80,10 @@ public class StoryFunctions {
     public static final RegistrySupplier<IStoryFunction> RUN_UNLIMITED_COMMAND = FUNCTIONS.register("run_unlimited_command", () -> new RunCommandFunction("runUnlimitedCommand", player -> player.createCommandSourceStack().withPermission(4)));
     public static final RegistrySupplier<IStoryFunction> RUN_SERVER_COMMAND = FUNCTIONS.register("run_server_command", () -> new RunCommandFunction("runServerCommand", player -> player.server.createCommandSourceStack()));
 
-//    public static final RegistrySupplier<StoryFunction> GIVE_ITEM = FUNCTIONS.register("give_item", GiveItemFunction::new);
-//    public static final RegistrySupplier<StoryFunction> GIVE_ITEM_STACK = FUNCTIONS.register("give_item_stack", GiveItemStackFunction::new);
-//    public static final RegistrySupplier<StoryFunction> HAS_ITEM_STACK = FUNCTIONS.register("has_item_stack", HasItemStackFunction::new);
-//    public static final RegistrySupplier<StoryFunction> COUNT_ITEM_STACK = FUNCTIONS.register("count_item_stack", CountItemStackFunction::new);
-//    public static final RegistrySupplier<StoryFunction> TAKE_ITEM_STACK = FUNCTIONS.register("take_item_stack", TakeItemStackFunction::new);
+    public static final RegistrySupplier<IStoryFunction> HAS_ITEM = FUNCTIONS.register("has_item", HasItemFunction::new);
+    public static final RegistrySupplier<IStoryFunction> COUNT_ITEM = FUNCTIONS.register("count_item", CountItemFunction::new);
+    public static final RegistrySupplier<IStoryFunction> GIVE_ITEM = FUNCTIONS.register("give_item", GiveItemFunction::new);
+    public static final RegistrySupplier<IStoryFunction> TAKE_ITEM = FUNCTIONS.register("take_item", TakeItemFunction::new);
 
     /// </editor-fold>
 }
