@@ -16,11 +16,8 @@ public class RealTimeFunction implements IStoryFunction {
     @Override
     public IStoryVariable<?> apply(StoryInstance instance, Object... args) {
         var now = OffsetDateTime.now();
-        if (args.length == 1) {
-            var pattern = args[0].toString();
-            return new IStoryVariable.Str(now.format(DateTimeFormatter.ofPattern(pattern)));
-        } else {
-            return new IStoryVariable.Str(now.toString());
-        }
+        var pattern = args[0].toString();
+        var result = pattern.isEmpty() ? now.toString() : now.format(DateTimeFormatter.ofPattern(pattern));
+        return new IStoryVariable.Str(result);
     }
 }

@@ -26,7 +26,7 @@ public class WorldTimeFunction implements IStoryFunction {
 
     @Override
     public IStoryVariable<?> apply(StoryInstance instance, Object... args) {
-        var id = args.length == 1 ? args[0].toString() : null;
+        var id = args[0].toString();
         var level = tryParseLevel(instance, id);
         var result = function.apply(level);
         return new IStoryVariable.Int(result);
@@ -34,7 +34,7 @@ public class WorldTimeFunction implements IStoryFunction {
 
     private static Level tryParseLevel(StoryInstance instance, String id) {
         try {
-            if (id != null) {
+            if (id.isEmpty()) {
                 var levelId = ResourceLocation.tryParse(id);
                 if (levelId != null) {
                     return instance.getPlayer().server.getLevel(ResourceKey.create(Registries.DIMENSION, levelId));

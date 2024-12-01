@@ -9,19 +9,23 @@ import java.util.List;
 import java.util.function.Predicate;
 
 public class ItemStackHelper {
-    public static Predicate<ItemStack> id(HolderLookup.Provider registries, String id) {
+    public static Predicate<ItemStack> predicateIdOrTag(HolderLookup.Provider registries, String id) {
         if (id.startsWith("#")) {
-            var tk = ArgumentParseHelper.parseItemTag(registries, id);
+            var tk = StringArgumentParseHelper.parseItemTag(id);
             return item -> item.is(tk);
         } else {
-            var i = ArgumentParseHelper.parseItem(registries, id);
+            var i = StringArgumentParseHelper.parseItem(registries, id);
             return item -> item.is(i);
         }
     }
 
-    public static Predicate<ItemStack> nbt(HolderLookup.Provider registries, String path, String value) {
-        var n = ArgumentParseHelper.parseTag(registries, value);
-        var p = ArgumentParseHelper.parseNbtPath(path);
+    public static Predicate<ItemStack> predicateNbt(HolderLookup.Provider registries, String path, String value) {
+        if (path.isEmpty() || value.isEmpty()) {
+            return item -> true;
+        }
+
+        var n = StringArgumentParseHelper.parseNbt(value);
+        var p = StringArgumentParseHelper.parseNbtPath(path);
         return item -> {
             try {
                 var l = p.get(item.save(registries));
@@ -33,15 +37,9 @@ public class ItemStackHelper {
         };
     }
 
-    public static Predicate<ItemStack> parsePredicate(HolderLookup.Provider registries, Object[] args, int idIndex, int nbtIndex) {
-        assert args.length >= idIndex + 1;
-        var predicate = id(registries, args[idIndex].toString());
-
-        if (args.length >= nbtIndex + 2) {
-            predicate = predicate.and(nbt(registries, args[nbtIndex].toString(), args[nbtIndex + 1].toString()));
-        }
-
-        return predicate;
+    public static Predicate<ItemStack> createPredicate(HolderLookup.Provider registries, String id, String tagPath, String tagValue) {
+        return predicateIdOrTag(registries, id)
+                .and(predicateNbt(registries, tagPath, tagValue));
     }
 
     public static List<ItemStack> match(ServerPlayer player, Predicate<ItemStack> predicate) {
@@ -52,22 +50,25 @@ public class ItemStackHelper {
                 .toList();
     }
 
-    public static ItemStack parseItemStack(HolderLookup.Provider registries, Object[] args, int startIndex) {
-        assert args.length >= startIndex + 1;
-        var item = ArgumentParseHelper.parseItem(registries, args[startIndex].toString());
-
+    public static ItemStack createItemStack(HolderLookup.Provider registries, String id, String count, String tagPath, String tagValue) {
+        var item = StringArgumentParseHelper.parseItem(registries, id);
         var result = new ItemStack(item);
 
-        if (args.length >= startIndex + 4) {
-            var p = ArgumentParseHelper.parseNbtPath(args[startIndex + 2].toString());
-            var t = ArgumentParseHelper.parseTag(registries, args[startIndex + 3].toString());
+        if (!count.isEmpty()) {
+            var c = Integer.parseInt(count);
+            result.setCount(c);
+        }
+
+        if (!tagPath.isEmpty() && !tagValue.isEmpty()) {
+            var p = StringArgumentParseHelper.parseNbtPath(tagPath);
+            var t = StringArgumentParseHelper.parseNbt(tagValue);
             var n = result.save(registries);
             try {
                 p.set(n, t);
+                result = ItemStack.parse(registries, n).orElseThrow();
             } catch (CommandSyntaxException ex) {
                 throw new RuntimeException(ex);
             }
-            result = ItemStack.parse(registries, n).orElseThrow();
         }
 
         return result;

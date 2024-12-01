@@ -12,13 +12,13 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 
-public class ArgumentParseHelper {
+public class StringArgumentParseHelper {
     public static Holder<Item> parseItem(HolderLookup.Provider registries, String id) {
         var rl = ResourceLocation.parse(id);
         return registries.lookupOrThrow(Registries.ITEM).getOrThrow(ResourceKey.create(Registries.ITEM, rl));
     }
 
-    public static TagKey<Item> parseItemTag(HolderLookup.Provider registries, String id) {
+    public static TagKey<Item> parseItemTag(String id) {
         var rl = ResourceLocation.parse(id);
         return TagKey.create(Registries.ITEM, rl);
     }
@@ -31,7 +31,7 @@ public class ArgumentParseHelper {
         }
     }
 
-    public static Tag parseTag(HolderLookup.Provider registries, String value) {
+    public static Tag parseNbt(String value) {
         try {
             return TagParser.parseTag(value);
         } catch (CommandSyntaxException ex) {
@@ -39,9 +39,9 @@ public class ArgumentParseHelper {
         }
     }
 
-    public static int parseCount(Object[] args, int index) {
-        if (args.length >= index + 1) {
-            return Integer.parseInt(args[index].toString());
+    public static int parseCount(String count) {
+        if (count.isEmpty()) {
+            return Integer.parseInt(count);
         }
         return 0;
     }
