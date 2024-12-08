@@ -167,7 +167,6 @@ public class StoryInstance {
             if (hasNextLine()) {
                 if (!cancellationToken.isCancelled()) {
                     nextLine();
-                    System.out.println(currentLine());
                 }
             } else {
                 showStoryEnd();
@@ -240,7 +239,7 @@ public class StoryInstance {
     /// <editor-fold desc="Safe story.">
 
     public boolean isStoryEnded() {
-        return story == null || (!story.canContinue() && !hasChoice());
+        return story == null || data.isEnded();
     }
 
     public String currentLine() {

@@ -14,6 +14,7 @@ import java.util.UUID;
 public class InkPlayerData implements IInkPlayerData {
     private ResourceLocation story;
     private String state;
+    private boolean ended;
     private UUID continuousToken;
     private final Map<String, IStoryVariable<?>> variables = new HashMap<>();
 
@@ -35,6 +36,16 @@ public class InkPlayerData implements IInkPlayerData {
     @Override
     public void setState(@Nullable String state) {
         this.state = state;
+    }
+
+    @Override
+    public boolean isEnded() {
+        return ended;
+    }
+
+    @Override
+    public void setEnded(boolean end) {
+        this.ended = end;
     }
 
     @Override

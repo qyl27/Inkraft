@@ -30,6 +30,7 @@ public class ModConstants {
     public static class Tags {
         public static final String STORY = "story";
         public static final String STATE = "state";
+        public static final String ENDED = "ended";
         public static final String VARIABLES = "variables";
         public static final String VARIABLE_ITEM_NAME = "name";
         public static final String VARIABLE_ITEM_VALUE = "value";

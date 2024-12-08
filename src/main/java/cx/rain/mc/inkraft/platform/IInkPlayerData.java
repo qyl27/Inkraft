@@ -21,6 +21,9 @@ public interface IInkPlayerData {
     String getState();
     void setState(@Nullable String state);
 
+    boolean isEnded();
+    void setEnded(boolean end);
+
     @Nullable
     UUID getContinuousToken();
     void setContinuousToken(@Nullable UUID token);
@@ -39,6 +42,7 @@ public interface IInkPlayerData {
 
     default void resetState() {
         setState(null);
+        setEnded(true);
         setContinuousToken(null);
     }
 
@@ -71,6 +75,8 @@ public interface IInkPlayerData {
         var state = getState();
         tag.putString(ModConstants.Tags.STATE, Objects.requireNonNullElse(state, ""));
 
+        tag.putBoolean(ModConstants.Tags.ENDED, isEnded());
+
         var list = new ListTag();
         for (var entry : getVariables().entrySet()) {
             var item = new CompoundTag();
@@ -99,6 +105,11 @@ public interface IInkPlayerData {
             } else {
                 setState(str);
             }
+        }
+
+        if (tag.contains(ModConstants.Tags.ENDED)) {
+            var ended = tag.getBoolean(ModConstants.Tags.ENDED);
+            setEnded(ended);
         }
 
         var list = tag.getList(ModConstants.Tags.VARIABLES, ListTag.TAG_COMPOUND);
