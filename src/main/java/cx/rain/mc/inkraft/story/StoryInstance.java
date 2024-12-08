@@ -84,6 +84,7 @@ public class StoryInstance {
     public void newStory(ResourceLocation path) {
         stop();
         data.setStory(path);
+        data.setEnded(false);
 
         var str = registry.get(path);
         try {
@@ -145,35 +146,39 @@ public class StoryInstance {
             cancellationToken.cancel();
         }
 
+        data.setEnded(!hasNextLine());
+
         cancellationToken = new CancellableToken();
         var finalPause = pause;
-        taskManager.run(() -> {
-            if (!currentLine().isBlank()) {
-                showLine();
-            }
+        taskManager.run(() -> tickStory(finalPause), cancellationToken, 0, pause);
+    }
 
-            if (hasChoice()) {
-                showChoices();
-                cancellationToken.cancel();
-                return;
-            }
+    private void tickStory(final int pause) {
+        if (!currentLine().isBlank()) {
+            showLine();
+        }
 
-            if (finalPause == -1) {
-                showClickToNext();
-                cancellationToken.cancel();
-                return;
-            }
+        if (hasChoice()) {
+            showChoices();
+            cancellationToken.cancel();
+            return;
+        }
 
+        if (pause == -1) {
+            showClickToNext();
+            cancellationToken.cancel();
+            return;
+        }
+
+        if (!cancellationToken.isCancelled()) {
             if (hasNextLine()) {
-                if (!cancellationToken.isCancelled()) {
-                    nextLine();
-                }
+                nextLine();
             } else {
                 showStoryEnd();
                 data.resetState();
                 cancellationToken.cancel();
             }
-        }, cancellationToken, 0, pause);
+        }
     }
 
     public void stop(boolean showContinue) {

@@ -42,7 +42,7 @@ public interface IInkPlayerData {
 
     default void resetState() {
         setState(null);
-        setEnded(true);
+//        setEnded(true);
         setContinuousToken(null);
     }
 
@@ -110,6 +110,8 @@ public interface IInkPlayerData {
         if (tag.contains(ModConstants.Tags.ENDED)) {
             var ended = tag.getBoolean(ModConstants.Tags.ENDED);
             setEnded(ended);
+        } else {
+            setEnded(true);
         }
 
         var list = tag.getList(ModConstants.Tags.VARIABLES, ListTag.TAG_COMPOUND);

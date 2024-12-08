@@ -14,7 +14,7 @@ import java.util.UUID;
 public class InkPlayerData implements IInkPlayerData {
     private ResourceLocation story;
     private String state;
-    private boolean ended;
+    private boolean ended = true;
     private UUID continuousToken;
     private final Map<String, IStoryVariable<?>> variables = new HashMap<>();
 
