@@ -7,6 +7,7 @@ import net.minecraft.world.item.ItemStack;
 
 import java.util.List;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 public class ItemStackHelper {
     public static Predicate<ItemStack> predicateIdOrTag(HolderLookup.Provider registries, String id) {
@@ -47,7 +48,7 @@ public class ItemStackHelper {
                 .items
                 .stream()
                 .filter(predicate)
-                .toList();
+                .collect(Collectors.toList());
     }
 
     public static ItemStack createItemStack(HolderLookup.Provider registries, String id, String count, String tagPath, String tagValue) {

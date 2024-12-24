@@ -103,7 +103,7 @@ public class InkraftCommand {
         var token = UuidArgument.getUuid(context, ARGUMENT_TOKEN);
         var player = context.getSource().getPlayerOrException();
         var data = InkraftPlatform.getPlayerData(player);
-        if (!data.getContinuousToken().equals(token)) {
+        if (data.getContinuousToken() == null || !data.getContinuousToken().equals(token)) {
             context.getSource().sendFailure(Component.translatable(ModConstants.Messages.STORY_OPTION_OUTDATED).withStyle(ChatFormatting.RED));
             return 0;
         }
@@ -126,7 +126,7 @@ public class InkraftCommand {
         var token = UuidArgument.getUuid(context, ARGUMENT_TOKEN);
         var player = context.getSource().getPlayerOrException();
         var data = InkraftPlatform.getPlayerData(player);
-        if (!data.getContinuousToken().equals(token)) {
+        if (data.getContinuousToken() == null || !data.getContinuousToken().equals(token)) {
             context.getSource().sendFailure(Component.translatable(ModConstants.Messages.STORY_OPTION_OUTDATED).withStyle(ChatFormatting.RED));
             return 0;
         }

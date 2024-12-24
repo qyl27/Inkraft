@@ -40,9 +40,9 @@ public class StringArgumentParseHelper {
     }
 
     public static int parseCount(String count) {
-        if (count.isEmpty()) {
+        if (!count.isEmpty()) {
             return Integer.parseInt(count);
         }
-        return 0;
+        return 1;
     }
 }
