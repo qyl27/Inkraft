@@ -21,6 +21,8 @@ dependencies {
     implementation "com.bladecoder.ink:blade-ink:${rootProject.blade_ink_version}"
     forgeRuntimeLibrary "com.bladecoder.ink:blade-ink:${rootProject.blade_ink_version}"
 
+    implementation 'cx.rain.mc.nbtedit:nbtedit-neoforge:5.2.8+mc1.21'
+
     common(project(path: ':', configuration: 'namedElements')) { transitive false }
     shadowBundle project(path: ':', configuration: 'transformProductionNeoForge')
 }
