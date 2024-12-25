@@ -11,7 +11,7 @@ public class FlowToDefaultFunction implements IStoryFunction {
     }
 
     @Override
-    public IStoryVariable.Bool apply(StoryInstance instance, Object... args) {
+    public IStoryVariable.Bool apply(StoryInstance instance, String... args) {
         instance.flowBackDefault();
         return IStoryVariable.Bool.TRUE;
     }

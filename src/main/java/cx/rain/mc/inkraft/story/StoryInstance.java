@@ -8,6 +8,7 @@ import cx.rain.mc.inkraft.timer.ITaskManager;
 import cx.rain.mc.inkraft.story.function.StoryFunctions;
 import cx.rain.mc.inkraft.platform.IInkPlayerData;
 import cx.rain.mc.inkraft.timer.cancellation.CancellableToken;
+import cx.rain.mc.inkraft.utility.StringArgumentParseHelper;
 import cx.rain.mc.inkraft.utility.TextStyleHelper;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.ClickEvent;
@@ -345,15 +346,20 @@ public class StoryInstance {
 
                 story.bindExternalFunction(func.getName(), args -> {
                     try {
-                        var result = func.apply(this, args);
-                        if (result instanceof IStoryVariable.Str strVar) {
-                            return strVar.value();
-                        } else if (result instanceof IStoryVariable.Int intVar) {
-                            return intVar.value();
-                        } else if (result instanceof IStoryVariable.Float doubleVar) {
-                            return doubleVar.value();
-                        } else if (result instanceof IStoryVariable.Bool boolVar) {
-                            return boolVar.value();
+                        var unescaped = Arrays.stream(args)
+                                .map(Object::toString)
+                                .map(StringArgumentParseHelper::unescape)
+                                .toArray(String[]::new);
+
+                        var result = func.apply(this, unescaped);
+                        if (result instanceof IStoryVariable.Str(String value)) {
+                            return value;
+                        } else if (result instanceof IStoryVariable.Int(int value)) {
+                            return value;
+                        } else if (result instanceof IStoryVariable.Float(float value)) {
+                            return value;
+                        } else if (result instanceof IStoryVariable.Bool(boolean value)) {
+                            return value;
                         }
                         return result;
                     } catch (RuntimeException ex) {

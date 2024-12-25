@@ -22,6 +22,7 @@ public class StringArgumentParseHelper {
             .put('>', '}')
             .put('q', '"')
             .put('d', '\'')
+            .put('s', '#')
             .build();
 
     public static String unescape(String str) {
@@ -64,8 +65,7 @@ public class StringArgumentParseHelper {
 
     public static NbtPathArgument.NbtPath parseNbtPath(String value) {
         try {
-            var unescaped = unescape(value);
-            return NbtPathArgument.NbtPath.of(unescaped);
+            return NbtPathArgument.NbtPath.of(value);
         } catch (CommandSyntaxException ex) {
             throw new RuntimeException(ex);
         }
@@ -73,8 +73,7 @@ public class StringArgumentParseHelper {
 
     public static Tag parseNbt(String value) {
         try {
-            var unescaped = unescape(value);
-            return TagParser.parseTag(unescaped);
+            return TagParser.parseTag(value);
         } catch (CommandSyntaxException ex) {
             throw new RuntimeException(ex);
         }

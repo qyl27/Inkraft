@@ -11,7 +11,7 @@ public class ClearVariableFunction implements IStoryFunction {
     }
 
     @Override
-    public IStoryVariable.Bool apply(StoryInstance instance, Object... args) {
+    public IStoryVariable.Bool apply(StoryInstance instance, String... args) {
         instance.getData().clearVariables();
         return IStoryVariable.Bool.TRUE;
     }

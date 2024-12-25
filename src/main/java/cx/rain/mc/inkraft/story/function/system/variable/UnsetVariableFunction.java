@@ -11,8 +11,8 @@ public class UnsetVariableFunction implements IStoryFunction {
     }
 
     @Override
-    public IStoryVariable.Bool apply(StoryInstance instance, Object... args) {
-        var name = args[0].toString();
+    public IStoryVariable.Bool apply(StoryInstance instance, String... args) {
+        var name = args[0];
         instance.getData().unsetVariable(name);
         return IStoryVariable.Bool.TRUE;
     }

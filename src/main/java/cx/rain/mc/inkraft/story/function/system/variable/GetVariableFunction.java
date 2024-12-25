@@ -11,8 +11,8 @@ public class GetVariableFunction implements IStoryFunction {
     }
 
     @Override
-    public IStoryVariable<?> apply(StoryInstance instance, Object... args) {
-        var name = args[0].toString();
+    public IStoryVariable<?> apply(StoryInstance instance, String... args) {
+        var name = args[0];
         var v = instance.getData().getVariable(name);
         if (v == null) {
             return IStoryVariable.Bool.FALSE;

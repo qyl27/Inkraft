@@ -13,11 +13,11 @@ public class HasItemFunction implements IStoryFunction {
     }
 
     @Override
-    public IStoryVariable<?> apply(StoryInstance instance, Object... args) {
+    public IStoryVariable<?> apply(StoryInstance instance, String... args) {
         var player = instance.getPlayer();
         var registries = player.registryAccess();
-        var predicate = ItemStackHelper.createPredicate(registries, args[0].toString(), args[2].toString(), args[3].toString());
-        var count = StringArgumentParseHelper.parseCount(args[1].toString());
+        var predicate = ItemStackHelper.createPredicate(registries, args[0], args[2], args[3]);
+        var count = StringArgumentParseHelper.parseCount(args[1]);
         var result = ItemStackHelper.match(player, predicate);
         while (count > 0 && !result.isEmpty()) {
             var s = result.removeFirst();

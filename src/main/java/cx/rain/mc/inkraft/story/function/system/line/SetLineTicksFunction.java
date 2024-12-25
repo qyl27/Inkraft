@@ -12,8 +12,8 @@ public class SetLineTicksFunction implements IStoryFunction {
     }
 
     @Override
-    public IStoryVariable.Bool apply(StoryInstance instance, Object... args) {
-        var ticks = Integer.parseInt(args[0].toString());
+    public IStoryVariable.Bool apply(StoryInstance instance, String... args) {
+        var ticks = Integer.parseInt(args[0]);
         instance.getData().setVariable(ModConstants.Variables.LINE_PAUSE_TICKS, new IStoryVariable.Int(ticks));
         instance.stop(false);
         instance.start();

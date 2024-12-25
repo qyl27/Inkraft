@@ -11,8 +11,8 @@ public class IsInFlowFunction implements IStoryFunction {
     }
 
     @Override
-    public IStoryVariable.Bool apply(StoryInstance instance, Object... args) {
-        var name = args[0].toString();
+    public IStoryVariable.Bool apply(StoryInstance instance, String... args) {
+        var name = args[0];
         return new IStoryVariable.Bool(instance.getFlowName().equals(name));
     }
 }

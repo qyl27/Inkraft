@@ -25,8 +25,8 @@ public class WorldTimeFunction implements IStoryFunction {
     }
 
     @Override
-    public IStoryVariable<?> apply(StoryInstance instance, Object... args) {
-        var id = args[0].toString();
+    public IStoryVariable<?> apply(StoryInstance instance, String... args) {
+        var id = args[0];
         var level = tryParseLevel(instance, id);
         var result = function.apply(level);
         return new IStoryVariable.Int(result);

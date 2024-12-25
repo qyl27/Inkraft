@@ -12,10 +12,10 @@ public class CountItemFunction implements IStoryFunction {
     }
 
     @Override
-    public IStoryVariable<?> apply(StoryInstance instance, Object... args) {
+    public IStoryVariable<?> apply(StoryInstance instance, String... args) {
         var player = instance.getPlayer();
         var registries = player.registryAccess();
-        var predicate = ItemStackHelper.createPredicate(registries, args[0].toString(), args[2].toString(), args[3].toString());
+        var predicate = ItemStackHelper.createPredicate(registries, args[0], args[2], args[3]);
         var matched = ItemStackHelper.match(player, predicate);
         var result = 0;
         while (!matched.isEmpty()) {

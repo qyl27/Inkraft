@@ -13,10 +13,10 @@ public class GiveItemFunction implements IStoryFunction {
     }
 
     @Override
-    public IStoryVariable<?> apply(StoryInstance instance, Object... args) {
+    public IStoryVariable<?> apply(StoryInstance instance, String... args) {
         var player = instance.getPlayer();
         var registries = player.registryAccess();
-        var item = ItemStackHelper.createItemStack(registries, args[0].toString(), args[1].toString(), args[2].toString(), args[3].toString());
+        var item = ItemStackHelper.createItemStack(registries, args[0], args[1], args[2], args[3]);
         var result = player.addItem(item);
         return new IStoryVariable.Bool(result);
     }

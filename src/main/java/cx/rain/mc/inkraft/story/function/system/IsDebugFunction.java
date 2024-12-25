@@ -11,7 +11,7 @@ public class IsDebugFunction implements IStoryFunction {
     }
 
     @Override
-    public IStoryVariable.Bool apply(StoryInstance instance, Object... args) {
+    public IStoryVariable.Bool apply(StoryInstance instance, String... args) {
         return new IStoryVariable.Bool(instance.getManager().isDebug());
     }
 }

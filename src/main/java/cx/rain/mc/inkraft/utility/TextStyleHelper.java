@@ -97,7 +97,7 @@ public class TextStyleHelper {
                     style = STYLE_CODES.get(u).apply(style);
                     escaping = false;
                     continue;
-                } else if (u == 'H') {
+                } else if (u == '$') {
                     buildingHexColor = true;
                     hexColorBuilder = new StringBuilder();
                     continue;

@@ -11,7 +11,7 @@ public class PauseFunction implements IStoryFunction {
     }
 
     @Override
-    public IStoryVariable.Bool apply(StoryInstance instance, Object... args) {
+    public IStoryVariable.Bool apply(StoryInstance instance, String... args) {
         instance.stop(true);
         return IStoryVariable.Bool.TRUE;
     }

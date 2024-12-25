@@ -15,10 +15,6 @@ import cx.rain.mc.inkraft.story.function.system.line.IsEndedFunction;
 import cx.rain.mc.inkraft.story.function.system.line.PauseFunction;
 import cx.rain.mc.inkraft.story.function.system.line.SetLineTicksFunction;
 import cx.rain.mc.inkraft.story.function.system.line.UnsetLineTicksFunction;
-import cx.rain.mc.inkraft.story.function.system.logging.LogDebugFunction;
-import cx.rain.mc.inkraft.story.function.system.logging.LogErrorFunction;
-import cx.rain.mc.inkraft.story.function.system.logging.LogInfoFunction;
-import cx.rain.mc.inkraft.story.function.system.logging.LogWarnFunction;
 import cx.rain.mc.inkraft.story.function.system.variable.*;
 import dev.architectury.registry.registries.DeferredRegister;
 import dev.architectury.registry.registries.Registrar;
@@ -28,6 +24,7 @@ import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
+import org.slf4j.Logger;
 
 public class StoryFunctions {
     public static final ResourceLocation REGISTRY_NAME = ResourceLocation.fromNamespaceAndPath(Inkraft.MODID, "functions");
@@ -62,14 +59,15 @@ public class StoryFunctions {
     public static final RegistrySupplier<IStoryFunction> UNSET_VARIABLE = FUNCTIONS.register("unset_variable", UnsetVariableFunction::new);
     public static final RegistrySupplier<IStoryFunction> CLEAR_VARIABLE = FUNCTIONS.register("clear_variable", ClearVariableFunction::new);
 
-    public static final RegistrySupplier<IStoryFunction> LOG_DEBUG = FUNCTIONS.register("log_debug", LogDebugFunction::new);
-    public static final RegistrySupplier<IStoryFunction> LOG_INFO = FUNCTIONS.register("log_info", LogInfoFunction::new);
-    public static final RegistrySupplier<IStoryFunction> LOG_WARN = FUNCTIONS.register("log_warn", LogWarnFunction::new);
-    public static final RegistrySupplier<IStoryFunction> LOG_ERROR = FUNCTIONS.register("log_error", LogErrorFunction::new);
+    public static final RegistrySupplier<IStoryFunction> LOG_DEBUG = FUNCTIONS.register("log_debug", () -> new LogFunction("logDebug", Logger::debug));
+    public static final RegistrySupplier<IStoryFunction> LOG_INFO = FUNCTIONS.register("log_info", () -> new LogFunction("logInfo", Logger::info));
+    public static final RegistrySupplier<IStoryFunction> LOG_WARN = FUNCTIONS.register("log_warn", () -> new LogFunction("logWarn", Logger::warn));
+    public static final RegistrySupplier<IStoryFunction> LOG_ERROR = FUNCTIONS.register("log_error", () -> new LogFunction("logError", Logger::error));
 
     /// </editor-fold>
 
     /// <editor-fold desc="Game functions.">
+
     public static final RegistrySupplier<IStoryFunction> GET_PLAYER_NAME = FUNCTIONS.register("get_player_name", GetPlayerNameFunction::new);
     public static final RegistrySupplier<IStoryFunction> GET_WORLD_DAY_TIME = FUNCTIONS.register("get_world_day_time", () -> new WorldTimeFunction("getWorldDayTime", level -> (int)(level.getDayTime() % 24000L)));
     public static final RegistrySupplier<IStoryFunction> GET_WORLD_GAME_TIME = FUNCTIONS.register("get_world_game_time", () -> new WorldTimeFunction("getWorldGameTime", level -> (int)(level.getGameTime() % Integer.MAX_VALUE)));

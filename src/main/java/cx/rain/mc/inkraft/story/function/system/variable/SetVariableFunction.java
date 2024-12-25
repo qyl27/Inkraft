@@ -11,9 +11,9 @@ public class SetVariableFunction implements IStoryFunction {
     }
 
     @Override
-    public IStoryVariable.Bool apply(StoryInstance instance, Object... args) {
-        var name = args[0].toString();
-        var value = args[1].toString();
+    public IStoryVariable.Bool apply(StoryInstance instance, String... args) {
+        var name = args[0];
+        var value = args[1];
         instance.getData().setVariable(name, IStoryVariable.fromString(value));
         return IStoryVariable.Bool.TRUE;
     }

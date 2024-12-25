@@ -11,7 +11,7 @@ public class GetPlayerNameFunction implements IStoryFunction {
     }
 
     @Override
-    public IStoryVariable.Str apply(StoryInstance instance, Object... args) {
+    public IStoryVariable.Str apply(StoryInstance instance, String... args) {
         return new IStoryVariable.Str(instance.getPlayer().getName().getString());
     }
 }

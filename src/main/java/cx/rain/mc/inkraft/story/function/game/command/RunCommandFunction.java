@@ -27,8 +27,8 @@ public class RunCommandFunction implements IStoryFunction {
     }
 
     @Override
-    public IStoryVariable.Int apply(StoryInstance instance, Object... args) {
-        var command = args[0].toString();
+    public IStoryVariable.Int apply(StoryInstance instance, String... args) {
+        var command = args[0];
         var unescaped = StringArgumentParseHelper.unescape(command);
         var source = function.apply(instance.getPlayer());
         var server = instance.getPlayer().getServer();
