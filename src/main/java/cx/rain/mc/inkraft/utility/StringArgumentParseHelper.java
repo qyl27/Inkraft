@@ -17,7 +17,7 @@ import java.util.Map;
 
 public class StringArgumentParseHelper {
     private static final Map<Character, Character> ESCAPING_CHARS = ImmutableMap.<Character, Character>builder()
-            .put('@', '@')
+            .put('$', '$')
             .put('<', '{')
             .put('>', '}')
             .put('q', '"')
@@ -36,7 +36,7 @@ public class StringArgumentParseHelper {
                 continue;
             }
 
-            if (codePoint == '@' && !escaping) {
+            if (codePoint == '$' && !escaping) {
                 escaping = true;
                 continue;
             }
