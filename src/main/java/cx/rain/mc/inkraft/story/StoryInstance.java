@@ -345,12 +345,11 @@ public class StoryInstance {
                 var func = entry.get();
 
                 story.bindExternalFunction(func.getName(), args -> {
+                    var unescaped = Arrays.stream(args)
+                            .map(Object::toString)
+                            .map(StringArgumentParseHelper::unescape)
+                            .toArray(String[]::new);
                     try {
-                        var unescaped = Arrays.stream(args)
-                                .map(Object::toString)
-                                .map(StringArgumentParseHelper::unescape)
-                                .toArray(String[]::new);
-
                         var result = func.apply(this, unescaped);
                         if (result instanceof IStoryVariable.Str(String value)) {
                             return value;
@@ -361,15 +360,15 @@ public class StoryInstance {
                         } else if (result instanceof IStoryVariable.Bool(boolean value)) {
                             return value;
                         }
-                        return result;
-                    } catch (RuntimeException ex) {
-                        logger.error("Running function {}", func.getName(), ex);
-                        return IStoryVariable.Bool.FALSE;
+                    } catch (Throwable ex) {
+                        logger.error("Running function {}\nArgs:{}", func.getName(), String.join("\n", unescaped));
+                        logger.error("Inner: ", ex);
                     }
+                    return false;
                 }, false);
             }
-        } catch (Exception ex) {
-            throw new RuntimeException(ex);
+        } catch (Throwable ex) {
+            logger.error("An error I can't handle!", ex);
         }
     }
 
