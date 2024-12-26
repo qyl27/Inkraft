@@ -20,10 +20,16 @@ import dev.architectury.registry.registries.DeferredRegister;
 import dev.architectury.registry.registries.Registrar;
 import dev.architectury.registry.registries.RegistrarManager;
 import dev.architectury.registry.registries.RegistrySupplier;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.core.Direction;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.block.CommandBlock;
+import net.minecraft.world.level.block.entity.CommandBlockEntity;
+import net.minecraft.world.phys.Vec2;
+import net.minecraft.world.phys.Vec3;
 import org.slf4j.Logger;
 
 public class StoryFunctions {
@@ -76,7 +82,8 @@ public class StoryFunctions {
 
     public static final RegistrySupplier<IStoryFunction> RUN_COMMAND = FUNCTIONS.register("run_command", () -> new RunCommandFunction("runCommand", Entity::createCommandSourceStack));
     public static final RegistrySupplier<IStoryFunction> RUN_UNLIMITED_COMMAND = FUNCTIONS.register("run_unlimited_command", () -> new RunCommandFunction("runUnlimitedCommand", player -> player.createCommandSourceStack().withPermission(4)));
-    public static final RegistrySupplier<IStoryFunction> RUN_SERVER_COMMAND = FUNCTIONS.register("run_server_command", () -> new RunCommandFunction("runServerCommand", player -> player.server.createCommandSourceStack()));
+    public static final RegistrySupplier<IStoryFunction> RUN_SILENT_UNLIMITED_COMMAND = FUNCTIONS.register("run_silent_unlimited_command", () -> new RunCommandFunction("runSilentUnlimitedCommand", player -> player.createCommandSourceStack().withPermission(4).withSuppressedOutput()));
+    public static final RegistrySupplier<IStoryFunction> RUN_SERVER_COMMAND = FUNCTIONS.register("run_server_command", () -> new RunCommandFunction("runServerCommand", player -> player.server.createCommandSourceStack().withPosition(player.position()).withRotation(player.getRotationVector()).withLevel(player.serverLevel())));
 
     public static final RegistrySupplier<IStoryFunction> HAS_ITEM = FUNCTIONS.register("has_item", HasItemFunction::new);
     public static final RegistrySupplier<IStoryFunction> COUNT_ITEM = FUNCTIONS.register("count_item", CountItemFunction::new);
