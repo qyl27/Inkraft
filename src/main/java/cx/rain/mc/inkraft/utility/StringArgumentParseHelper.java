@@ -1,6 +1,7 @@
 package cx.rain.mc.inkraft.utility;
 
 import com.google.common.collect.ImmutableMap;
+import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.commands.arguments.NbtPathArgument;
 import net.minecraft.core.Holder;
@@ -73,7 +74,7 @@ public class StringArgumentParseHelper {
 
     public static Tag parseNbt(String value) {
         try {
-            return TagParser.parseTag(value);
+            return new TagParser(new StringReader(value)).readValue();
         } catch (CommandSyntaxException ex) {
             throw new RuntimeException(ex);
         }

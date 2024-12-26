@@ -251,8 +251,9 @@ public class StoryInstance {
     public String currentLine() {
         try {
             return story.getCurrentText();
-        } catch (Exception ex) {
-            throw new RuntimeException(ex);
+        } catch (Throwable ex) {
+            logger.error("An error I can't handle!", ex);
+            return "";
         }
     }
 
@@ -264,8 +265,8 @@ public class StoryInstance {
         try {
             story.Continue();
             saveStory();
-        } catch (Exception ex) {
-            throw new RuntimeException(ex);
+        } catch (Throwable ex) {
+            logger.error("An error I can't handle!", ex);
         }
     }
 
@@ -277,8 +278,8 @@ public class StoryInstance {
         try {
             story.chooseChoiceIndex(index);
             nextLine();
-        } catch (Exception ex) {
-            throw new RuntimeException(ex);
+        } catch (Throwable ex) {
+            logger.error("An error I can't handle!", ex);
         }
     }
 
@@ -302,32 +303,32 @@ public class StoryInstance {
         try {
             story.switchFlow(name);
             story.choosePathString(knot);
-        } catch (Exception ex) {
-            throw new RuntimeException(ex);
+        } catch (Throwable ex) {
+            logger.error("An error I can't handle!", ex);
         }
     }
 
     public void removeFlow(String name) {
         try {
             story.removeFlow(name);
-        } catch (Exception ex) {
-            throw new RuntimeException(ex);
+        } catch (Throwable ex) {
+            logger.error("An error I can't handle!", ex);
         }
     }
 
     public void flowTo(String name) {
         try {
             story.switchFlow(name);
-        } catch (Exception ex) {
-            throw new RuntimeException(ex);
+        } catch (Throwable ex) {
+            logger.error("An error I can't handle!", ex);
         }
     }
 
     public void flowBackDefault() {
         try {
             story.switchToDefaultFlow();
-        } catch (Exception ex) {
-            throw new RuntimeException(ex);
+        } catch (Throwable ex) {
+            logger.error("An error I can't handle!", ex);
         }
     }
 
