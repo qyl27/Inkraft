@@ -1,6 +1,7 @@
 package cx.rain.mc.inkraft.story;
 
 import com.bladecoder.ink.runtime.Choice;
+import com.bladecoder.ink.runtime.Error;
 import com.bladecoder.ink.runtime.Story;
 import cx.rain.mc.inkraft.ModConstants;
 import cx.rain.mc.inkraft.data.story.StoryRegistry;
@@ -44,7 +45,7 @@ public class StoryInstance {
         loadStory();
     }
 
-    /// <editor-fold desc="Dependencies.">
+    // <editor-fold desc="Dependencies.">
 
     public Logger getLogger() {
         return logger;
@@ -78,9 +79,9 @@ public class StoryInstance {
         return cancellationToken;
     }
 
-    /// </editor-fold>
+    // </editor-fold>
 
-    /// <editor-fold desc="Init.">
+    // <editor-fold desc="Init.">
 
     public void newStory(ResourceLocation path) {
         stop();
@@ -90,6 +91,7 @@ public class StoryInstance {
         var str = registry.get(path);
         try {
             story = new Story(str);
+            story.onError = StoryErrorHandler.INSTANCE;
             bindStoryFunctions();
         } catch (Exception ex) {
             throw new RuntimeException(ex);
@@ -125,9 +127,9 @@ public class StoryInstance {
         }
     }
 
-    /// </editor-fold>
+    // </editor-fold>
 
-    /// <editor-fold desc="Game control.">
+    // <editor-fold desc="Game control.">
 
     public void start() {
         if (isStoryEnded()) {
@@ -240,9 +242,9 @@ public class StoryInstance {
         player.sendSystemMessage(component);
     }
 
-    /// </editor-fold>
+    // </editor-fold>
 
-    /// <editor-fold desc="Safe story.">
+    // <editor-fold desc="Safe story.">
 
     public boolean isStoryEnded() {
         return story == null || data.isEnded();
@@ -287,9 +289,9 @@ public class StoryInstance {
         return story.getCurrentChoices();
     }
 
-    /// </editor-fold>
+    // </editor-fold>
 
-    /// <editor-fold desc="Parallel flows.">
+    // <editor-fold desc="Parallel flows.">
 
     public boolean isDefaultFlow() {
         return story.currentFlowIsDefaultFlow();
@@ -336,9 +338,9 @@ public class StoryInstance {
         return story.aliveFlowNames();
     }
 
-    /// </editor-fold>
+    // </editor-fold>
 
-    /// <editor-fold desc="Internal.">
+    // <editor-fold desc="Internal.">
 
     private void bindStoryFunctions() {
         try {
@@ -373,5 +375,5 @@ public class StoryInstance {
         }
     }
 
-    /// </editor-fold>
+    // </editor-fold>
 }
