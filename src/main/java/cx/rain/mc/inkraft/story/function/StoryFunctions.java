@@ -88,6 +88,7 @@ public class StoryFunctions {
     public static final RegistrySupplier<IStoryFunction> ADD_SCOREBOARD = FUNCTIONS.register("add_scoreboard", ScoreboardValuedFunction::addScoreBoard);
     public static final RegistrySupplier<IStoryFunction> SUB_SCOREBOARD = FUNCTIONS.register("sub_scoreboard", ScoreboardValuedFunction::subScoreBoard);
     public static final RegistrySupplier<IStoryFunction> MULTIPLY_SCOREBOARD = FUNCTIONS.register("multiply_scoreboard", ScoreboardValuedFunction::multiplyScoreBoard);
+
     public static final RegistrySupplier<IStoryFunction> GET_STORAGE = FUNCTIONS.register("get_storage", GetStorageFunction::new);
     public static final RegistrySupplier<IStoryFunction> SET_STORAGE = FUNCTIONS.register("set_storage", SetStorageFunction::new);
 

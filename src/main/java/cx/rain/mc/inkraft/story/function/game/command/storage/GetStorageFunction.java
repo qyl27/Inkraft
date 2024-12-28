@@ -18,16 +18,16 @@ public class GetStorageFunction implements IStoryFunction {
         var server = instance.getPlayer().getServer();
         assert server != null;
         var id = StringArgumentParseHelper.parseId(args[0]);
-        var path = StringArgumentParseHelper.parseNbtPath(args[1]);
-        var type = StorageType.from(args[2]);
-
         var storage = server.getCommandStorage();
-
         var tag = storage.get(id);
+
         try {
+            var path = StringArgumentParseHelper.parseNbtPath(args[1]);
             var list = path.get(tag);
-            if (!list.isEmpty()) {
-                return type.asValue(list.getFirst());
+            if (list.size() == 1) {
+                return new IStoryVariable.Str(list.getFirst().getAsString());
+            } else {
+                return new IStoryVariable.Int(list.size());
             }
         } catch (CommandSyntaxException ex) {
             instance.getLogger().warn("NBT Path Error: ", ex);
