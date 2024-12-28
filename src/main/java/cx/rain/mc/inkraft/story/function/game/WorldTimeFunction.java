@@ -34,7 +34,7 @@ public class WorldTimeFunction implements IStoryFunction {
 
     private static Level tryParseLevel(StoryInstance instance, String id) {
         try {
-            if (id.isEmpty()) {
+            if (!id.isEmpty()) {
                 var levelId = ResourceLocation.tryParse(id);
                 if (levelId != null) {
                     return instance.getPlayer().server.getLevel(ResourceKey.create(Registries.DIMENSION, levelId));
