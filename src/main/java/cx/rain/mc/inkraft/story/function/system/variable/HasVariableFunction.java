@@ -14,6 +14,6 @@ public class HasVariableFunction implements IStoryFunction {
     public IStoryVariable<?> apply(StoryInstance instance, String... args) {
         var name = args[0];
         var result = instance.getData().hasVariable(name);
-        return new IStoryVariable.Bool(result);
+        return IStoryVariable.Bool.from(result);
     }
 }

@@ -18,6 +18,6 @@ public class RealTimeFunction implements IStoryFunction {
         var now = OffsetDateTime.now();
         var pattern = args[0];
         var result = pattern.isEmpty() ? now.toString() : now.format(DateTimeFormatter.ofPattern(pattern));
-        return new IStoryVariable.Str(result);
+        return IStoryVariable.fromString(result);
     }
 }

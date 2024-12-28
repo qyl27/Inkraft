@@ -19,6 +19,6 @@ public class TakeItemFunction implements IStoryFunction {
         var predicate = ItemStackHelper.createPredicate(registries, args[0], args[2], args[3]);
         var count = StringArgumentParseHelper.parseCount(args[1]);
         var took = player.getInventory().clearOrCountMatchingItems(predicate, count, player.getInventory());
-        return new IStoryVariable.Bool(count == took);
+        return IStoryVariable.Bool.from(count == took);
     }
 }

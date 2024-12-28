@@ -5,6 +5,7 @@ import cx.rain.mc.inkraft.story.IStoryVariable;
 import cx.rain.mc.inkraft.story.StoryInstance;
 import cx.rain.mc.inkraft.story.function.IStoryFunction;
 import cx.rain.mc.inkraft.utility.StringArgumentParseHelper;
+import net.minecraft.nbt.NumericTag;
 
 public class GetStorageFunction implements IStoryFunction {
 
@@ -25,7 +26,11 @@ public class GetStorageFunction implements IStoryFunction {
             var path = StringArgumentParseHelper.parseNbtPath(args[1]);
             var list = path.get(tag);
             if (list.size() == 1) {
-                return new IStoryVariable.Str(list.getFirst().getAsString());
+                var t = list.getFirst();
+                if (t instanceof NumericTag n) {
+                    return new IStoryVariable.Float(n.getAsFloat());
+                }
+                return IStoryVariable.fromString(t.getAsString());
             } else {
                 return new IStoryVariable.Int(list.size());
             }

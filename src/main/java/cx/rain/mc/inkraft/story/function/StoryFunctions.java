@@ -19,6 +19,10 @@ import cx.rain.mc.inkraft.story.function.system.line.IsEndedFunction;
 import cx.rain.mc.inkraft.story.function.system.line.PauseFunction;
 import cx.rain.mc.inkraft.story.function.system.line.SetLineTicksFunction;
 import cx.rain.mc.inkraft.story.function.system.line.UnsetLineTicksFunction;
+import cx.rain.mc.inkraft.story.function.system.parse.ParseBoolFunction;
+import cx.rain.mc.inkraft.story.function.system.parse.ParseFloatFunction;
+import cx.rain.mc.inkraft.story.function.system.parse.ParseIntFunction;
+import cx.rain.mc.inkraft.story.function.system.parse.ToStringFunction;
 import cx.rain.mc.inkraft.story.function.system.variable.*;
 import dev.architectury.registry.registries.DeferredRegister;
 import dev.architectury.registry.registries.Registrar;
@@ -67,6 +71,11 @@ public class StoryFunctions {
     public static final RegistrySupplier<IStoryFunction> LOG_INFO = FUNCTIONS.register("log_info", () -> new LogFunction("logInfo", Logger::info));
     public static final RegistrySupplier<IStoryFunction> LOG_WARN = FUNCTIONS.register("log_warn", () -> new LogFunction("logWarn", Logger::warn));
     public static final RegistrySupplier<IStoryFunction> LOG_ERROR = FUNCTIONS.register("log_error", () -> new LogFunction("logError", Logger::error));
+
+    public static final RegistrySupplier<IStoryFunction> PARSE_BOOL = FUNCTIONS.register("parse_bool", ParseBoolFunction::new);
+    public static final RegistrySupplier<IStoryFunction> PARSE_INT = FUNCTIONS.register("parse_int", ParseIntFunction::new);
+    public static final RegistrySupplier<IStoryFunction> PARSE_FLOAT = FUNCTIONS.register("parse_float", ParseFloatFunction::new);
+    public static final RegistrySupplier<IStoryFunction> TO_STRING = FUNCTIONS.register("to_string", ToStringFunction::new);
 
     /// </editor-fold>
 

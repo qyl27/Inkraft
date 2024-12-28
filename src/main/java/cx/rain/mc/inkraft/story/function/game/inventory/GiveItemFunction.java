@@ -18,6 +18,6 @@ public class GiveItemFunction implements IStoryFunction {
         var registries = player.registryAccess();
         var item = ItemStackHelper.createItemStack(registries, args[0], args[1], args[2], args[3]);
         var result = player.addItem(item);
-        return new IStoryVariable.Bool(result);
+        return IStoryVariable.Bool.from(result);
     }
 }

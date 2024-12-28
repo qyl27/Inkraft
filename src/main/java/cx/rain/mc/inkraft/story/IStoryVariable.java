@@ -29,6 +29,14 @@ public interface IStoryVariable<T> {
         public static final Bool TRUE = new Bool(true);
         public static final Bool FALSE = new Bool(false);
 
+        public static Bool from(boolean value) {
+            if (value) {
+                return TRUE;
+            } else {
+                return FALSE;
+            }
+        }
+
         @Override
         public Boolean getValue() {
             return value;
