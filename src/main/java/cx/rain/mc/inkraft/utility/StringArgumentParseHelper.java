@@ -13,6 +13,8 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 
@@ -25,6 +27,7 @@ public class StringArgumentParseHelper {
             .put('d', '\'')
             .put('s', '#')
             .build();
+    private static final Logger log = LoggerFactory.getLogger(StringArgumentParseHelper.class);
 
     public static String unescape(String str) {
         var builder = new StringBuilder();
@@ -55,12 +58,12 @@ public class StringArgumentParseHelper {
     }
 
     public static Holder<Item> parseItem(HolderLookup.Provider registries, String id) {
-        var rl = ResourceLocation.parse(id);
+        var rl = parseId(id);
         return registries.lookupOrThrow(Registries.ITEM).getOrThrow(ResourceKey.create(Registries.ITEM, rl));
     }
 
     public static TagKey<Item> parseItemTag(String id) {
-        var rl = ResourceLocation.parse(id);
+        var rl = parseId(id);
         return TagKey.create(Registries.ITEM, rl);
     }
 
@@ -68,6 +71,7 @@ public class StringArgumentParseHelper {
         try {
             return NbtPathArgument.NbtPath.of(value);
         } catch (CommandSyntaxException ex) {
+            log.warn("Malformed NbtPath: {}", value);
             throw new RuntimeException(ex);
         }
     }
@@ -76,6 +80,7 @@ public class StringArgumentParseHelper {
         try {
             return new TagParser(new StringReader(value)).readValue();
         } catch (CommandSyntaxException ex) {
+            log.warn("Malformed Tag: {}", value);
             throw new RuntimeException(ex);
         }
     }
@@ -88,44 +93,26 @@ public class StringArgumentParseHelper {
         return ResourceLocation.parse(id);
     }
 
-    public static byte parseByte(String str, byte defaultValue) {
-        if (!str.isEmpty()) {
-            return Byte.parseByte(str);
-        }
-        return defaultValue;
-    }
-
-    public static short parseShort(String str, short defaultValue) {
-        if (!str.isEmpty()) {
-            return Short.parseShort(str);
-        }
-        return defaultValue;
-    }
-
     public static int parseInt(String str, int defaultValue) {
         if (!str.isEmpty()) {
-            return Integer.parseInt(str);
-        }
-        return defaultValue;
-    }
-
-    public static long parseLong(String str, long defaultValue) {
-        if (!str.isEmpty()) {
-            return Long.parseLong(str);
+            try {
+                return Integer.parseInt(str);
+            } catch (NumberFormatException ignored) {
+                log.warn("Bad int value: {}", str);
+                return defaultValue;
+            }
         }
         return defaultValue;
     }
 
     public static float parseFloat(String str, float defaultValue) {
         if (!str.isEmpty()) {
-            return Float.parseFloat(str);
-        }
-        return defaultValue;
-    }
-
-    public static double parseDouble(String str, double defaultValue) {
-        if (!str.isEmpty()) {
-            return Double.parseDouble(str);
+            try {
+                return Float.parseFloat(str);
+            } catch (NumberFormatException ignored) {
+                log.warn("Bad float value: {}", str);
+                return defaultValue;
+            }
         }
         return defaultValue;
     }
