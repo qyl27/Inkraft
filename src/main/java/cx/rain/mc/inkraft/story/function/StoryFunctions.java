@@ -4,6 +4,10 @@ import cx.rain.mc.inkraft.Inkraft;
 import cx.rain.mc.inkraft.story.function.game.RealTimeFunction;
 import cx.rain.mc.inkraft.story.function.game.WorldTimeFunction;
 import cx.rain.mc.inkraft.story.function.game.command.RunCommandFunction;
+import cx.rain.mc.inkraft.story.function.game.command.ScoreboardFunction;
+import cx.rain.mc.inkraft.story.function.game.command.ScoreboardValuedFunction;
+import cx.rain.mc.inkraft.story.function.game.command.storage.GetStorageFunction;
+import cx.rain.mc.inkraft.story.function.game.command.storage.SetStorageFunction;
 import cx.rain.mc.inkraft.story.function.game.inventory.CountItemFunction;
 import cx.rain.mc.inkraft.story.function.game.inventory.GiveItemFunction;
 import cx.rain.mc.inkraft.story.function.game.inventory.HasItemFunction;
@@ -20,16 +24,10 @@ import dev.architectury.registry.registries.DeferredRegister;
 import dev.architectury.registry.registries.Registrar;
 import dev.architectury.registry.registries.RegistrarManager;
 import dev.architectury.registry.registries.RegistrySupplier;
-import net.minecraft.commands.CommandSourceStack;
-import net.minecraft.core.Direction;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.level.block.CommandBlock;
-import net.minecraft.world.level.block.entity.CommandBlockEntity;
-import net.minecraft.world.phys.Vec2;
-import net.minecraft.world.phys.Vec3;
 import org.slf4j.Logger;
 
 public class StoryFunctions {
@@ -84,6 +82,14 @@ public class StoryFunctions {
     public static final RegistrySupplier<IStoryFunction> RUN_UNLIMITED_COMMAND = FUNCTIONS.register("run_unlimited_command", () -> new RunCommandFunction("runUnlimitedCommand", player -> player.createCommandSourceStack().withPermission(4)));
     public static final RegistrySupplier<IStoryFunction> RUN_SILENT_UNLIMITED_COMMAND = FUNCTIONS.register("run_silent_unlimited_command", () -> new RunCommandFunction("runSilentUnlimitedCommand", player -> player.createCommandSourceStack().withPermission(4).withSuppressedOutput()));
     public static final RegistrySupplier<IStoryFunction> RUN_SERVER_COMMAND = FUNCTIONS.register("run_server_command", () -> new RunCommandFunction("runServerCommand", player -> player.server.createCommandSourceStack().withPosition(player.position()).withRotation(player.getRotationVector()).withLevel(player.serverLevel())));
+
+    public static final RegistrySupplier<IStoryFunction> GET_SCOREBOARD = FUNCTIONS.register("get_scoreboard", ScoreboardFunction::getScoreBoard);
+    public static final RegistrySupplier<IStoryFunction> SET_SCOREBOARD = FUNCTIONS.register("set_scoreboard", ScoreboardValuedFunction::setScoreBoard);
+    public static final RegistrySupplier<IStoryFunction> ADD_SCOREBOARD = FUNCTIONS.register("add_scoreboard", ScoreboardValuedFunction::addScoreBoard);
+    public static final RegistrySupplier<IStoryFunction> SUB_SCOREBOARD = FUNCTIONS.register("sub_scoreboard", ScoreboardValuedFunction::subScoreBoard);
+    public static final RegistrySupplier<IStoryFunction> MULTIPLY_SCOREBOARD = FUNCTIONS.register("multiply_scoreboard", ScoreboardValuedFunction::multiplyScoreBoard);
+    public static final RegistrySupplier<IStoryFunction> GET_STORAGE = FUNCTIONS.register("get_storage", GetStorageFunction::new);
+    public static final RegistrySupplier<IStoryFunction> SET_STORAGE = FUNCTIONS.register("set_storage", SetStorageFunction::new);
 
     public static final RegistrySupplier<IStoryFunction> HAS_ITEM = FUNCTIONS.register("has_item", HasItemFunction::new);
     public static final RegistrySupplier<IStoryFunction> COUNT_ITEM = FUNCTIONS.register("count_item", CountItemFunction::new);

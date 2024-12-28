@@ -81,9 +81,52 @@ public class StringArgumentParseHelper {
     }
 
     public static int parseCount(String count) {
-        if (!count.isEmpty()) {
-            return Integer.parseInt(count);
+        return parseInt(count, 1);
+    }
+
+    public static ResourceLocation parseId(String id) {
+        return ResourceLocation.parse(id);
+    }
+
+    public static byte parseByte(String str, byte defaultValue) {
+        if (!str.isEmpty()) {
+            return Byte.parseByte(str);
         }
-        return 1;
+        return defaultValue;
+    }
+
+    public static short parseShort(String str, short defaultValue) {
+        if (!str.isEmpty()) {
+            return Short.parseShort(str);
+        }
+        return defaultValue;
+    }
+
+    public static int parseInt(String str, int defaultValue) {
+        if (!str.isEmpty()) {
+            return Integer.parseInt(str);
+        }
+        return defaultValue;
+    }
+
+    public static long parseLong(String str, long defaultValue) {
+        if (!str.isEmpty()) {
+            return Long.parseLong(str);
+        }
+        return defaultValue;
+    }
+
+    public static float parseFloat(String str, float defaultValue) {
+        if (!str.isEmpty()) {
+            return Float.parseFloat(str);
+        }
+        return defaultValue;
+    }
+
+    public static double parseDouble(String str, double defaultValue) {
+        if (!str.isEmpty()) {
+            return Double.parseDouble(str);
+        }
+        return defaultValue;
     }
 }

@@ -41,6 +41,8 @@ public interface IStoryVariable<T> {
     }
 
     record Int(int value) implements IStoryVariable<Integer> {
+        public static final Int ZERO = new Int(0);
+
         @Override
         public Integer getValue() {
             return value;
@@ -53,6 +55,8 @@ public interface IStoryVariable<T> {
     }
 
     record Float(float value) implements IStoryVariable<java.lang.Float> {
+        public static final Float ZERO = new Float(0);
+
         @Override
         public java.lang.Float getValue() {
             return value;
