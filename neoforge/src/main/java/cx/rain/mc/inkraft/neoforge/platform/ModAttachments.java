@@ -11,7 +11,7 @@ import java.util.function.Supplier;
 public class ModAttachments {
     public static final DeferredRegister<AttachmentType<?>> ATTACHMENT_TYPES = DeferredRegister.create(NeoForgeRegistries.ATTACHMENT_TYPES, Inkraft.MODID);
 
-    public static final Supplier<AttachmentType<InkPlayerDataNeoForge>> PLAYER_DATA = ATTACHMENT_TYPES.register("player_data", () -> AttachmentType.serializable(InkPlayerDataNeoForge::new).build());
+    public static final Supplier<AttachmentType<InkPlayerDataNeoForge>> PLAYER_DATA = ATTACHMENT_TYPES.register("player_data", () -> AttachmentType.serializable(InkPlayerDataNeoForge::new).copyOnDeath().build());
 
     public static void register(IEventBus bus) {
         ATTACHMENT_TYPES.register(bus);

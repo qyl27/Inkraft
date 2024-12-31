@@ -4,7 +4,10 @@ public class ModConstants {
     public static class Messages {
         public static final String COMMAND_VERSION = "message.command.version";
         public static final String COMMAND_SUCCESS = "message.command.success";
-        public static final String COMMAND_VARIABLE = "message.command.variable";
+        public static final String COMMAND_VARIABLE_GET = "message.command.variable.get";
+        public static final String COMMAND_VARIABLE_MISSING = "message.command.variable.missing";
+        public static final String COMMAND_VARIABLE_SET = "message.command.variable.set";
+        public static final String COMMAND_VARIABLE_UNSET = "message.command.variable.unset";
 
         public static final String STORY_ALREADY_END = "message.story.already_end";
         public static final String STORY_OPTION_OUTDATED = "message.story.option_outdated";

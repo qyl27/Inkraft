@@ -14,7 +14,10 @@ public class ZhCnProvider extends LanguageProvider {
     protected void addTranslations() {
         add(ModConstants.Messages.COMMAND_VERSION, "Inkraft 版本：%1$s，构建于 %2$s。");
         add(ModConstants.Messages.COMMAND_SUCCESS, "操作成功完成。");
-        add(ModConstants.Messages.COMMAND_VARIABLE, "变量名：%1$s，值：%2$s");
+        add(ModConstants.Messages.COMMAND_VARIABLE_GET, "变量名：%1$s，值：%2$s。");
+        add(ModConstants.Messages.COMMAND_VARIABLE_MISSING, "变量 %1$s 不存在！");
+        add(ModConstants.Messages.COMMAND_VARIABLE_SET, "变量 %1$s 已设置为 %2$s。");
+        add(ModConstants.Messages.COMMAND_VARIABLE_UNSET, "变量 %1$s 已删除。");
 
         add(ModConstants.Messages.STORY_ALREADY_END, "错误！剧情已结束。");
         add(ModConstants.Messages.STORY_OPTION_OUTDATED, "错误！选项已过期。");

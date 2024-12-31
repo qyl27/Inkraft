@@ -14,7 +14,10 @@ public class EnUsProvider extends LanguageProvider {
     protected void addTranslations() {
         add(ModConstants.Messages.COMMAND_VERSION, "Inkraft ver: %1$s, build at %2$s.");
         add(ModConstants.Messages.COMMAND_SUCCESS, "Command successful.");
-        add(ModConstants.Messages.COMMAND_VARIABLE, "Variable name: %1$s, value: %2$s");
+        add(ModConstants.Messages.COMMAND_VARIABLE_GET, "Variable name: %1$s, value: %2$s.");
+        add(ModConstants.Messages.COMMAND_VARIABLE_MISSING, "Variable %1$s is missing.");
+        add(ModConstants.Messages.COMMAND_VARIABLE_SET, "Variable %1$s set to %2$s.");
+        add(ModConstants.Messages.COMMAND_VARIABLE_UNSET, "Variable %1$s unsetted.");
 
         add(ModConstants.Messages.STORY_ALREADY_END, "Error! The story is over.");
         add(ModConstants.Messages.STORY_OPTION_OUTDATED, "Error! This option is outdated.");

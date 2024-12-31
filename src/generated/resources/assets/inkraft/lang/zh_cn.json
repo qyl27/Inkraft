@@ -1,6 +1,9 @@
 {
   "message.command.success": "操作成功完成。",
-  "message.command.variable": "变量名：%1$s，值：%2$s",
+  "message.command.variable.get": "变量名：%1$s，值：%2$s。",
+  "message.command.variable.missing": "变量 %1$s 不存在！",
+  "message.command.variable.set": "变量 %1$s 已设置为 %2$s。",
+  "message.command.variable.unset": "变量 %1$s 已删除。",
   "message.command.version": "Inkraft 版本：%1$s，构建于 %2$s。",
   "message.story.already_end": "错误！剧情已结束。",
   "message.story.end": "【剧情结束】",

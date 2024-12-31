@@ -4,12 +4,16 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class ItemStackHelper {
+    private static final Logger log = LoggerFactory.getLogger(ItemStackHelper.class);
+
     public static Predicate<ItemStack> predicateIdOrTag(HolderLookup.Provider registries, String id) {
         if (id.startsWith("#")) {
             var tk = StringArgumentParseHelper.parseItemTag(id);
@@ -60,6 +64,10 @@ public class ItemStackHelper {
             result.setCount(c);
         }
 
+        if (result.isEmpty()) {
+            return ItemStack.EMPTY;
+        }
+
         if (!tagPath.isEmpty() && !tagValue.isEmpty()) {
             var p = StringArgumentParseHelper.parseNbtPath(tagPath);
             var t = StringArgumentParseHelper.parseNbt(tagValue);
@@ -68,7 +76,7 @@ public class ItemStackHelper {
                 p.set(n, t);
                 result = ItemStack.parse(registries, n).orElseThrow();
             } catch (CommandSyntaxException ex) {
-                throw new RuntimeException(ex);
+                log.warn("ItemStack parse error: ", ex);
             }
         }
 

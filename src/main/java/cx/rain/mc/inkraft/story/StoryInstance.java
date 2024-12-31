@@ -364,8 +364,12 @@ public class StoryInstance {
                             return value;
                         }
                     } catch (Throwable ex) {
-                        logger.error("Running function {}\nArgs:{}", func.getName(), String.join("\n", unescaped));
-                        logger.error("Inner: ", ex);
+                        logger.warn("Running function {}", func.getName());
+                        for (int i = 0; i < unescaped.length; i++) {
+                            var a = unescaped[i];
+                            logger.warn("Arg {}: {}", i, a);
+                        }
+                        logger.warn("Inner: ", ex);
                     }
                     return false;
                 }, false);
