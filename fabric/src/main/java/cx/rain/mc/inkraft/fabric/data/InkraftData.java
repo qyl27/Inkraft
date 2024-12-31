@@ -26,7 +26,7 @@ public class InkraftData extends SavedData {
         }
 
         if (data == null) {
-            data = server.overworld().getDataStorage().get(FACTORY, "inkraft_data");
+            data = server.overworld().getDataStorage().computeIfAbsent(FACTORY, "inkraft_data");
         }
 
         return data;
