@@ -5,13 +5,13 @@
   "message.command.variable.set": "Variable %1$s set to %2$s.",
   "message.command.variable.unset": "Variable %1$s unsetted.",
   "message.command.version": "Inkraft ver: %1$s, build at %2$s.",
-  "message.story.already_end": "Error! The story is over.",
-  "message.story.end": "[Story over]",
+  "message.story.already_end": "Error! The chat is over.",
+  "message.story.end": "[Chat ended]",
   "message.story.next": "[Continue]",
   "message.story.next.choice": "[Option] 1$s",
   "message.story.next.choice.hint": "Click to choose this option",
   "message.story.next.hint": "Click to continue",
-  "message.story.option_outdated": "Error! This option is outdated.",
-  "message.story.resume": "[You have unfinished story]",
+  "message.story.option_outdated": "Error! This button is outdated.",
+  "message.story.resume": "[You have unfinished chat]",
   "message.story.resume.hint": "Click to continue"
 }

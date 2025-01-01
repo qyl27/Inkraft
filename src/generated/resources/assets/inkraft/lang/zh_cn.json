@@ -5,13 +5,13 @@
   "message.command.variable.set": "变量 %1$s 已设置为 %2$s。",
   "message.command.variable.unset": "变量 %1$s 已删除。",
   "message.command.version": "Inkraft 版本：%1$s，构建于 %2$s。",
-  "message.story.already_end": "错误！剧情已结束。",
-  "message.story.end": "【剧情结束】",
+  "message.story.already_end": "错误！对话已结束。",
+  "message.story.end": "【对话结束】",
   "message.story.next": "【继续】",
   "message.story.next.choice": "【选项】%1$s",
   "message.story.next.choice.hint": "点击选择",
   "message.story.next.hint": "点击继续",
-  "message.story.option_outdated": "错误！选项已过期。",
-  "message.story.resume": "【你还在一段剧情中】",
+  "message.story.option_outdated": "错误！按钮已过期。",
+  "message.story.resume": "【你还在一段对话中】",
   "message.story.resume.hint": "点击继续"
 }

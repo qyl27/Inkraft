@@ -1,6 +1,7 @@
 package cx.rain.mc.inkraft.command;
 
 import com.mojang.brigadier.arguments.StringArgumentType;
+import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -11,12 +12,13 @@ import cx.rain.mc.inkraft.InkraftPlatform;
 import cx.rain.mc.inkraft.story.IStoryVariable;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 
 import java.util.concurrent.CompletableFuture;
 
-import static cx.rain.mc.inkraft.command.InkraftCommand.withOptionalPlayerArgs;
+import static cx.rain.mc.inkraft.command.InkraftCommand.ARGUMENT_PLAYER;
 import static net.minecraft.commands.Commands.argument;
 import static net.minecraft.commands.Commands.literal;
 
@@ -49,6 +51,15 @@ public class VariablesCommand {
         INKRAFT_VARIABLES.then(withOptionalPlayerArgs(get, getArgs));
         INKRAFT_VARIABLES.then(withOptionalPlayerArgs(set, setArgs));
         INKRAFT_VARIABLES.then(withOptionalPlayerArgs(unset, unsetArgs));
+    }
+
+
+    protected static ArgumentBuilder<CommandSourceStack, ?> withOptionalPlayerArgs(ArgumentBuilder<CommandSourceStack, ?> parent, ArgumentBuilder<CommandSourceStack, ?> args) {
+        var node = parent.then(args)
+                .build();
+        return parent.then(argument(ARGUMENT_PLAYER, EntityArgument.player())
+                .requires(InkraftPlatform.getPermissionManager()::isAdmin)
+                .redirect(node, context -> context.getSource().withEntity(EntityArgument.getPlayer(context, ARGUMENT_PLAYER))));
     }
 
     private static CompletableFuture<Suggestions> suggestName(final CommandContext<CommandSourceStack> context,

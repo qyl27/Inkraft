@@ -1,7 +1,6 @@
 package cx.rain.mc.inkraft.command;
 
 import com.mojang.brigadier.arguments.IntegerArgumentType;
-import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -31,14 +30,6 @@ public class InkraftCommand {
     public static final String ARGUMENT_TOKEN = "token";
     public static final String ARGUMENT_CHOICE = "optionIndex";
 
-    protected static ArgumentBuilder<CommandSourceStack, ?> withOptionalPlayerArgs(ArgumentBuilder<CommandSourceStack, ?> parent, ArgumentBuilder<CommandSourceStack, ?> args) {
-        var node = parent.then(args)
-                .build();
-        return parent.then(argument(ARGUMENT_PLAYER, EntityArgument.player())
-                .requires(InkraftPlatform.getPermissionManager()::isAdmin)
-                .redirect(node, context -> context.getSource().withEntity(EntityArgument.getPlayer(context, ARGUMENT_PLAYER))));
-    }
-
     public static final LiteralArgumentBuilder<CommandSourceStack> INKRAFT;
 
     static {
@@ -47,37 +38,42 @@ public class InkraftCommand {
                 .then(literal("version")
                         .executes(InkraftCommand::onVersion));
 
-        var startArgs = argument(ARGUMENT_ID, ResourceLocationArgument.id())
-                .suggests(InkraftCommand::suggestStart)
-                .executes(InkraftCommand::onStart);
-        var start = literal("start")
-                .requires(InkraftPlatform.getPermissionManager()::couldUse);
-        INKRAFT.then(withOptionalPlayerArgs(start, startArgs));
+        INKRAFT.then(literal("start")
+                .requires(InkraftPlatform.getPermissionManager()::couldUse)
+                .then(argument(ARGUMENT_ID, ResourceLocationArgument.id())
+                        .suggests(InkraftCommand::suggestStart)
+                        .then(argument(ARGUMENT_PLAYER, EntityArgument.player())
+                                .requires(InkraftPlatform.getPermissionManager()::isAdmin)
+                                .executes(InkraftCommand::onStartPlayer))
+                        .executes(InkraftCommand::onStart)))
+                .then(literal("next")
+                        .requires(InkraftPlatform.getPermissionManager()::couldUse)
+                        .then(argument(ARGUMENT_TOKEN, UuidArgument.uuid())
+                                .then(argument(ARGUMENT_CHOICE, IntegerArgumentType.integer())
+                                        // qyl27: Players should never use it.
+                                    .suggests(InkraftCommand::suggestChoice)
+                                    .executes(InkraftCommand::onNextChoose))
+                                .executes(InkraftCommand::onNext))
+                        .then(argument(ARGUMENT_PLAYER, EntityArgument.player())
+                                .requires(InkraftPlatform.getPermissionManager()::isAdmin)
+                                .then(argument(ARGUMENT_CHOICE, IntegerArgumentType.integer())
+                                        .suggests(InkraftCommand::suggestChoice)
+                                        .executes(InkraftCommand::onNextChoosePlayer))
+                                .executes(InkraftCommand::onNextPlayer)));
 
         INKRAFT.then(literal("current")
                 .requires(InkraftPlatform.getPermissionManager()::couldUse)
                 .executes(InkraftCommand::onCurrent)
                 .then(argument(ARGUMENT_PLAYER, EntityArgument.player())
                         .requires(InkraftPlatform.getPermissionManager()::isAdmin)
-                        .executes(InkraftCommand::onResetOther)));
-
-        var nextArgs = argument(ARGUMENT_TOKEN, UuidArgument.uuid())
-                .then(argument(ARGUMENT_CHOICE, IntegerArgumentType.integer())
-                        // qyl27: Anyone should never use it.
-                        .suggests(InkraftCommand::suggestChoice)
-                        .executes(InkraftCommand::onNextChoose))
-                .executes(InkraftCommand::onNext);
-        var next = literal("next")
-                .requires(InkraftPlatform.getPermissionManager()::couldUse)
-                .executes(InkraftCommand::onCurrent);
-        INKRAFT.then(withOptionalPlayerArgs(next, nextArgs));
+                        .executes(InkraftCommand::onCurrentPlayer)));
 
         INKRAFT.then(literal("reset")
                 .requires(InkraftPlatform.getPermissionManager()::isAdmin)
                 .executes(InkraftCommand::onReset)
                 .then(argument(ARGUMENT_PLAYER, EntityArgument.player())
                         .requires(InkraftPlatform.getPermissionManager()::isAdmin)
-                        .executes(InkraftCommand::onResetOther)));
+                        .executes(InkraftCommand::onResetPlayer)));
     }
 
     // <editor-fold desc="Handle.">
@@ -89,25 +85,21 @@ public class InkraftCommand {
 
     private static int onStart(final CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
         var id = ResourceLocationArgument.getId(context, ARGUMENT_ID);
+        var player = context.getSource().getPlayerOrException();
+        doStart(player, id);
+        return 1;
+    }
 
-        var entity = context.getSource().getEntity();
-        if (!(entity instanceof ServerPlayer)) {
-            entity = context.getSource().getPlayerOrException();
-        }
-        var player = (ServerPlayer) entity;
-
+    private static int onStartPlayer(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+        var id = ResourceLocationArgument.getId(context, ARGUMENT_ID);
+        var player = EntityArgument.getPlayer(context, ARGUMENT_PLAYER);
         doStart(player, id);
         return 1;
     }
 
     private static int onNext(final CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
-        var entity = context.getSource().getEntity();
-        if (!(entity instanceof ServerPlayer)) {
-            entity = context.getSource().getPlayerOrException();
-        }
-        var player = (ServerPlayer) entity;
-
         var token = UuidArgument.getUuid(context, ARGUMENT_TOKEN);
+        var player = context.getSource().getPlayerOrException();
 
         var data = InkraftPlatform.getPlayerData(player);
         if (data.getContinuousToken() == null || !data.getContinuousToken().equals(token)) {
@@ -120,17 +112,39 @@ public class InkraftCommand {
     }
 
     private static int onNextChoose(final CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
-        var entity = context.getSource().getEntity();
-        if (!(entity instanceof ServerPlayer)) {
-            entity = context.getSource().getPlayerOrException();
-        }
-        var player = (ServerPlayer) entity;
-
         var token = UuidArgument.getUuid(context, ARGUMENT_TOKEN);
+        var player = context.getSource().getPlayerOrException();
         var choice = IntegerArgumentType.getInteger(context, ARGUMENT_CHOICE);
 
         var data = InkraftPlatform.getPlayerData(player);
         if (data.getContinuousToken() == null || !data.getContinuousToken().equals(token)) {
+            context.getSource().sendFailure(Component.translatable(ModConstants.Messages.STORY_OPTION_OUTDATED).withStyle(ChatFormatting.RED));
+            return 0;
+        }
+
+        doChoice(player, choice);
+        return 1;
+    }
+
+    private static int onNextPlayer(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+        var player = EntityArgument.getPlayer(context, ARGUMENT_PLAYER);
+
+        var data = InkraftPlatform.getPlayerData(player);
+        if (data.getContinuousToken() == null) {
+            context.getSource().sendFailure(Component.translatable(ModConstants.Messages.STORY_OPTION_OUTDATED).withStyle(ChatFormatting.RED));
+            return 0;
+        }
+
+        doNext(player);
+        return 1;
+    }
+
+    private static int onNextChoosePlayer(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+        var player = EntityArgument.getPlayer(context, ARGUMENT_PLAYER);
+        var choice = IntegerArgumentType.getInteger(context, ARGUMENT_CHOICE);
+
+        var data = InkraftPlatform.getPlayerData(player);
+        if (data.getContinuousToken() == null) {
             context.getSource().sendFailure(Component.translatable(ModConstants.Messages.STORY_OPTION_OUTDATED).withStyle(ChatFormatting.RED));
             return 0;
         }
@@ -150,7 +164,7 @@ public class InkraftCommand {
         return 1;
     }
 
-    private static int onCurrentOther(final CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+    private static int onCurrentPlayer(final CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
         var entity = context.getSource().getEntity();
         var player = (ServerPlayer) entity;
 
@@ -166,7 +180,7 @@ public class InkraftCommand {
         return 1;
     }
 
-    private static int onResetOther(final CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+    private static int onResetPlayer(final CommandContext<CommandSourceStack> context) {
         var entity = context.getSource().getEntity();
         var player = (ServerPlayer) entity;
 

@@ -19,15 +19,15 @@ public class EnUsProvider extends LanguageProvider {
         add(ModConstants.Messages.COMMAND_VARIABLE_SET, "Variable %1$s set to %2$s.");
         add(ModConstants.Messages.COMMAND_VARIABLE_UNSET, "Variable %1$s unsetted.");
 
-        add(ModConstants.Messages.STORY_ALREADY_END, "Error! The story is over.");
-        add(ModConstants.Messages.STORY_OPTION_OUTDATED, "Error! This option is outdated.");
+        add(ModConstants.Messages.STORY_ALREADY_END, "Error! The chat is over.");
+        add(ModConstants.Messages.STORY_OPTION_OUTDATED, "Error! This button is outdated.");
 
         add(ModConstants.Messages.STORY_NEXT, "[Continue]");
         add(ModConstants.Messages.STORY_NEXT_CHOICE, "[Option] 1$s");
         add(ModConstants.Messages.STORY_NEXT_HINT, "Click to continue");
         add(ModConstants.Messages.STORY_NEXT_CHOICE_HINT, "Click to choose this option");
-        add(ModConstants.Messages.STORY_RESUME, "[You have unfinished story]");
+        add(ModConstants.Messages.STORY_RESUME, "[You have unfinished chat]");
         add(ModConstants.Messages.STORY_RESUME_HINT, "Click to continue");
-        add(ModConstants.Messages.STORY_END, "[Story over]");
+        add(ModConstants.Messages.STORY_END, "[Chat ended]");
     }
 }
