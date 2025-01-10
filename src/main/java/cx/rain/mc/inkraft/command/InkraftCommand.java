@@ -39,7 +39,7 @@ public class InkraftCommand {
                         .executes(InkraftCommand::onVersion));
 
         INKRAFT.then(literal("start")
-                .requires(InkraftPlatform.getPermissionManager()::couldUse)
+                .requires(InkraftPlatform.getPermissionManager()::isAdmin)
                 .then(argument(ARGUMENT_ID, ResourceLocationArgument.id())
                         .suggests(InkraftCommand::suggestStart)
                         .then(argument(ARGUMENT_PLAYER, EntityArgument.player())
