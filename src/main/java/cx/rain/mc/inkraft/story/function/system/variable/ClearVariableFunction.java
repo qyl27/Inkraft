@@ -1,6 +1,7 @@
 package cx.rain.mc.inkraft.story.function.system.variable;
 
-import cx.rain.mc.inkraft.story.IStoryVariable;
+import cx.rain.mc.inkraft.story.value.BoolStoryValue;
+import cx.rain.mc.inkraft.story.value.IStoryValue;
 import cx.rain.mc.inkraft.story.StoryInstance;
 import cx.rain.mc.inkraft.story.function.IStoryFunction;
 
@@ -11,8 +12,8 @@ public class ClearVariableFunction implements IStoryFunction {
     }
 
     @Override
-    public IStoryVariable.Bool apply(StoryInstance instance, String... args) {
+    public BoolStoryValue apply(StoryInstance instance, IStoryValue<?, ?>... args) {
         instance.getData().clearVariables();
-        return IStoryVariable.Bool.TRUE;
+        return BoolStoryValue.TRUE;
     }
 }

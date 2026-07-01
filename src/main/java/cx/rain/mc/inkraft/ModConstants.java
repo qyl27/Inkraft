@@ -37,6 +37,7 @@ public class ModConstants {
         public static final String ENDED = "ended";
         public static final String VARIABLES = "variables";
         public static final String VARIABLE_ITEM_NAME = "name";
+        public static final String VARIABLE_ITEM_TYPE = "type";
         public static final String VARIABLE_ITEM_VALUE = "value";
         public static final String FABRIC_TAG_NAME = "inkraft";
     }

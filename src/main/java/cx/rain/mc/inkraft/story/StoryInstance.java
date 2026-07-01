@@ -5,6 +5,8 @@ import com.bladecoder.ink.runtime.Story;
 import cx.rain.mc.inkraft.ModConstants;
 import cx.rain.mc.inkraft.engine.EngineManager;
 import cx.rain.mc.inkraft.registry.InkraftRegistries;
+import cx.rain.mc.inkraft.story.value.IStoryValue;
+import cx.rain.mc.inkraft.story.value.IntStoryValue;
 import cx.rain.mc.inkraft.timer.ITaskManager;
 import cx.rain.mc.inkraft.api.platform.storage.IInkPlayerData;
 import cx.rain.mc.inkraft.timer.cancellation.CancellableToken;
@@ -62,7 +64,7 @@ public class StoryInstance {
             story.onError = StoryErrorHandler.INSTANCE;
             bindStoryFunctions();
         } catch (Exception ex) {
-            throw new RuntimeException(ex);
+            log.error("Error starting story", ex);
         }
     }
 
@@ -89,15 +91,16 @@ public class StoryInstance {
         try {
             story.getState().loadJson(data.getState());
         } catch (Exception ex) {
-            throw new RuntimeException(ex);
+            log.warn("Failed to load state", ex);
         }
     }
 
     public void saveStory() {
         try {
-            data.setState(story.getState().toJson());
+            var state = story.getState().toJson();
+            data.setState(state);
         } catch (Exception ex) {
-            throw new RuntimeException(ex);
+            log.warn("Failed to save state", ex);
         }
     }
 
@@ -113,7 +116,7 @@ public class StoryInstance {
 
         int pause = ModConstants.Values.DEFAULT_PAUSE_TICKS;
         if (data.hasVariable(ModConstants.Variables.LINE_PAUSE_TICKS)) {
-            var v = data.getVariable(ModConstants.Variables.LINE_PAUSE_TICKS, IStoryVariable.Int.class);
+            var v = data.getVariable(ModConstants.Variables.LINE_PAUSE_TICKS, IntStoryValue.class);
             if (v != null) {
                 pause = v;
             }
@@ -323,30 +326,22 @@ public class StoryInstance {
                 var func = entry.getValue();
 
                 story.bindExternalFunction(func.getName(), args -> {
-                    var functionArgs = Arrays.stream(args)
-                            .map(Object::toString)
-                            .toArray(String[]::new);
                     try {
-                        var result = func.apply(this, functionArgs);
-                        if (result instanceof IStoryVariable.Str(String value)) {
-                            return value;
-                        } else if (result instanceof IStoryVariable.Int(int value)) {
-                            return value;
-                        } else if (result instanceof IStoryVariable.Float(float value)) {
-                            return value;
-                        } else if (result instanceof IStoryVariable.Bool(boolean value)) {
-                            return value;
+                        var functionArgs = new IStoryValue<?, ?>[args.length];
+                        for (int i = 0; i < args.length; i++) {
+                            functionArgs[i] = IStoryValue.fromObject(args[i]);
                         }
+                        return func.apply(this, functionArgs).asObject();
                     } catch (Throwable ex) {
                         log.warn("Running function {}", func.getName());
-                        for (int i = 0; i < functionArgs.length; i++) {
-                            var a = functionArgs[i];
+                        for (int i = 0; i < args.length; i++) {
+                            var a = args[i];
                             log.warn("Arg {}: {}", i, a);
                         }
                         log.warn("Inner: ", ex);
                     }
                     return false;
-                }, false);
+                }, func.isLookaheadSafe());
             }
         } catch (Throwable ex) {
             log.error("An error I can't handle!", ex);

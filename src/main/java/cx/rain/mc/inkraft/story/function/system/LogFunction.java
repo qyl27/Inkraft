@@ -1,6 +1,7 @@
 package cx.rain.mc.inkraft.story.function.system;
 
-import cx.rain.mc.inkraft.story.IStoryVariable;
+import cx.rain.mc.inkraft.story.value.BoolStoryValue;
+import cx.rain.mc.inkraft.story.value.IStoryValue;
 import cx.rain.mc.inkraft.story.StoryInstance;
 import cx.rain.mc.inkraft.story.function.IStoryFunction;
 import lombok.extern.slf4j.Slf4j;
@@ -24,9 +25,9 @@ public class LogFunction implements IStoryFunction {
     }
 
     @Override
-    public IStoryVariable.Bool apply(StoryInstance instance, String... args) {
-        var message = args[0];
+    public BoolStoryValue apply(StoryInstance instance, IStoryValue<?, ?>... args) {
+        var message = args[0].getString();
         consumer.accept(log, message);
-        return IStoryVariable.Bool.TRUE;
+        return BoolStoryValue.TRUE;
     }
 }

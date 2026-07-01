@@ -1,9 +1,14 @@
 package cx.rain.mc.inkraft.story.function;
 
 import cx.rain.mc.inkraft.story.StoryInstance;
-import cx.rain.mc.inkraft.story.IStoryVariable;
+import cx.rain.mc.inkraft.story.value.IStoryValue;
 
 public interface IStoryFunction {
     String getName();
-    IStoryVariable<?> apply(StoryInstance instance, String... args);
+
+    IStoryValue<?, ?> apply(StoryInstance instance, IStoryValue<?, ?>... args);
+
+    default boolean isLookaheadSafe() {
+        return false;
+    }
 }

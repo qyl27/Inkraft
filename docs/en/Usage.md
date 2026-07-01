@@ -13,7 +13,10 @@ Other languages: [简体中文](../zh/使用方法.md)
 
 ### Writing Stories
 
-See [Writing Story Scripts](Writing-Story-Scripts.md).
+See:
+
+- [Writing Story Scripts](Writing-Story-Scripts.md)
+- [Language Enhancements](Language-Enhancements.md)
 
 ## Adding Stories
 
@@ -91,7 +94,7 @@ Command: `/inkraft variables set <name|{<player> <name>}> <value>`
 
 `player`: A player, or a selector that selects exactly one player. This player is used as the command target.
 
-`value`: The engine variable value. It can be any string. The engine will try to automatically convert it to a supported variable type. If it cannot be converted, it will be treated as a string.
+`value`: The engine variable value. It can be any string.
 
 ### View the Engine Version
 

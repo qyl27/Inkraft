@@ -33,6 +33,10 @@ dependencies {
 
     compileOnly "net.kyori:adventure-platform-mod-shared:${rootProject.adventure_platform_version}"
     implementation "net.kyori:adventure-text-serializer-legacy:${rootProject.adventure_version}"
+
+    testImplementation platform("org.junit:junit-bom:${rootProject.junit_version}")
+    testImplementation "org.junit.jupiter:junit-jupiter"
+    testRuntimeOnly "org.junit.platform:junit-platform-launcher"
 }
 
 sourceSets {
@@ -111,6 +115,10 @@ allprojects {
     tasks.withType(JavaCompile).configureEach {
         options.encoding = 'UTF-8'
         options.release = 25
+    }
+
+    tasks.withType(Test).configureEach {
+        useJUnitPlatform()
     }
 
     java {

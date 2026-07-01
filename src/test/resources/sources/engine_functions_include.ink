@@ -1,7 +1,10 @@
 // title: engine_functions_include.ink
 // author: qyl27
 // license: CC0
-// version: 2024.12.24
+// version: 2026.07.02
+
+
+// System functions
 
 EXTERNAL isDebug()
 
@@ -28,6 +31,14 @@ EXTERNAL logInfo(message)
 EXTERNAL logWarn(message)
 EXTERNAL logError(message)
 
+EXTERNAL parseBool(str)
+EXTERNAL parseInt(str)
+EXTERNAL parseFloat(str)
+EXTERNAL toString(value)
+
+
+// Game functions
+
 EXTERNAL getPlayerName()
 EXTERNAL getWorldDayTime(worldId)
 EXTERNAL getWorldGameTime(worldId)
@@ -36,9 +47,61 @@ EXTERNAL getRealTime(pattern)
 
 EXTERNAL runCommand(command)
 EXTERNAL runUnlimitedCommand(command)
+EXTERNAL runSilentUnlimitedCommand(command)
 EXTERNAL runServerCommand(command)
+
+EXTERNAL getScoreboard(objective)
+EXTERNAL setScoreboard(objective, value)
+EXTERNAL addScoreboard(objective, value)
+EXTERNAL subScoreboard(objective, value)
+EXTERNAL multiplyScoreboard(objective, value)
+
+EXTERNAL getStorage(id, nbtPath)
+EXTERNAL setStorage(id, nbtPath, value)
 
 EXTERNAL hasItem(itemId, count, nbtPath, nbtValue)
 EXTERNAL countItem(itemId, nbtPath, nbtValue)
 EXTERNAL giveItem(itemId, count, nbtPath, nbtValue)
 EXTERNAL takeItem(itemId, count, nbtPath, nbtValue)
+
+
+// Language enhancement functions
+
+EXTERNAL createArray()
+EXTERNAL isArray(value)
+EXTERNAL arraySize(array)
+EXTERNAL arraySet(array, index, value)
+EXTERNAL arrayGet(array, index)
+EXTERNAL arrayAdd(array, value)
+EXTERNAL arrayRemove(array, index)
+EXTERNAL arrayContains(array, element)
+
+EXTERNAL createMap()
+EXTERNAL isMap(value)
+EXTERNAL mapSize(map)
+EXTERNAL mapSet(map, key, value)
+EXTERNAL mapGet(map, key)
+EXTERNAL mapRemove(map, key)
+EXTERNAL mapContains(map, key)
+
+=== function arrayHas(array, index) ===
+~ return index >= 0 and index < arraySize(array)
+
+=== function isArrayEmpty(array) ===
+~ return arraySize(array) == 0
+
+=== function arrayFirst(array) ===
+{ arrayHas(array, 0):
+    ~ return arrayGet(array, 0)
+}
+~ return false
+
+=== function arrayLast(array) ===
+~ temp size = arraySize(array)
+{ size > 0:
+    ~ return arrayGet(array, size - 1)
+}
+~ return false
+
+=== function isMapEmpty(map) ===
+~ return mapSize(map) == 0

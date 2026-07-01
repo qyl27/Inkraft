@@ -14,9 +14,11 @@ Other languages: [简体中文](README.zh.md)
   - Execute commands.
   - Operate on scoreboards and command storage.
   - Get real-world time.
+  - Provide Array and Map data structures that extend Ink's language capabilities.
 - It provides a global variable mechanism for storing information across different Ink scripts.
 
 ## User Guide
 
-[Usage](docs/en/Usage.md)  
-[Writing Story Scripts](docs/en/Writing-Story-Scripts.md)  
+- [Usage](docs/en/Usage.md)
+- [Writing Story Scripts](docs/en/Writing-Story-Scripts.md)
+- [Language Enhancements](docs/en/Language-Enhancements.md)

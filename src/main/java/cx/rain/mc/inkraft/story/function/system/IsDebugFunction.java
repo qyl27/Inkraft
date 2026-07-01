@@ -2,7 +2,8 @@ package cx.rain.mc.inkraft.story.function.system;
 
 import cx.rain.mc.inkraft.story.StoryInstance;
 import cx.rain.mc.inkraft.story.function.IStoryFunction;
-import cx.rain.mc.inkraft.story.IStoryVariable;
+import cx.rain.mc.inkraft.story.value.BoolStoryValue;
+import cx.rain.mc.inkraft.story.value.IStoryValue;
 
 public class IsDebugFunction implements IStoryFunction {
     @Override
@@ -11,7 +12,7 @@ public class IsDebugFunction implements IStoryFunction {
     }
 
     @Override
-    public IStoryVariable.Bool apply(StoryInstance instance, String... args) {
-        return IStoryVariable.Bool.from(instance.getManager().isDebug());
+    public BoolStoryValue apply(StoryInstance instance, IStoryValue<?, ?>... args) {
+        return BoolStoryValue.from(instance.getManager().isDebug());
     }
 }

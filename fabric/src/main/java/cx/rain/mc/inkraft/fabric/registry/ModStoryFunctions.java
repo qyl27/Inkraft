@@ -16,6 +16,8 @@ import cx.rain.mc.inkraft.story.function.game.inventory.TakeItemFunction;
 import cx.rain.mc.inkraft.story.function.game.player.GetPlayerNameFunction;
 import cx.rain.mc.inkraft.story.function.system.IsDebugFunction;
 import cx.rain.mc.inkraft.story.function.system.LogFunction;
+import cx.rain.mc.inkraft.story.function.lang.ArrayFunctions;
+import cx.rain.mc.inkraft.story.function.lang.MapFunctions;
 import cx.rain.mc.inkraft.story.function.system.flow.*;
 import cx.rain.mc.inkraft.story.function.system.line.IsEndedFunction;
 import cx.rain.mc.inkraft.story.function.system.line.PauseFunction;
@@ -79,6 +81,23 @@ public class ModStoryFunctions {
         register(registry, "parse_int", ParseIntFunction::new);
         register(registry, "parse_float", ParseFloatFunction::new);
         register(registry, "to_string", ToStringFunction::new);
+
+        register(registry, "create_array", ArrayFunctions::create);
+        register(registry, "is_array", ArrayFunctions::isArray);
+        register(registry, "array_size", ArrayFunctions::size);
+        register(registry, "array_set", ArrayFunctions::set);
+        register(registry, "array_get", ArrayFunctions::get);
+        register(registry, "array_add", ArrayFunctions::add);
+        register(registry, "array_remove", ArrayFunctions::remove);
+        register(registry, "array_contains", ArrayFunctions::contains);
+
+        register(registry, "create_map", MapFunctions::create);
+        register(registry, "is_map", MapFunctions::isMap);
+        register(registry, "map_size", MapFunctions::size);
+        register(registry, "map_set", MapFunctions::set);
+        register(registry, "map_get", MapFunctions::get);
+        register(registry, "map_remove", MapFunctions::remove);
+        register(registry, "map_contains", MapFunctions::contains);
 
         // </editor-fold>
 

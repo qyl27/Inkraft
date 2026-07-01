@@ -7,4 +7,8 @@ public class IdHelper {
     public static Identifier modLoc(String path) {
         return Identifier.fromNamespaceAndPath(Inkraft.MODID, path);
     }
+
+    public static Identifier of(String id) {
+        return Identifier.parse(id);
+    }
 }

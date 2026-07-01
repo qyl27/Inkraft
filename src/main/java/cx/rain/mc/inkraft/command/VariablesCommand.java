@@ -9,7 +9,7 @@ import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import cx.rain.mc.inkraft.ModConstants;
 import cx.rain.mc.inkraft.InkraftPlatform;
-import cx.rain.mc.inkraft.story.IStoryVariable;
+import cx.rain.mc.inkraft.story.value.IStoryValue;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.arguments.EntityArgument;
@@ -90,8 +90,8 @@ public class VariablesCommand {
         if (!data.hasVariable(name)) {
             context.getSource().sendSuccess(() -> Component.translatable(ModConstants.Messages.COMMAND_VARIABLE_MISSING, name), true);
         } else {
-            var value = data.getVariable(name).getValue();
-            context.getSource().sendSuccess(() -> Component.translatable(ModConstants.Messages.COMMAND_VARIABLE_GET, name, value.toString()), true);
+            var value = data.getVariable(name).getString();
+            context.getSource().sendSuccess(() -> Component.translatable(ModConstants.Messages.COMMAND_VARIABLE_GET, name, value), true);
         }
 
         return 1;
@@ -107,7 +107,7 @@ public class VariablesCommand {
         var name = StringArgumentType.getString(context, ARGUMENT_NAME);
         var value = StringArgumentType.getString(context, ARGUMENT_VALUE);
         var data = InkraftPlatform.getPlayerData(player);
-        data.setVariable(name, IStoryVariable.fromString(value));
+        data.setVariable(name, IStoryValue.fromString(value));
         context.getSource().sendSuccess(() -> Component.translatable(ModConstants.Messages.COMMAND_VARIABLE_SET, name, value).withStyle(ChatFormatting.LIGHT_PURPLE), true);
         return 1;
     }
