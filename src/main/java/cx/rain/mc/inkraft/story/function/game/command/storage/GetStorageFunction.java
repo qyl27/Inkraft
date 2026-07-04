@@ -1,7 +1,10 @@
 package cx.rain.mc.inkraft.story.function.game.command.storage;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import cx.rain.mc.inkraft.story.IStoryVariable;
+import cx.rain.mc.inkraft.story.value.BoolStoryValue;
+import cx.rain.mc.inkraft.story.value.FloatStoryValue;
+import cx.rain.mc.inkraft.story.value.IntStoryValue;
+import cx.rain.mc.inkraft.story.value.IStoryValue;
 import cx.rain.mc.inkraft.story.StoryInstance;
 import cx.rain.mc.inkraft.story.function.IStoryFunction;
 import cx.rain.mc.inkraft.utility.StringArgumentParseHelper;
@@ -17,28 +20,28 @@ public class GetStorageFunction implements IStoryFunction {
     }
 
     @Override
-    public IStoryVariable<?> apply(StoryInstance instance, String... args) {
+    public IStoryValue<?, ?> apply(StoryInstance instance, IStoryValue<?, ?>... args) {
         var server = instance.getPlayer().level().getServer();
-        var id = StringArgumentParseHelper.parseId(args[0]);
+        var id = StringArgumentParseHelper.parseId(args[0].getString());
         var storage = server.getCommandStorage();
         var tag = storage.get(id);
 
         try {
-            var path = StringArgumentParseHelper.parseNbtPath(args[1]);
+            var path = StringArgumentParseHelper.parseNbtPath(args[1].getString());
             var list = path.get(tag);
             if (list.size() == 1) {
                 var t = list.getFirst();
                 if (t instanceof NumericTag n) {
-                    return new IStoryVariable.Float(n.floatValue());
+                    return new FloatStoryValue(n.floatValue());
                 }
-                return IStoryVariable.fromString(t.asString().orElseGet(t::toString));
+                return IStoryValue.fromString(t.asString().orElseGet(t::toString));
             } else {
-                return new IStoryVariable.Int(list.size());
+                return new IntStoryValue(list.size());
             }
         } catch (CommandSyntaxException ex) {
             log.warn("NBT Path Error: ", ex);
         }
 
-        return IStoryVariable.Bool.FALSE;
+        return BoolStoryValue.FALSE;
     }
 }

@@ -1,6 +1,7 @@
 package cx.rain.mc.inkraft.story.function.system.variable;
 
-import cx.rain.mc.inkraft.story.IStoryVariable;
+import cx.rain.mc.inkraft.story.value.BoolStoryValue;
+import cx.rain.mc.inkraft.story.value.IStoryValue;
 import cx.rain.mc.inkraft.story.StoryInstance;
 import cx.rain.mc.inkraft.story.function.IStoryFunction;
 
@@ -11,9 +12,9 @@ public class HasVariableFunction implements IStoryFunction {
     }
 
     @Override
-    public IStoryVariable<?> apply(StoryInstance instance, String... args) {
-        var name = args[0];
+    public IStoryValue<?, ?> apply(StoryInstance instance, IStoryValue<?, ?>... args) {
+        var name = args[0].getString();
         var result = instance.getData().hasVariable(name);
-        return IStoryVariable.Bool.from(result);
+        return BoolStoryValue.from(result);
     }
 }

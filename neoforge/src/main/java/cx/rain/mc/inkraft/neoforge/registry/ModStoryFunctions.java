@@ -17,6 +17,8 @@ import cx.rain.mc.inkraft.story.function.game.inventory.TakeItemFunction;
 import cx.rain.mc.inkraft.story.function.game.player.GetPlayerNameFunction;
 import cx.rain.mc.inkraft.story.function.system.IsDebugFunction;
 import cx.rain.mc.inkraft.story.function.system.LogFunction;
+import cx.rain.mc.inkraft.story.function.lang.ArrayFunctions;
+import cx.rain.mc.inkraft.story.function.lang.MapFunctions;
 import cx.rain.mc.inkraft.story.function.system.flow.*;
 import cx.rain.mc.inkraft.story.function.system.line.IsEndedFunction;
 import cx.rain.mc.inkraft.story.function.system.line.PauseFunction;
@@ -73,6 +75,23 @@ public class ModStoryFunctions {
     public static final Supplier<IStoryFunction> PARSE_INT = REGISTRY.register("parse_int", ParseIntFunction::new);
     public static final Supplier<IStoryFunction> PARSE_FLOAT = REGISTRY.register("parse_float", ParseFloatFunction::new);
     public static final Supplier<IStoryFunction> TO_STRING = REGISTRY.register("to_string", ToStringFunction::new);
+
+    public static final Supplier<IStoryFunction> CREATE_ARRAY = REGISTRY.register("create_array", ArrayFunctions::create);
+    public static final Supplier<IStoryFunction> IS_ARRAY = REGISTRY.register("is_array", ArrayFunctions::isArray);
+    public static final Supplier<IStoryFunction> ARRAY_SIZE = REGISTRY.register("array_size", ArrayFunctions::size);
+    public static final Supplier<IStoryFunction> ARRAY_SET = REGISTRY.register("array_set", ArrayFunctions::set);
+    public static final Supplier<IStoryFunction> ARRAY_GET = REGISTRY.register("array_get", ArrayFunctions::get);
+    public static final Supplier<IStoryFunction> ARRAY_ADD = REGISTRY.register("array_add", ArrayFunctions::add);
+    public static final Supplier<IStoryFunction> ARRAY_REMOVE = REGISTRY.register("array_remove", ArrayFunctions::remove);
+    public static final Supplier<IStoryFunction> ARRAY_CONTAINS = REGISTRY.register("array_contains", ArrayFunctions::contains);
+
+    public static final Supplier<IStoryFunction> CREATE_MAP = REGISTRY.register("create_map", MapFunctions::create);
+    public static final Supplier<IStoryFunction> IS_MAP = REGISTRY.register("is_map", MapFunctions::isMap);
+    public static final Supplier<IStoryFunction> MAP_SIZE = REGISTRY.register("map_size", MapFunctions::size);
+    public static final Supplier<IStoryFunction> MAP_SET = REGISTRY.register("map_set", MapFunctions::set);
+    public static final Supplier<IStoryFunction> MAP_GET = REGISTRY.register("map_get", MapFunctions::get);
+    public static final Supplier<IStoryFunction> MAP_REMOVE = REGISTRY.register("map_remove", MapFunctions::remove);
+    public static final Supplier<IStoryFunction> MAP_CONTAINS = REGISTRY.register("map_contains", MapFunctions::contains);
 
     // </editor-fold>
 

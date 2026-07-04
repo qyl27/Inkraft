@@ -6,7 +6,16 @@ For Ink script syntax, see the [official tutorial](https://github.com/inkle/ink/
 
 The rest of this document may refer to concepts from the Ink scripting language.
 
-Supported variable types in the engine: Bool, Int32, Float32, String.
+Ink itself supports the following data types: Bool, Int32, Float32, String, and List.
+
+- Bool has the values true and false.
+- When a number exceeds the range of Int32 or Float32, Ink silently discards the overflowing high-order data and preserves only the low-order data.
+- Values of different data types can be implicitly promoted.
+- Float32 does not include the special values +Infinity, -Infinity, sNaN, qNaN, +0.0, or -0.0 defined by IEEE 754:
+  - ±Infinity is converted to ±3.4E38F.
+  - sNaN, qNaN, +0.0, and -0.0 are all converted to +0.0.
+- There is no type representing null or exceptions.
+- List represents a choice from a finite set of values and is effectively an enumeration (Enum).
 
 ## Style Codes
 
@@ -22,7 +31,7 @@ Appendix A provides a declaration file containing all engine functions. It can b
 
 Function names in the Inkraft engine generally use camelCase.
 
-When a function parameter is described as "nullable", it means an empty string `""` can be used as a placeholder. This is a workaround because Ink does not support function overloading.
+When a function parameter is described as "nullable", it means an empty string `""` can be used as a placeholder. This is a workaround because Ink does not support function overloading or have a type representing an empty value.
 
 ### System Functions
 
@@ -52,17 +61,23 @@ When a function parameter is described as "nullable", it means an empty string `
 
 #### Engine Variable Functions
 
+Engine variables are attached to players and are used to persist data or pass it between different scripts.
+
 Variable names are recommended to use snake_case. It is best to prefix them with the data pack namespace ID to avoid conflicts with other data packs.
 
 If a variable needs to be shared between players, it is recommended to run server commands through game functions and use vanilla scoreboard or command storage mechanisms.
 
-| Function definition      | Description                                             | Parameters                                               | Return value                                                                       |
-|--------------------------|---------------------------------------------------------|----------------------------------------------------------|------------------------------------------------------------------------------------|
-| hasVariable(name)        | Checks whether an engine variable exists on the player. | name: The variable name.                                 | bool, true means it exists, false means it does not.                               |
-| getVariable(name)        | Gets an engine variable value.                          | name: The variable name.                                 | any, the engine variable value.<br />Returns false if the variable does not exist. |
-| setVariable(name, value) | Sets an engine variable value.                          | name: The variable name.<br />value: The variable value. |                                                                                    |
-| unsetVariable(name)      | Removes an engine variable.                             | name: The variable name.                                 |                                                                                    |
-| clearVariables()         | Clears all engine variables.                            |                                                          |                                                                                    |
+Engine variables store values as Bool, Int32, Float32, or String. Array and Map values are represented as String.
+
+Because Ink's List type consists of enumeration values bound to the script being run, it is not meaningful outside that specific script. The engine therefore automatically converts a List value to String when it is written to an engine variable and returns it as String.
+
+| Function definition      | Description                                             | Parameters                                               | Return value                                                                                       |
+|--------------------------|---------------------------------------------------------|----------------------------------------------------------|----------------------------------------------------------------------------------------------------|
+| hasVariable(name)        | Checks whether an engine variable exists on the player. | name: The variable name.                                 | bool, true means it exists, false means it does not.                                               |
+| getVariable(name)        | Gets an engine variable value.                          | name: The variable name.                                 | any, the engine variable value in its corresponding type.<br />Returns false if it does not exist. |
+| setVariable(name, value) | Sets an engine variable value.                          | name: The variable name.<br />value: The variable value. | bool, true means success.                                                                          |
+| unsetVariable(name)      | Removes an engine variable.                             | name: The variable name.                                 |                                                                                                    |
+| clearVariables()         | Clears all engine variables.                            |                                                          |                                                                                                    |
 
 #### Log Functions
 
@@ -75,7 +90,7 @@ Print logs to the console.
 | logWarn(message)    | Prints a Warning-level log. | message: The content. |              |
 | logError(message)   | Prints an Error-level log.  | message: The content. |              |
 
-#### Type Conversion
+#### Explicit Type Conversion
 
 | Function definition | Description                   | Parameters        | Return value                                                              |
 |---------------------|-------------------------------|-------------------|---------------------------------------------------------------------------|
@@ -84,7 +99,7 @@ Print logs to the console.
 | parseFloat(str)     | Converts a string to Float32. | str: The string.  | float, 0 if conversion fails.                                             |
 | toString(value)     | Converts a value to a string. | value: The value. | string, the string representation of the value.                           |
 
-### Game Function List
+### Game Functions
 
 | Function signature        | Description                           | Parameters                                                               | Return value                                                                   |
 |---------------------------|---------------------------------------|--------------------------------------------------------------------------|--------------------------------------------------------------------------------|

@@ -1,6 +1,7 @@
 package cx.rain.mc.inkraft.story.function.game;
 
-import cx.rain.mc.inkraft.story.IStoryVariable;
+import cx.rain.mc.inkraft.story.value.IntStoryValue;
+import cx.rain.mc.inkraft.story.value.IStoryValue;
 import cx.rain.mc.inkraft.story.StoryInstance;
 import cx.rain.mc.inkraft.story.function.IStoryFunction;
 import net.minecraft.core.registries.Registries;
@@ -25,11 +26,11 @@ public class WorldTimeFunction implements IStoryFunction {
     }
 
     @Override
-    public IStoryVariable<?> apply(StoryInstance instance, String... args) {
-        var id = args[0];
+    public IStoryValue<?, ?> apply(StoryInstance instance, IStoryValue<?, ?>... args) {
+        var id = args[0].getString();
         var level = tryParseLevel(instance, id);
         var result = function.apply(level);
-        return new IStoryVariable.Int(result);
+        return new IntStoryValue(result);
     }
 
     private static Level tryParseLevel(StoryInstance instance, String id) {

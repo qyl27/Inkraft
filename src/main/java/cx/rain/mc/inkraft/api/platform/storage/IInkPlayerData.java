@@ -1,20 +1,18 @@
 package cx.rain.mc.inkraft.api.platform.storage;
 
 import cx.rain.mc.inkraft.ModConstants;
-import cx.rain.mc.inkraft.story.IStoryVariable;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
+import cx.rain.mc.inkraft.storage.StoredInkVariable;
+import cx.rain.mc.inkraft.story.value.IStoryValue;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
-public interface IInkPlayerData extends IValueIOSerializable {
+public interface IInkPlayerData {
     @Nullable
     Identifier getStory();
 
@@ -34,16 +32,16 @@ public interface IInkPlayerData extends IValueIOSerializable {
 
     void setContinuousToken(@Nullable UUID token);
 
-    boolean hasVariable(@NotNull String name);
+    boolean hasVariable(String name);
 
     @Nullable
-    IStoryVariable<?> getVariable(@NotNull String name);
+    IStoryValue<?, ?> getVariable(String name);
 
-    void setVariable(@NotNull String name, @NotNull IStoryVariable<?> value);
+    void setVariable(String name, IStoryValue<?, ?> value);
 
-    void unsetVariable(@NotNull String name);
+    void unsetVariable(String name);
 
-    @NotNull Map<String, IStoryVariable<?>> getVariables();
+    Map<String, IStoryValue<?, ?>> getVariables();
 
     void clearVariables();
 
@@ -65,44 +63,11 @@ public interface IInkPlayerData extends IValueIOSerializable {
 
     @SuppressWarnings("unchecked")
     @Nullable
-    default <U, T extends IStoryVariable<U>> U getVariable(@NotNull String name, Class<T> type) {
+    default <U, T extends IStoryValue<U, ?>> U getVariable(String name, Class<T> type) {
         var v = getVariable(name);
         if (v != null && v.getClass().equals(type)) {
             return ((T) v).getValue();
         }
         return null;
-    }
-
-    @Override
-    default void serialize(ValueOutput output) {
-        var story = getStory();
-        output.putString(ModConstants.Tags.STORY, story == null ? "" : story.toString());
-        output.putString(ModConstants.Tags.STATE, Objects.requireNonNullElse(getState(), ""));
-        output.putBoolean(ModConstants.Tags.ENDED, isEnded());
-
-        var list = output.childrenList(ModConstants.Tags.VARIABLES);
-        for (var entry : getVariables().entrySet()) {
-            var item = list.addChild();
-            item.putString(ModConstants.Tags.VARIABLE_ITEM_NAME, entry.getKey());
-            item.putString(ModConstants.Tags.VARIABLE_ITEM_VALUE, entry.getValue().getValue().toString());
-        }
-    }
-
-    @Override
-    default void deserialize(ValueInput input) {
-        clearData();
-
-        var story = input.getStringOr(ModConstants.Tags.STORY, "");
-        setStory(story.isBlank() ? null : Identifier.parse(story));
-
-        var state = input.getStringOr(ModConstants.Tags.STATE, "");
-        setState(state.isBlank() ? null : state);
-
-        setEnded(input.getBooleanOr(ModConstants.Tags.ENDED, true));
-        for (var item : input.childrenListOrEmpty(ModConstants.Tags.VARIABLES)) {
-            var name = item.getStringOr(ModConstants.Tags.VARIABLE_ITEM_NAME, "");
-            var value = IStoryVariable.fromString(item.getStringOr(ModConstants.Tags.VARIABLE_ITEM_VALUE, ""));
-            setVariable(name, value);
-        }
     }
 }

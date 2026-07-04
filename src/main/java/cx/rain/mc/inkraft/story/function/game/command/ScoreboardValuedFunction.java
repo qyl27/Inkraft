@@ -1,6 +1,7 @@
 package cx.rain.mc.inkraft.story.function.game.command;
 
-import cx.rain.mc.inkraft.story.IStoryVariable;
+import cx.rain.mc.inkraft.story.value.BoolStoryValue;
+import cx.rain.mc.inkraft.story.value.IStoryValue;
 import cx.rain.mc.inkraft.story.StoryInstance;
 import cx.rain.mc.inkraft.story.function.IStoryFunction;
 import cx.rain.mc.inkraft.utility.StringArgumentParseHelper;
@@ -24,18 +25,18 @@ public class ScoreboardValuedFunction implements IStoryFunction {
     }
 
     @Override
-    public IStoryVariable<?> apply(StoryInstance instance, String... args) {
+    public IStoryValue<?, ?> apply(StoryInstance instance, IStoryValue<?, ?>... args) {
         var player = instance.getPlayer();
         var scoreboard = player.level().getScoreboard();
-        var objective = scoreboard.getObjective(args[0]);
+        var objective = scoreboard.getObjective(args[0].getString());
         if (objective == null) {
-            return IStoryVariable.Bool.FALSE;
+            return BoolStoryValue.FALSE;
         }
 
-        var value = StringArgumentParseHelper.parseInt(args[1], 0);
+        var value = StringArgumentParseHelper.parseInt(args[1].getString(), 0);
         var access = scoreboard.getOrCreatePlayerScore(player, objective);
         function.accept(access, value);
-        return IStoryVariable.Bool.TRUE;
+        return BoolStoryValue.TRUE;
     }
 
     public static ScoreboardValuedFunction setScoreBoard() {
