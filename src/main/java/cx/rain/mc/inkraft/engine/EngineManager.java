@@ -36,7 +36,9 @@ public class EngineManager {
 
     public void remove(ServerPlayer player) {
         var story = playerStories.remove(player.getUUID());
-        story.stop();
+        if (story != null) {
+            story.stop();
+        }
     }
 
     public StoryInstance get(ServerPlayer player) {
