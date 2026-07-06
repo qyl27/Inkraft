@@ -19,13 +19,9 @@ public enum SerializeValueType {
     @Getter
     private final Codec<? extends IStoryValue<?, ?>> codec;
 
-    @Getter
-    private final MapCodec<? extends IStoryValue<?, ?>> mapCodec;
-
     SerializeValueType(String name, Codec<? extends IStoryValue<?, ?>> codec) {
         this.name = name;
         this.codec = codec;
-        this.mapCodec = MapCodec.assumeMapUnsafe(codec);
     }
 
     public static SerializeValueType from(String name) {

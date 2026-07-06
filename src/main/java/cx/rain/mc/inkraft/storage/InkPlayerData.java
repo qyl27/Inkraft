@@ -76,7 +76,11 @@ public class InkPlayerData implements IInkPlayerData, IValueIOSerializable {
 
     @Override
     public @Nullable IStoryValue<?, ?> getVariable(String name) {
-        return variablesByNameView.get(name).value();
+        var variable = variablesByNameView.get(name);
+        if (variable == null) {
+            return null;
+        }
+        return variable.value();
     }
 
     @Override

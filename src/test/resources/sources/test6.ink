@@ -52,5 +52,5 @@ mapContains：{mapContains(map, "b")}    // Expected: false
 
 ~ map = mapSet(map, "c", inner)
 nesting mapSet：{map}   // Expected: {"a": "value", "c": "["wolf", "seikou!"]"}, order is not important
-nesting mapGet：{map(array, "c")}  // Expected: "["wolf", "seikou!"]"
+nesting mapGet：{mapGet(map, "c")}  // Expected: "["wolf", "seikou!"]"
 
