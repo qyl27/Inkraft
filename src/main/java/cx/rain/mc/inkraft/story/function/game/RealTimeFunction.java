@@ -2,6 +2,7 @@ package cx.rain.mc.inkraft.story.function.game;
 
 import cx.rain.mc.inkraft.story.value.IStoryValue;
 import cx.rain.mc.inkraft.story.StoryInstance;
+import cx.rain.mc.inkraft.story.function.FunctionArgs;
 import cx.rain.mc.inkraft.story.function.IStoryFunction;
 
 import java.time.OffsetDateTime;
@@ -15,8 +16,11 @@ public class RealTimeFunction implements IStoryFunction {
 
     @Override
     public IStoryValue<?, ?> apply(StoryInstance instance, IStoryValue<?, ?>... args) {
+        FunctionArgs.requireCount(args, 1);
+        FunctionArgs.requireTyped(args, 0, String.class);
+
         var now = OffsetDateTime.now();
-        var pattern = args[0].getString();
+        var pattern = FunctionArgs.getString(args[0]);
         var result = pattern.isEmpty() ? now.toString() : now.format(DateTimeFormatter.ofPattern(pattern));
         return IStoryValue.fromString(result);
     }
