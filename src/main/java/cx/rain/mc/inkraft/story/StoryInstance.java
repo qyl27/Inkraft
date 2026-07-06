@@ -230,16 +230,19 @@ public class StoryInstance {
     @Nullable
     private Story story;
 
+    private boolean hasStory() {
+        return story != null;
+    }
+
     public boolean isStoryEnded() {
-        return story == null || data.isEnded();
+        return !hasStory() || data.isEnded();
     }
 
     public String currentLine() {
-        if (isStoryEnded()) {
+        if (!hasStory()) {
             log.warn("currentLine: Story ended. It shouldn't happen!");
             return "";
         }
-        assert story != null;
 
         try {
             return story.getCurrentText();
@@ -254,11 +257,10 @@ public class StoryInstance {
     }
 
     public void nextLine() {
-        if (isStoryEnded()) {
+        if (!hasStory()) {
             log.warn("nextLine: Story ended. It shouldn't happen!");
             return;
         }
-        assert story != null;
 
         try {
             story.Continue();
@@ -273,11 +275,10 @@ public class StoryInstance {
     }
 
     public void choose(int index) {
-        if (isStoryEnded()) {
+        if (!hasStory()) {
             log.warn("choose: Story ended. It shouldn't happen!");
             return;
         }
-        assert story != null;
 
         try {
             story.chooseChoiceIndex(index);
@@ -288,11 +289,10 @@ public class StoryInstance {
     }
 
     public List<Choice> getChoices() {
-        if (isStoryEnded()) {
+        if (!hasStory()) {
             log.warn("getChoices: Story ended. It shouldn't happen!");
             return List.of();
         }
-        assert story != null;
 
         return story.getCurrentChoices();
     }
@@ -302,31 +302,28 @@ public class StoryInstance {
     // region Parallel flows.">
 
     public boolean isDefaultFlow() {
-        if (isStoryEnded()) {
+        if (!hasStory()) {
             log.warn("isDefaultFlow: Story ended. It shouldn't happen!");
             return false;
         }
-        assert story != null;
 
         return story.currentFlowIsDefaultFlow();
     }
 
     public String getFlowName() {
-        if (isStoryEnded()) {
+        if (!hasStory()) {
             log.warn("getFlowName: Story ended. It shouldn't happen!");
             return StoryState.kDefaultFlowName;
         }
-        assert story != null;
 
         return story.getCurrentFlowName();
     }
 
     public void addFlow(String name, String knot) {
-        if (isStoryEnded()) {
+        if (!hasStory()) {
             log.warn("addFlow: Story ended. It shouldn't happen!");
             return;
         }
-        assert story != null;
 
         try {
             story.switchFlow(name);
@@ -337,11 +334,10 @@ public class StoryInstance {
     }
 
     public void removeFlow(String name) {
-        if (isStoryEnded()) {
+        if (!hasStory()) {
             log.warn("removeFlow: Story ended. It shouldn't happen!");
             return;
         }
-        assert story != null;
 
         try {
             story.removeFlow(name);
@@ -351,11 +347,10 @@ public class StoryInstance {
     }
 
     public void flowTo(String name) {
-        if (isStoryEnded()) {
+        if (!hasStory()) {
             log.warn("flowTo: Story ended. It shouldn't happen!");
             return;
         }
-        assert story != null;
 
         try {
             story.switchFlow(name);
@@ -365,11 +360,10 @@ public class StoryInstance {
     }
 
     public void flowBackDefault() {
-        if (isStoryEnded()) {
+        if (!hasStory()) {
             log.warn("flowBackDefault: Story ended. It shouldn't happen!");
             return;
         }
-        assert story != null;
 
         try {
             story.switchToDefaultFlow();
@@ -379,11 +373,10 @@ public class StoryInstance {
     }
 
     public List<String> getFlows() {
-        if (isStoryEnded()) {
+        if (!hasStory()) {
             log.warn("getFlows: Story ended. It shouldn't happen!");
             return List.of();
         }
-        assert story != null;
 
         return story.aliveFlowNames();
     }

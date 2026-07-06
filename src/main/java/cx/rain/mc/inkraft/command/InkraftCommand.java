@@ -181,9 +181,8 @@ public class InkraftCommand {
         return 1;
     }
 
-    private static int onResetPlayer(final CommandContext<CommandSourceStack> context) {
-        var entity = context.getSource().getEntity();
-        var player = (ServerPlayer) entity;
+    private static int onResetPlayer(final CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+        var player = EntityArgument.getPlayer(context, ARGUMENT_PLAYER);
 
         doReset(player);
         context.getSource().sendSuccess(() -> Component.translatable(ModConstants.Messages.COMMAND_SUCCESS).withStyle(ChatFormatting.LIGHT_PURPLE), true);
