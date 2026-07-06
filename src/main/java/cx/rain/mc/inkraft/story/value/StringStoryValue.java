@@ -7,7 +7,9 @@ import java.util.Objects;
 
 @AllArgsConstructor
 public final class StringStoryValue extends StringifyStoryValue<String> {
-    public static final Codec<? extends StringifyStoryValue<?>> CODEC = Codec.STRING.xmap(StringStoryValue::new, StringifyStoryValue::getString);
+    public static final Codec<? extends StringifyStoryValue<?>> CODEC = Codec.STRING.xmap(
+        s -> (StringifyStoryValue<?>) new StringStoryValue(s),
+        StringifyStoryValue::getString);
 
     private final String value;
 

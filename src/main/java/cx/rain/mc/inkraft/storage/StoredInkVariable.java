@@ -9,13 +9,21 @@ import java.util.List;
 
 public record StoredInkVariable(String name, SerializeValueType type, IStoryValue<?, ?> value) {
     private static final Codec<SerializeValueType> TYPE_CODEC = SerializeValueType.CODEC;
-    private static final Codec<IStoryValue<?, ?>> VALUE_CODEC = TYPE_CODEC.dispatch(IStoryValue::getSerializedType, SerializeValueType::getMapCodec);
+    private static final Codec<IStoryValue<?, ?>> VALUE_CODEC = TYPE_CODEC.dispatch(IStoryValue::getSerializedType, type -> type.getCodec().fieldOf("value"));
 
-    public static final Codec<StoredInkVariable> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+    public static final Codec<StoredInkVariable> TYPED_CODEC = RecordCodecBuilder.create(instance -> instance.group(
         Codec.STRING.fieldOf("name").forGetter(StoredInkVariable::name),
         SerializeValueType.CODEC.fieldOf("type").forGetter(StoredInkVariable::type),
         VALUE_CODEC.fieldOf("value").forGetter(StoredInkVariable::value)
     ).apply(instance, StoredInkVariable::new));
+
+    private static final Codec<StoredInkVariable> LEGACY_CODEC = RecordCodecBuilder.create(instance -> instance.group(
+        Codec.STRING.fieldOf("name").forGetter(StoredInkVariable::name),
+        Codec.STRING.fieldOf("value").forGetter(value -> value.value().getString())
+    ).apply(instance,
+        (name, value) -> new StoredInkVariable(name, IStoryValue.fromString(value))));
+
+    public static final Codec<StoredInkVariable> CODEC = Codec.withAlternative(TYPED_CODEC, LEGACY_CODEC);
 
     public static final Codec<List<StoredInkVariable>> LIST_CODEC = CODEC.listOf();
 
