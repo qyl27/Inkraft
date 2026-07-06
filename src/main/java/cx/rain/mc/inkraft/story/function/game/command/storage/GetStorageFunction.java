@@ -6,6 +6,7 @@ import cx.rain.mc.inkraft.story.value.FloatStoryValue;
 import cx.rain.mc.inkraft.story.value.IntStoryValue;
 import cx.rain.mc.inkraft.story.value.IStoryValue;
 import cx.rain.mc.inkraft.story.StoryInstance;
+import cx.rain.mc.inkraft.story.function.FunctionArgs;
 import cx.rain.mc.inkraft.story.function.IStoryFunction;
 import cx.rain.mc.inkraft.utility.StringArgumentParseHelper;
 import lombok.extern.slf4j.Slf4j;
@@ -21,13 +22,17 @@ public class GetStorageFunction implements IStoryFunction {
 
     @Override
     public IStoryValue<?, ?> apply(StoryInstance instance, IStoryValue<?, ?>... args) {
+        FunctionArgs.requireCount(args, 2);
+        FunctionArgs.requireTyped(args, 0, String.class);
+        FunctionArgs.requireTyped(args, 1, String.class);
+
         var server = instance.getPlayer().level().getServer();
-        var id = StringArgumentParseHelper.parseId(args[0].getString());
+        var id = StringArgumentParseHelper.parseId(FunctionArgs.getString(args[0]));
         var storage = server.getCommandStorage();
         var tag = storage.get(id);
 
         try {
-            var path = StringArgumentParseHelper.parseNbtPath(args[1].getString());
+            var path = StringArgumentParseHelper.parseNbtPath(FunctionArgs.getString(args[1]));
             var list = path.get(tag);
             if (list.size() == 1) {
                 var t = list.getFirst();

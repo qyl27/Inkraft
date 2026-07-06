@@ -3,8 +3,8 @@ package cx.rain.mc.inkraft.story.function.game.command;
 import cx.rain.mc.inkraft.story.value.BoolStoryValue;
 import cx.rain.mc.inkraft.story.value.IStoryValue;
 import cx.rain.mc.inkraft.story.StoryInstance;
+import cx.rain.mc.inkraft.story.function.FunctionArgs;
 import cx.rain.mc.inkraft.story.function.IStoryFunction;
-import cx.rain.mc.inkraft.utility.StringArgumentParseHelper;
 import net.minecraft.world.scores.ScoreAccess;
 
 import java.util.function.BiConsumer;
@@ -26,14 +26,18 @@ public class ScoreboardValuedFunction implements IStoryFunction {
 
     @Override
     public IStoryValue<?, ?> apply(StoryInstance instance, IStoryValue<?, ?>... args) {
+        FunctionArgs.requireCount(args, 2);
+        FunctionArgs.requireTyped(args, 0, String.class);
+        FunctionArgs.requireTyped(args, 1, Integer.class);
+
         var player = instance.getPlayer();
         var scoreboard = player.level().getScoreboard();
-        var objective = scoreboard.getObjective(args[0].getString());
+        var objective = scoreboard.getObjective(FunctionArgs.getString(args[0]));
         if (objective == null) {
             return BoolStoryValue.FALSE;
         }
 
-        var value = StringArgumentParseHelper.parseInt(args[1].getString(), 0);
+        var value = FunctionArgs.getInt(args[1]);
         var access = scoreboard.getOrCreatePlayerScore(player, objective);
         function.accept(access, value);
         return BoolStoryValue.TRUE;

@@ -10,7 +10,7 @@ public class FunctionArgs {
     }
 
     public static void requireMoreThan(IStoryValue<?, ?>[] args, int expected) {
-        if (args.length < expected) {
+        if (args.length <= expected) {
             throw new IllegalArgumentException("Expected more than " + expected + " arguments, got " + args.length + '.');
         }
     }
@@ -18,7 +18,7 @@ public class FunctionArgs {
     public static void requireTyped(IStoryValue<?, ?>[] args, int index, Class<?> expected) {
         requireMoreThan(args, index);
 
-        if (!args[index].getValueType().isAssignableFrom(expected)) {
+        if (!expected.isAssignableFrom(args[index].getValueType())) {
             throw new IllegalArgumentException("Expected " + expected + " in the " + index + "th argument, got " + args[index].getClass() + '.');
         }
     }
@@ -35,6 +35,13 @@ public class FunctionArgs {
             return i;
         }
         throw new UnsupportedOperationException();
+    }
+
+    public static int getIntOrDefault(IStoryValue<?, ?> value, int defaultValue) {
+        if (value instanceof StringStoryValue string && string.getString().isEmpty()) {
+            return defaultValue;
+        }
+        return getInt(value);
     }
 
     public static float getFloat(IStoryValue<?, ?> value) {
