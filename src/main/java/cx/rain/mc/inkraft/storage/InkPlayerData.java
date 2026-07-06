@@ -26,8 +26,7 @@ public class InkPlayerData implements IInkPlayerData, IValueIOSerializable {
     @Nullable
     private UUID continuousToken;   // Won't be serialized.
 
-    private final List<StoredInkVariable> variables = new ArrayList<>();
-    private final Map<String, StoredInkVariable> variablesByNameView = new HashMap<>();
+    private final Map<String, StoredInkVariable> variables = new HashMap<>();
 
     @Override
     public @Nullable Identifier getStory() {
@@ -71,12 +70,12 @@ public class InkPlayerData implements IInkPlayerData, IValueIOSerializable {
 
     @Override
     public boolean hasVariable(String name) {
-        return variablesByNameView.containsKey(name);
+        return variables.containsKey(name);
     }
 
     @Override
     public @Nullable IStoryValue<?, ?> getVariable(String name) {
-        var variable = variablesByNameView.get(name);
+        var variable = variables.get(name);
         if (variable == null) {
             return null;
         }
@@ -90,20 +89,18 @@ public class InkPlayerData implements IInkPlayerData, IValueIOSerializable {
             value = new StringStoryValue(value.getString());
         }
         var variable = new StoredInkVariable(name, value);
-        variables.add(variable);
-        variablesByNameView.put(name, variable);
+        variables.put(name, variable);
     }
 
     @Override
     public void unsetVariable(String name) {
-        var value = variablesByNameView.remove(name);
-        variables.remove(value);
+        variables.remove(name);
     }
 
     @Override
     public Map<String, IStoryValue<?, ?>> getVariables() {
         var builder = ImmutableMap.<String, IStoryValue<?, ?>>builder();
-        for (var entry : variablesByNameView.entrySet()) {
+        for (var entry : variables.entrySet()) {
             builder.put(entry.getKey(), entry.getValue().value());
         }
         return builder.build();
@@ -112,7 +109,6 @@ public class InkPlayerData implements IInkPlayerData, IValueIOSerializable {
     @Override
     public void clearVariables() {
         variables.clear();
-        variablesByNameView.clear();
     }
 
 
@@ -120,16 +116,14 @@ public class InkPlayerData implements IInkPlayerData, IValueIOSerializable {
 
     @ApiStatus.Internal
     protected List<StoredInkVariable> getStoredInkVariables() {
-        return variables;
+        return variables.values().stream().toList();
     }
 
     @ApiStatus.Internal
     protected void setStoredInkVariables(List<StoredInkVariable> variables) {
         this.variables.clear();
-        this.variables.addAll(variables);
-        this.variablesByNameView.clear();
         for (var v : variables) {
-            this.variablesByNameView.put(v.name(), v);
+            this.variables.put(v.name(), v);
         }
     }
 

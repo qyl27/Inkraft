@@ -34,6 +34,7 @@ public class SetStorageFunction implements IStoryFunction {
             var path = StringArgumentParseHelper.parseNbtPath(FunctionArgs.getString(args[1]));
             var value = StringArgumentParseHelper.parseNbt(FunctionArgs.getString(args[2]));
             path.set(tag, value);
+            storage.set(id, tag);
             return BoolStoryValue.TRUE;
         } catch (CommandSyntaxException ex) {
             log.warn("NBT Path Error: ", ex);

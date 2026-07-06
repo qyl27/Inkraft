@@ -35,7 +35,8 @@ public class EngineManager {
     private final Map<UUID, StoryInstance> playerStories = new HashMap<>();
 
     public void remove(ServerPlayer player) {
-        playerStories.remove(player.getUUID());
+        var story = playerStories.remove(player.getUUID());
+        story.stop();
     }
 
     public StoryInstance get(ServerPlayer player) {

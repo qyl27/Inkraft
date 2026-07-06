@@ -51,7 +51,7 @@ public interface IInkPlayerData {
 
     default void resetState() {
         setState(null);
-//        setEnded(true);
+        setEnded(true);
         setContinuousToken(null);
     }
 

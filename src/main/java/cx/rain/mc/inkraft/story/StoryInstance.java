@@ -2,24 +2,24 @@ package cx.rain.mc.inkraft.story;
 
 import com.bladecoder.ink.runtime.Choice;
 import com.bladecoder.ink.runtime.Story;
+import com.bladecoder.ink.runtime.StoryState;
 import cx.rain.mc.inkraft.ModConstants;
 import cx.rain.mc.inkraft.engine.EngineManager;
 import cx.rain.mc.inkraft.registry.InkraftRegistries;
 import cx.rain.mc.inkraft.story.value.IStoryValue;
 import cx.rain.mc.inkraft.story.value.IntStoryValue;
-import cx.rain.mc.inkraft.timer.ITaskManager;
 import cx.rain.mc.inkraft.api.platform.storage.IInkPlayerData;
 import cx.rain.mc.inkraft.timer.cancellation.CancellableToken;
 import cx.rain.mc.inkraft.utility.TextStyleHelper;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.minecraft.ChatFormatting;
-import net.minecraft.core.Holder;
 import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.HoverEvent;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
@@ -31,9 +31,6 @@ public class StoryInstance {
     private final ServerPlayer player;
     private final IInkPlayerData data;
 
-    private Story story;
-    private CancellableToken cancellationToken;
-
     public StoryInstance(EngineManager manager, ServerPlayer player, IInkPlayerData data) {
         this.manager = manager;
         this.player = player;
@@ -42,11 +39,11 @@ public class StoryInstance {
         loadStory();
     }
 
-    // <editor-fold desc="Dependencies.">
+    // region Dependencies
 
-    // </editor-fold>
+    // endregion
 
-    // <editor-fold desc="Init.">
+    // region Init
 
     public void newStory(Identifier path) {
         stop();
@@ -88,6 +85,11 @@ public class StoryInstance {
 
         newStory(storyId);
 
+        if (story == null) {
+            log.warn("No story to load.");
+            return;
+        }
+
         try {
             story.getState().loadJson(data.getState());
         } catch (Exception ex) {
@@ -96,6 +98,10 @@ public class StoryInstance {
     }
 
     public void saveStory() {
+        if (story == null) {
+            log.warn("No story to save.");
+            return;
+        }
         try {
             var state = story.getState().toJson();
             data.setState(state);
@@ -104,9 +110,9 @@ public class StoryInstance {
         }
     }
 
-    // </editor-fold>
+    // endregion
 
-    // <editor-fold desc="Game control.">
+    // region Game control
 
     public void start() {
         if (isStoryEnded()) {
@@ -122,9 +128,7 @@ public class StoryInstance {
             }
         }
 
-        if (cancellationToken != null) {
-            cancellationToken.cancel();
-        }
+        cancel();
 
         data.setEnded(!hasNextLine());
 
@@ -140,30 +144,30 @@ public class StoryInstance {
 
         if (hasChoice()) {
             showChoices();
-            cancellationToken.cancel();
+            cancel();
             return;
         }
 
-        if (pause == -1) {
+        if (pause <= -1) {
             showClickToNext();
-            cancellationToken.cancel();
+            cancel();
             return;
         }
 
-        if (!cancellationToken.isCancelled()) {
+        if (!isCancelled()) {
             if (hasNextLine()) {
                 nextLine();
             } else {
                 showStoryEnd();
                 data.resetState();
-                cancellationToken.cancel();
+                cancel();
             }
         }
     }
 
     public void stop(boolean showContinue) {
         if (isStoryRunning()) {
-            cancellationToken.cancel();
+            cancel();
         }
 
         if (showContinue && !isStoryEnded()) {
@@ -176,7 +180,7 @@ public class StoryInstance {
     }
 
     public boolean isStoryRunning() {
-        return story != null && cancellationToken != null && !cancellationToken.isCancelled();
+        return story != null && !isCancelled();
     }
 
     private void showLine() {
@@ -219,15 +223,24 @@ public class StoryInstance {
         player.sendSystemMessage(component);
     }
 
-    // </editor-fold>
+    // endregion
 
-    // <editor-fold desc="Safe story.">
+    // region Safe story
+
+    @Nullable
+    private Story story;
 
     public boolean isStoryEnded() {
         return story == null || data.isEnded();
     }
 
     public String currentLine() {
+        if (isStoryEnded()) {
+            log.warn("currentLine: Story ended. It shouldn't happen!");
+            return "";
+        }
+        assert story != null;
+
         try {
             return story.getCurrentText();
         } catch (Throwable ex) {
@@ -241,6 +254,12 @@ public class StoryInstance {
     }
 
     public void nextLine() {
+        if (isStoryEnded()) {
+            log.warn("nextLine: Story ended. It shouldn't happen!");
+            return;
+        }
+        assert story != null;
+
         try {
             story.Continue();
             saveStory();
@@ -254,6 +273,12 @@ public class StoryInstance {
     }
 
     public void choose(int index) {
+        if (isStoryEnded()) {
+            log.warn("choose: Story ended. It shouldn't happen!");
+            return;
+        }
+        assert story != null;
+
         try {
             story.chooseChoiceIndex(index);
             nextLine();
@@ -263,22 +288,46 @@ public class StoryInstance {
     }
 
     public List<Choice> getChoices() {
+        if (isStoryEnded()) {
+            log.warn("getChoices: Story ended. It shouldn't happen!");
+            return List.of();
+        }
+        assert story != null;
+
         return story.getCurrentChoices();
     }
 
-    // </editor-fold>
+    // endregion
 
-    // <editor-fold desc="Parallel flows.">
+    // region Parallel flows.">
 
     public boolean isDefaultFlow() {
+        if (isStoryEnded()) {
+            log.warn("isDefaultFlow: Story ended. It shouldn't happen!");
+            return false;
+        }
+        assert story != null;
+
         return story.currentFlowIsDefaultFlow();
     }
 
     public String getFlowName() {
+        if (isStoryEnded()) {
+            log.warn("getFlowName: Story ended. It shouldn't happen!");
+            return StoryState.kDefaultFlowName;
+        }
+        assert story != null;
+
         return story.getCurrentFlowName();
     }
 
     public void addFlow(String name, String knot) {
+        if (isStoryEnded()) {
+            log.warn("addFlow: Story ended. It shouldn't happen!");
+            return;
+        }
+        assert story != null;
+
         try {
             story.switchFlow(name);
             story.choosePathString(knot);
@@ -288,6 +337,12 @@ public class StoryInstance {
     }
 
     public void removeFlow(String name) {
+        if (isStoryEnded()) {
+            log.warn("removeFlow: Story ended. It shouldn't happen!");
+            return;
+        }
+        assert story != null;
+
         try {
             story.removeFlow(name);
         } catch (Throwable ex) {
@@ -296,6 +351,12 @@ public class StoryInstance {
     }
 
     public void flowTo(String name) {
+        if (isStoryEnded()) {
+            log.warn("flowTo: Story ended. It shouldn't happen!");
+            return;
+        }
+        assert story != null;
+
         try {
             story.switchFlow(name);
         } catch (Throwable ex) {
@@ -304,6 +365,12 @@ public class StoryInstance {
     }
 
     public void flowBackDefault() {
+        if (isStoryEnded()) {
+            log.warn("flowBackDefault: Story ended. It shouldn't happen!");
+            return;
+        }
+        assert story != null;
+
         try {
             story.switchToDefaultFlow();
         } catch (Throwable ex) {
@@ -312,14 +379,21 @@ public class StoryInstance {
     }
 
     public List<String> getFlows() {
+        if (isStoryEnded()) {
+            log.warn("getFlows: Story ended. It shouldn't happen!");
+            return List.of();
+        }
+        assert story != null;
+
         return story.aliveFlowNames();
     }
 
-    // </editor-fold>
+    // endregion
 
-    // <editor-fold desc="Internal.">
+    // region Internal
 
     private void bindStoryFunctions() {
+        assert story != null;
         try {
             var functions = player.registryAccess().lookupOrThrow(InkraftRegistries.STORY_FUNCTIONS);
             for (var entry : functions.entrySet()) {
@@ -348,5 +422,22 @@ public class StoryInstance {
         }
     }
 
-    // </editor-fold>
+    // endregion
+
+    // region Async Cancellation
+
+    @Nullable
+    private CancellableToken cancellationToken;
+
+    private void cancel() {
+        if (cancellationToken != null) {
+            cancellationToken.cancel();
+        }
+    }
+
+    private boolean isCancelled() {
+        return cancellationToken != null && cancellationToken.isCancelled();
+    }
+
+    // endregion
 }

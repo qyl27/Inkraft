@@ -167,8 +167,7 @@ public class InkraftCommand {
     }
 
     private static int onCurrentPlayer(final CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
-        var entity = context.getSource().getEntity();
-        var player = (ServerPlayer) entity;
+        var player = EntityArgument.getPlayer(context, ARGUMENT_PLAYER);
 
         doCurrent(player);
         return 1;
