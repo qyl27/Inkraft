@@ -15,16 +15,16 @@ public class CountItemFunction implements IStoryFunction {
 
     @Override
     public IStoryValue<?, ?> apply(StoryInstance instance, IStoryValue<?, ?>... args) {
-        FunctionArgs.requireCount(args, 4);
+        FunctionArgs.requireCount(args, 3);
         FunctionArgs.requireTyped(args, 0, String.class);
+        FunctionArgs.requireTyped(args, 1, String.class);
         FunctionArgs.requireTyped(args, 2, String.class);
-        FunctionArgs.requireTyped(args, 3, String.class);
 
         var player = instance.getPlayer();
         var registries = player.registryAccess();
         var predicate = ItemStackHelper.createPredicate(
-                registries, FunctionArgs.getString(args[0]), FunctionArgs.getString(args[2]),
-                FunctionArgs.getString(args[3]));
+                registries, FunctionArgs.getString(args[0]), FunctionArgs.getString(args[1]),
+                FunctionArgs.getString(args[2]));
         var matched = ItemStackHelper.match(player, predicate);
         var result = 0;
         while (!matched.isEmpty()) {
