@@ -1,9 +1,9 @@
 package cx.rain.mc.inkraft.storage;
 
 import com.google.common.collect.ImmutableMap;
+import com.mojang.serialization.Codec;
 import cx.rain.mc.inkraft.ModConstants;
 import cx.rain.mc.inkraft.api.platform.storage.IInkPlayerData;
-import cx.rain.mc.inkraft.api.platform.storage.IValueIOSerializable;
 import cx.rain.mc.inkraft.story.value.IStoryValue;
 import cx.rain.mc.inkraft.story.value.InkListStoryValue;
 import cx.rain.mc.inkraft.story.value.StringStoryValue;
@@ -12,12 +12,14 @@ import cx.rain.mc.inkraft.utility.IdHelper;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
-import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
-public class InkPlayerData implements IInkPlayerData, IValueIOSerializable {
+public class InkPlayerData implements IInkPlayerData {
+    private static final Codec<Map<String, Boolean>> PENDING_LINES_CODEC =
+        Codec.unboundedMap(Codec.STRING, Codec.BOOL);
+
     @Nullable
     private Identifier story;
     @Nullable
@@ -27,6 +29,7 @@ public class InkPlayerData implements IInkPlayerData, IValueIOSerializable {
     private UUID continuousToken;   // Won't be serialized.
 
     private final Map<String, StoredInkVariable> variables = new HashMap<>();
+    private final Map<String, Boolean> pendingLines = new HashMap<>();
 
     @Override
     public @Nullable Identifier getStory() {
@@ -56,6 +59,30 @@ public class InkPlayerData implements IInkPlayerData, IValueIOSerializable {
     @Override
     public void setEnded(boolean end) {
         this.ended = end;
+    }
+
+    @Override
+    public boolean hasPendingLine(String flowName) {
+        return pendingLines.getOrDefault(flowName, false);
+    }
+
+    @Override
+    public void setPendingLine(String flowName, boolean pending) {
+        if (pending) {
+            pendingLines.put(flowName, true);
+        } else {
+            pendingLines.remove(flowName);
+        }
+    }
+
+    @Override
+    public void removePendingLine(String flowName) {
+        pendingLines.remove(flowName);
+    }
+
+    @Override
+    public void clearPendingLines() {
+        pendingLines.clear();
     }
 
     @Override
@@ -114,17 +141,25 @@ public class InkPlayerData implements IInkPlayerData, IValueIOSerializable {
 
     // region IValueIOSerializable
 
-    @ApiStatus.Internal
-    protected List<StoredInkVariable> getStoredInkVariables() {
+    private List<StoredInkVariable> getStoredInkVariables() {
         return variables.values().stream().toList();
     }
 
-    @ApiStatus.Internal
-    protected void setStoredInkVariables(List<StoredInkVariable> variables) {
+    private void setStoredInkVariables(List<StoredInkVariable> variables) {
         this.variables.clear();
         for (var v : variables) {
             this.variables.put(v.name(), v);
         }
+    }
+
+    private Map<String, Boolean> getStoredPendingLines() {
+        pendingLines.entrySet().removeIf(entry -> !entry.getValue());
+        return Map.copyOf(pendingLines);
+    }
+
+    private void setStoredPendingLines(Map<String, Boolean> pending) {
+        pendingLines.clear();
+        pendingLines.putAll(pending);
     }
 
     @Override
@@ -138,6 +173,7 @@ public class InkPlayerData implements IInkPlayerData, IValueIOSerializable {
             output.putString(ModConstants.Tags.STATE, state);
         }
         output.putBoolean(ModConstants.Tags.ENDED, isEnded());
+        output.store(ModConstants.Tags.PENDING_LINES, PENDING_LINES_CODEC, getStoredPendingLines());
         output.store(ModConstants.Tags.VARIABLES, StoredInkVariable.LIST_CODEC, getStoredInkVariables());
     }
 
@@ -147,7 +183,10 @@ public class InkPlayerData implements IInkPlayerData, IValueIOSerializable {
         input.getString(ModConstants.Tags.STORY).map(IdHelper::of).ifPresent(this::setStory);
         input.getString(ModConstants.Tags.STATE).ifPresent(this::setState);
         setEnded(input.getBooleanOr(ModConstants.Tags.ENDED, true));
+        input.read(ModConstants.Tags.PENDING_LINES, PENDING_LINES_CODEC)
+            .ifPresent(this::setStoredPendingLines);
         input.read(ModConstants.Tags.VARIABLES, StoredInkVariable.LIST_CODEC)
             .ifPresent(this::setStoredInkVariables);
     }
+
 }

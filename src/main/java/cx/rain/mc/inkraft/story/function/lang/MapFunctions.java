@@ -54,16 +54,15 @@ public class MapFunctions {
     public static AbstractLangFunction set() {
         return new AbstractLangFunction("mapSet") {
             @Override
-            public MapStoryValue apply(StoryInstance instance, IStoryValue<?, ?>... args) {
+            public IStoryValue<?, ?> apply(StoryInstance instance, IStoryValue<?, ?>... args) {
                 // mapSet(map, key, value)
                 FunctionArgs.requireCount(args, 3);
                 FunctionArgs.requireTyped(args, 0, String.class);
                 FunctionArgs.requireTyped(args, 1, String.class);
 
                 var str = FunctionArgs.getString(args[0]);
-                var map = MapStoryValue.parse(str);
                 var key = FunctionArgs.getString(args[1]);
-                return map.set(key, args[2]);
+                return falseOnInvalidInput(() -> MapStoryValue.parse(str).set(key, args[2]));
             }
         };
     }
@@ -78,9 +77,8 @@ public class MapFunctions {
                 FunctionArgs.requireTyped(args, 1, String.class);
 
                 var str = FunctionArgs.getString(args[0]);
-                var map = MapStoryValue.parse(str);
                 var key = FunctionArgs.getString(args[1]);
-                return map.get(key);
+                return falseOnInvalidInput(() -> MapStoryValue.parse(str).get(key));
             }
         };
     }
@@ -88,16 +86,15 @@ public class MapFunctions {
     public static AbstractLangFunction remove() {
         return new AbstractLangFunction("mapRemove") {
             @Override
-            public MapStoryValue apply(StoryInstance instance, IStoryValue<?, ?>... args) {
+            public IStoryValue<?, ?> apply(StoryInstance instance, IStoryValue<?, ?>... args) {
                 // mapRemove(map, key)
                 FunctionArgs.requireCount(args, 2);
                 FunctionArgs.requireTyped(args, 0, String.class);
                 FunctionArgs.requireTyped(args, 1, String.class);
 
                 var str = FunctionArgs.getString(args[0]);
-                var map = MapStoryValue.parse(str);
                 var key = FunctionArgs.getString(args[1]);
-                return map.remove(key);
+                return falseOnInvalidInput(() -> MapStoryValue.parse(str).remove(key));
             }
         };
     }

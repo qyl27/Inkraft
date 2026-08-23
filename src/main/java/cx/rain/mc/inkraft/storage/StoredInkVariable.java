@@ -2,6 +2,7 @@ package cx.rain.mc.inkraft.storage;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import cx.rain.mc.inkraft.ModConstants;
 import cx.rain.mc.inkraft.story.value.IStoryValue;
 import cx.rain.mc.inkraft.story.value.SerializeValueType;
 
@@ -12,14 +13,14 @@ public record StoredInkVariable(String name, SerializeValueType type, IStoryValu
     private static final Codec<IStoryValue<?, ?>> VALUE_CODEC = TYPE_CODEC.dispatch(IStoryValue::getSerializedType, type -> type.getCodec().fieldOf("value"));
 
     public static final Codec<StoredInkVariable> TYPED_CODEC = RecordCodecBuilder.create(instance -> instance.group(
-        Codec.STRING.fieldOf("name").forGetter(StoredInkVariable::name),
-        SerializeValueType.CODEC.fieldOf("type").forGetter(StoredInkVariable::type),
-        VALUE_CODEC.fieldOf("value").forGetter(StoredInkVariable::value)
+        Codec.STRING.fieldOf(ModConstants.Tags.VARIABLE_ITEM_NAME).forGetter(StoredInkVariable::name),
+        SerializeValueType.CODEC.fieldOf(ModConstants.Tags.VARIABLE_ITEM_TYPE).forGetter(StoredInkVariable::type),
+        VALUE_CODEC.fieldOf(ModConstants.Tags.VARIABLE_ITEM_VALUE).forGetter(StoredInkVariable::value)
     ).apply(instance, StoredInkVariable::new));
 
     private static final Codec<StoredInkVariable> LEGACY_CODEC = RecordCodecBuilder.create(instance -> instance.group(
-        Codec.STRING.fieldOf("name").forGetter(StoredInkVariable::name),
-        Codec.STRING.fieldOf("value").forGetter(value -> value.value().getString())
+        Codec.STRING.fieldOf(ModConstants.Tags.VARIABLE_ITEM_NAME).forGetter(StoredInkVariable::name),
+        Codec.STRING.fieldOf(ModConstants.Tags.VARIABLE_ITEM_VALUE).forGetter(value -> value.value().getString())
     ).apply(instance,
         (name, value) -> new StoredInkVariable(name, IStoryValue.fromString(value))));
 

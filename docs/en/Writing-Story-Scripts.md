@@ -25,9 +25,9 @@ Story text supports [MiniMessage](https://docs.advntr.dev/minimessage/format.htm
 
 This section describes the engine functions provided by Inkraft.
 
-Use `EXTERNAL <function definition>` at the beginning of an Ink script to declare external functions. The engine functions provided by Inkraft are divided into system functions and game functions. System functions are related to Ink script execution, while game functions operate on Minecraft game content.
+In Ink scripts, use `EXTERNAL <function definition>` to declare the primitive external functions provided by Inkraft. The include file in Appendix A contains both these external declarations and Ink convenience functions composed from the primitive functions. Engine functions are divided into system functions, which relate to Ink script execution, and game functions, which operate on Minecraft game content.
 
-Appendix A provides a declaration file containing all engine functions. It can be used for editor syntax hints and included directly with `INCLUDE` when writing scripts.
+Scripts should include the Appendix A file with `INCLUDE engine_functions_include.ink`. Declaring the external functions manually does not provide the convenience functions implemented in Ink.
 
 Function names in the Inkraft engine generally use camelCase.
 
@@ -39,25 +39,41 @@ When a function parameter is described as "nullable", it means an empty string `
 |---------------------|------------------------------------------------------------------|------------|-----------------------------------------|
 | isDebug()           | Indicates whether the currently running engine is in Debug mode. |            | bool, true means Debug mode is enabled. |
 
-#### Parallel Flow Functions
+#### Multiple Parallel Flow Control
 
-| Function definition | Description                                                  | Parameters                                                                                    | Return value              |
-|---------------------|--------------------------------------------------------------|-----------------------------------------------------------------------------------------------|---------------------------|
-| isInFlow(name)      | Checks whether the player is in the specified parallel flow. | name: The parallel flow name string.                                                          | bool, true means yes.     |
-| isInDefaultFlow()   | Checks whether the player is in the default parallel flow.   |                                                                                               | bool, true means yes.     |
-| flowTo(name)        | Switches to the specified parallel flow.                     | name: The parallel flow name string.                                                          | bool, true means success. |
-| flowToDefault()     | Switches to the default parallel flow.                       |                                                                                               | bool, true means success. |
-| newFlow(name, flow) | Creates the specified parallel flow and switches to it.      | name: The parallel flow name string.<br />flow: The story knot executed by the parallel flow. | bool, true means success. |
-| removeFlow(name)    | Removes the specified parallel flow.                         | name: The parallel flow name string.                                                          | bool, true means success. |
+**This is a beta feature of the Ink language.**
+
+See: [Official documentation](https://github.com/inkle/ink/blob/master/Documentation/RunningYourInk.md#multiple-parallel-flows-beta)
+
+Parallel flows store multiple independent context states within the same story script. Global variables and visit counts are shared between flows, while the current pointer, call stack, and similar state are isolated. Parallel flows can be used to implement story-level save/load behavior or interruptible conversations.
+
+Flows are indexed by name. The default flow is named `DEFAULT_FLOW`; it is created when story playback begins, cannot be removed, and can therefore be treated as always existing in scripts.
+
+The Flow-mutating functions `flowTo`, `newFlow`, and `removeFlow` send requests to the engine to switch parallel flows. These requests form a queue and execute after the current story line has been processed. Their return values only indicate whether the engine accepted the request, not whether it ultimately executed successfully. `isInFlow` and `hasFlow` only query committed Flow state and do not include pending requests.
+
+| Function definition | Description | Parameters | Return value |
+|---|---|---|---|
+| isInFlow(name) | Checks whether the player is currently in the specified flow. | name: The parallel flow name. | bool, true means yes. |
+| hasFlow(name) | Checks whether the current script state contains the specified flow. The default flow always exists. | name: The parallel flow name. | bool, true means it exists. |
+| isFlowEnded(name) | Checks whether the specified flow has ended, meaning it has no subsequent story lines or choices. | name: The parallel flow name. | bool, true means ended. A missing flow is also considered ended. |
+| flowTo(name) | Requests a switch to the specified flow, which must exist when the request executes. | name: The parallel flow name. | bool, true means the engine accepted the request; false means the request cannot currently be accepted. |
+| newFlow(name, knot) | Requests creation of a flow from the specified knot and switches to it. If the target already exists, it is overwritten. | name: The parallel flow name.<br />knot: The knot name. | bool, true means the engine accepted the request; false means the request cannot currently be accepted. |
+| removeFlow(name) | Requests removal of the specified non-default flow. Removing the current flow switches to the default flow after removal. | name: The parallel flow name. | bool, true means the engine accepted the request; false means the request cannot currently be accepted. |
+
+The declaration file in Appendix A also provides common functions for working with the default flow.
+
+| Function definition | Description | Return value |
+|---|---|---|
+| isInDefaultFlow() | Checks whether the player is currently in the default flow. | bool, true means yes. |
+| flowToDefault() | Requests a switch to the default flow. | bool, true means the engine accepted the request. |
 
 #### Story Line Functions
 
-| Function definition | Description                                                                                                                                                            | Parameters                                                                                                                                                                                                               | Return value                                    |
-|---------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------|
-| isEnded()           | Checks whether the current story has any more lines available, that is, whether it has ended. Story lines in different parallel flows are independent from each other. |                                                                                                                                                                                                                          | bool, true means there are no more story lines. |
-| pause()             | Pauses story playback and lets the player click to continue manually.                                                                                                  |                                                                                                                                                                                                                          |                                                 |
-| setLineTicks(ticks) | Sets the story playback speed.<br />(In practice, this sets the value of an engine variable named `line_pause_ticks`.)                                                 | ticks: The playback speed, meaning the wait time after each line is displayed, in game ticks. It must be a positive integer, 0, or the special value -1, which means the player must click to continue after every line. | bool, true means success.                       |
-| unsetLineTicks()    | Clears the story playback speed setting.                                                                                                                               |                                                                                                                                                                                                                          |                                                 |
+| Function definition | Description                                                                            | Parameters                                                                                                                                                                                                               | Return value              |
+|---------------------|----------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------------|
+| pause()             | Pauses story playback and lets the player click to continue manually.                  |                                                                                                                                                                                                                          |                           |
+| setLineTicks(ticks) | Sets the story playback speed.<br />(In practice, this sets the value of an engine variable named `line_pause_ticks`.) | ticks: The playback speed, meaning the wait time after each line is displayed, in game ticks. It must be a positive integer, 0, or the special value -1, which means the player must click to continue after every line. | bool, true means success. |
+| unsetLineTicks()    | Clears the story playback speed setting.                                               |                                                                                                                                                                                                                          |                           |
 
 #### Engine Variable Functions
 

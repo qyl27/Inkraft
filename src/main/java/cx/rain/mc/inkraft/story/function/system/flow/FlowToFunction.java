@@ -18,7 +18,6 @@ public class FlowToFunction implements IStoryFunction {
         FunctionArgs.requireTyped(args, 0, String.class);
 
         var name = FunctionArgs.getString(args[0]);
-        instance.flowTo(name);
-        return BoolStoryValue.TRUE;
+        return BoolStoryValue.from(instance.requestFlowTo(name));
     }
 }

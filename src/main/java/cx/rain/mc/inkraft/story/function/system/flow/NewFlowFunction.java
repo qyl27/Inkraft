@@ -20,7 +20,6 @@ public class NewFlowFunction implements IStoryFunction {
 
         var name = FunctionArgs.getString(args[0]);
         var knot = FunctionArgs.getString(args[1]);
-        instance.addFlow(name, knot);
-        return BoolStoryValue.TRUE;
+        return BoolStoryValue.from(instance.requestNewFlow(name, knot));
     }
 }

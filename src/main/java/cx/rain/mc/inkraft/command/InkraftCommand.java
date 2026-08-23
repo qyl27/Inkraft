@@ -10,7 +10,6 @@ import cx.rain.mc.inkraft.Inkraft;
 import cx.rain.mc.inkraft.InkraftPlatform;
 import cx.rain.mc.inkraft.ModConstants;
 import cx.rain.mc.inkraft.engine.EngineManager;
-import cx.rain.mc.inkraft.registry.InkraftRegistries;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.arguments.EntityArgument;
@@ -19,7 +18,9 @@ import net.minecraft.commands.arguments.UuidArgument;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
+import org.jetbrains.annotations.Nullable;
 
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 import static cx.rain.mc.inkraft.command.VariablesCommand.INKRAFT_VARIABLES;
@@ -78,7 +79,8 @@ public class InkraftCommand {
                         .executes(InkraftCommand::onResetPlayer)));
     }
 
-    // <editor-fold desc="Handle.">
+
+    // region Executes
 
     private static int onVersion(final CommandContext<CommandSourceStack> context) {
         context.getSource().sendSuccess(() -> Component.translatable(ModConstants.Messages.COMMAND_VERSION, Inkraft.VERSION, Inkraft.BUILD_TIME.toString()).withStyle(ChatFormatting.LIGHT_PURPLE), true);
@@ -103,9 +105,7 @@ public class InkraftCommand {
         var token = UuidArgument.getUuid(context, ARGUMENT_TOKEN);
         var player = context.getSource().getPlayerOrException();
 
-        var data = InkraftPlatform.getPlayerData(player);
-        if (data.getContinuousToken() == null || !data.getContinuousToken().equals(token)) {
-            context.getSource().sendFailure(Component.translatable(ModConstants.Messages.STORY_OPTION_OUTDATED).withStyle(ChatFormatting.RED));
+        if (!consumeContinuousToken(context.getSource(), player, token)) {
             return 0;
         }
 
@@ -118,9 +118,7 @@ public class InkraftCommand {
         var player = context.getSource().getPlayerOrException();
         var choice = IntegerArgumentType.getInteger(context, ARGUMENT_CHOICE);
 
-        var data = InkraftPlatform.getPlayerData(player);
-        if (data.getContinuousToken() == null || !data.getContinuousToken().equals(token)) {
-            context.getSource().sendFailure(Component.translatable(ModConstants.Messages.STORY_OPTION_OUTDATED).withStyle(ChatFormatting.RED));
+        if (!consumeContinuousToken(context.getSource(), player, token)) {
             return 0;
         }
 
@@ -131,9 +129,7 @@ public class InkraftCommand {
     private static int onNextPlayer(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
         var player = EntityArgument.getPlayer(context, ARGUMENT_PLAYER);
 
-        var data = InkraftPlatform.getPlayerData(player);
-        if (data.getContinuousToken() == null) {
-            context.getSource().sendFailure(Component.translatable(ModConstants.Messages.STORY_OPTION_OUTDATED).withStyle(ChatFormatting.RED));
+        if (!consumeContinuousToken(context.getSource(), player, null)) {
             return 0;
         }
 
@@ -145,9 +141,7 @@ public class InkraftCommand {
         var player = EntityArgument.getPlayer(context, ARGUMENT_PLAYER);
         var choice = IntegerArgumentType.getInteger(context, ARGUMENT_CHOICE);
 
-        var data = InkraftPlatform.getPlayerData(player);
-        if (data.getContinuousToken() == null) {
-            context.getSource().sendFailure(Component.translatable(ModConstants.Messages.STORY_OPTION_OUTDATED).withStyle(ChatFormatting.RED));
+        if (!consumeContinuousToken(context.getSource(), player, null)) {
             return 0;
         }
 
@@ -162,15 +156,13 @@ public class InkraftCommand {
         }
         var player = (ServerPlayer) entity;
 
-        doCurrent(player);
-        return 1;
+        return doCurrent(player);
     }
 
     private static int onCurrentPlayer(final CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
         var player = EntityArgument.getPlayer(context, ARGUMENT_PLAYER);
 
-        doCurrent(player);
-        return 1;
+        return doCurrent(player);
     }
 
     private static int onReset(final CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
@@ -189,47 +181,41 @@ public class InkraftCommand {
         return 1;
     }
 
-    // </editor-fold>
+    // endregion
 
-    // <editor-fold desc="Logic.">
+
+    // region Logic
 
     private static void doStart(ServerPlayer player, Identifier id) {
         var story = EngineManager.getInstance().get(player);
-        story.stop();
-        story.newStory(id);
-        story.start();
+        story.requestNewStory(id);
     }
 
     private static void doNext(ServerPlayer player) {
         var story = EngineManager.getInstance().get(player);
         story.stop();
-        story.nextLine();
         story.start();
     }
 
     private static void doChoice(ServerPlayer player, int index) {
         var story = EngineManager.getInstance().get(player);
-        story.stop();
         story.choose(index);
-        story.start();
     }
 
-    private static void doCurrent(ServerPlayer player) {
+    private static int doCurrent(ServerPlayer player) {
         var story = EngineManager.getInstance().get(player);
-        story.stop();
-        story.loadStory();
-        story.start();
+        return story.requestResume() ? 1 : 0;
     }
 
     private static void doReset(ServerPlayer player) {
         var story = EngineManager.getInstance().get(player);
-        story.getData().clearData();
-        story.stop();
+        story.requestResetStory();
     }
 
-    // </editor-fold>
+    // endregion
 
-    // <editor-fold desc="Suggestions.">
+
+    // region Suggestions
 
     private static CompletableFuture<Suggestions> suggestStart(final CommandContext<CommandSourceStack> context,
                                                                final SuggestionsBuilder builder) throws CommandSyntaxException {
@@ -244,19 +230,41 @@ public class InkraftCommand {
                                                                 final SuggestionsBuilder builder) throws CommandSyntaxException {
         try {
             var object = EntityArgument.getPlayer(context, ARGUMENT_PLAYER);
-            for (var choice : EngineManager.getInstance().get(object).getChoices()) {
-                builder.suggest(choice.getIndex(), choice::getText);
-            }
+            EngineManager.getInstance().get(object).getRuntime().ifPresent(runtime -> {
+                for (var choice : runtime.getChoices()) {
+                    builder.suggest(choice.getIndex(), choice::getText);
+                }
+            });
             return builder.buildFuture();
         } catch (IllegalArgumentException ignored) {
         }
 
         var player = context.getSource().getPlayerOrException();
-        for (var choice : EngineManager.getInstance().get(player).getChoices()) {
-            builder.suggest(choice.getIndex(), choice::getText);
-        }
+        EngineManager.getInstance().get(player).getRuntime().ifPresent(runtime -> {
+            for (var choice : runtime.getChoices()) {
+                builder.suggest(choice.getIndex(), choice::getText);
+            }
+        });
         return builder.buildFuture();
     }
 
-    // </editor-fold>
+    // endregion
+
+
+    // region Internal
+
+    private static boolean consumeContinuousToken(CommandSourceStack source, ServerPlayer player,
+                                                  @Nullable UUID expectedToken) {
+        var data = InkraftPlatform.getPlayerData(player);
+        var continuousToken = data.getContinuousToken();
+        if (continuousToken == null || expectedToken != null && !continuousToken.equals(expectedToken)) {
+            source.sendFailure(Component.translatable(ModConstants.Messages.STORY_OPTION_OUTDATED).withStyle(ChatFormatting.RED));
+            return false;
+        }
+
+        data.setContinuousToken(null);
+        return true;
+    }
+
+    // endregion
 }

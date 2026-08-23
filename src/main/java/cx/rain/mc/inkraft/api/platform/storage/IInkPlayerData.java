@@ -1,18 +1,13 @@
 package cx.rain.mc.inkraft.api.platform.storage;
 
-import cx.rain.mc.inkraft.ModConstants;
-import cx.rain.mc.inkraft.storage.StoredInkVariable;
 import cx.rain.mc.inkraft.story.value.IStoryValue;
 import net.minecraft.resources.Identifier;
-import net.minecraft.world.level.storage.ValueInput;
-import net.minecraft.world.level.storage.ValueOutput;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
-import java.util.Objects;
 import java.util.UUID;
 
-public interface IInkPlayerData {
+public interface IInkPlayerData extends IValueIOSerializable {
     @Nullable
     Identifier getStory();
 
@@ -26,6 +21,14 @@ public interface IInkPlayerData {
     boolean isEnded();
 
     void setEnded(boolean end);
+
+    boolean hasPendingLine(String flowName);
+
+    void setPendingLine(String flowName, boolean pending);
+
+    void removePendingLine(String flowName);
+
+    void clearPendingLines();
 
     @Nullable
     UUID getContinuousToken();
@@ -52,6 +55,7 @@ public interface IInkPlayerData {
     default void resetState() {
         setState(null);
         setEnded(true);
+        clearPendingLines();
         setContinuousToken(null);
     }
 

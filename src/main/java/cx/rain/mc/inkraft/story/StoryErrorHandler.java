@@ -4,8 +4,8 @@ import com.bladecoder.ink.runtime.Error;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class StoryErrorHandler implements Error.ErrorHandler {
-    public static StoryErrorHandler INSTANCE = new StoryErrorHandler();
+public final class StoryErrorHandler implements Error.ErrorHandler {
+    public static final StoryErrorHandler INSTANCE = new StoryErrorHandler();
 
     private static final Logger log = LoggerFactory.getLogger(StoryErrorHandler.class);
 

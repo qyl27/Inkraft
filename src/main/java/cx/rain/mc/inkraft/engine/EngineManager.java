@@ -37,7 +37,7 @@ public class EngineManager {
     public void remove(ServerPlayer player) {
         var story = playerStories.remove(player.getUUID());
         if (story != null) {
-            story.stop();
+            story.dispose();
         }
     }
 

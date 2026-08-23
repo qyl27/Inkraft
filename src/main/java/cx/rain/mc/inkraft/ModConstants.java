@@ -29,12 +29,14 @@ public class ModConstants {
 
     public static class Values {
         public static final int DEFAULT_PAUSE_TICKS = 10;
+        public static final String DEFAULT_FLOW_NAME = "DEFAULT_FLOW";
     }
 
     public static class Tags {
         public static final String STORY = "story";
         public static final String STATE = "state";
         public static final String ENDED = "ended";
+        public static final String PENDING_LINES = "pending_lines";
         public static final String VARIABLES = "variables";
         public static final String VARIABLE_ITEM_NAME = "name";
         public static final String VARIABLE_ITEM_TYPE = "type";
