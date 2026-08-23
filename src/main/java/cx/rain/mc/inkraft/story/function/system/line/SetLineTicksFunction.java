@@ -20,9 +20,11 @@ public class SetLineTicksFunction implements IStoryFunction {
         FunctionArgs.requireTyped(args, 0, Integer.class);
 
         var ticks = FunctionArgs.getInt(args[0]);
+        if (ticks < -1) {
+            return BoolStoryValue.FALSE;
+        }
+
         instance.getData().setVariable(ModConstants.Variables.LINE_PAUSE_TICKS, new IntStoryValue(ticks));
-        instance.stop(false);
-        instance.start();
         return BoolStoryValue.TRUE;
     }
 }

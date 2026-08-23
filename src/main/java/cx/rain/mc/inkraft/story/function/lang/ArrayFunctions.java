@@ -51,16 +51,17 @@ public class ArrayFunctions {
     public static AbstractLangFunction set() {
         return new AbstractLangFunction("arraySet") {
             @Override
-            public ArrayStoryValue apply(StoryInstance instance, IStoryValue<?, ?>... args) {
+            public IStoryValue<?, ?> apply(StoryInstance instance, IStoryValue<?, ?>... args) {
                 // arraySet(array, index, value)
                 FunctionArgs.requireCount(args, 3);
                 FunctionArgs.requireTyped(args, 0, String.class);
                 FunctionArgs.requireTyped(args, 1, Integer.class);
 
                 var str = FunctionArgs.getString(args[0]);
-                var array = ArrayStoryValue.parse(str);
-                var index = FunctionArgs.getIndex(args[1]);
-                return array.set(index, args[2]);
+                return falseOnInvalidInput(() -> {
+                    var index = FunctionArgs.getInt(args[1]);
+                    return ArrayStoryValue.parse(str).set(index, args[2]);
+                });
             }
         };
     }
@@ -75,9 +76,10 @@ public class ArrayFunctions {
                 FunctionArgs.requireTyped(args, 1, Integer.class);
 
                 var str = FunctionArgs.getString(args[0]);
-                var array = ArrayStoryValue.parse(str);
-                var index = FunctionArgs.getIndex(args[1]);
-                return array.get(index);
+                return falseOnInvalidInput(() -> {
+                    var index = FunctionArgs.getInt(args[1]);
+                    return ArrayStoryValue.parse(str).get(index);
+                });
             }
         };
     }
@@ -85,14 +87,13 @@ public class ArrayFunctions {
     public static AbstractLangFunction add() {
         return new AbstractLangFunction("arrayAdd") {
             @Override
-            public ArrayStoryValue apply(StoryInstance instance, IStoryValue<?, ?>... args) {
+            public IStoryValue<?, ?> apply(StoryInstance instance, IStoryValue<?, ?>... args) {
                 // arrayAdd(array, value)
                 FunctionArgs.requireCount(args, 2);
                 FunctionArgs.requireTyped(args, 0, String.class);
 
                 var str = FunctionArgs.getString(args[0]);
-                var array = ArrayStoryValue.parse(str);
-                return array.add(args[1]);
+                return falseOnInvalidInput(() -> ArrayStoryValue.parse(str).add(args[1]));
             }
         };
     }
@@ -100,16 +101,17 @@ public class ArrayFunctions {
     public static AbstractLangFunction remove() {
         return new AbstractLangFunction("arrayRemove") {
             @Override
-            public ArrayStoryValue apply(StoryInstance instance, IStoryValue<?, ?>... args) {
+            public IStoryValue<?, ?> apply(StoryInstance instance, IStoryValue<?, ?>... args) {
                 // arrayRemove(array, index)
                 FunctionArgs.requireCount(args, 2);
                 FunctionArgs.requireTyped(args, 0, String.class);
                 FunctionArgs.requireTyped(args, 1, Integer.class);
 
                 var str = FunctionArgs.getString(args[0]);
-                var array = ArrayStoryValue.parse(str);
-                var index = FunctionArgs.getIndex(args[1]);
-                return array.remove(index);
+                return falseOnInvalidInput(() -> {
+                    var index = FunctionArgs.getInt(args[1]);
+                    return ArrayStoryValue.parse(str).remove(index);
+                });
             }
         };
     }

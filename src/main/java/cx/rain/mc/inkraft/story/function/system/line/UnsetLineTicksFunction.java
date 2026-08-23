@@ -18,8 +18,6 @@ public class UnsetLineTicksFunction implements IStoryFunction {
         FunctionArgs.requireCount(args, 0);
 
         instance.getData().unsetVariable(ModConstants.Variables.LINE_PAUSE_TICKS);
-        instance.stop(false);
-        instance.start();
         return BoolStoryValue.TRUE;
     }
 }

@@ -20,7 +20,6 @@ import cx.rain.mc.inkraft.story.function.system.LogFunction;
 import cx.rain.mc.inkraft.story.function.lang.ArrayFunctions;
 import cx.rain.mc.inkraft.story.function.lang.MapFunctions;
 import cx.rain.mc.inkraft.story.function.system.flow.*;
-import cx.rain.mc.inkraft.story.function.system.line.IsEndedFunction;
 import cx.rain.mc.inkraft.story.function.system.line.PauseFunction;
 import cx.rain.mc.inkraft.story.function.system.line.SetLineTicksFunction;
 import cx.rain.mc.inkraft.story.function.system.line.UnsetLineTicksFunction;
@@ -51,11 +50,10 @@ public class ModStoryFunctions {
     public static final Supplier<IStoryFunction> NEW_FLOW = REGISTRY.register("new_flow", NewFlowFunction::new);
     public static final Supplier<IStoryFunction> REMOVE_FLOW = REGISTRY.register("remove_flow", RemoveFlowFunction::new);
     public static final Supplier<IStoryFunction> FLOW_TO = REGISTRY.register("flow_to", FlowToFunction::new);
-    public static final Supplier<IStoryFunction> FLOW_TO_DEFAULT = REGISTRY.register("flow_to_default", FlowToDefaultFunction::new);
     public static final Supplier<IStoryFunction> IS_IN_FLOW = REGISTRY.register("is_in_flow", IsInFlowFunction::new);
-    public static final Supplier<IStoryFunction> IS_IN_DEFAULT_FLOW = REGISTRY.register("is_in_default_flow", IsInDefaultFlowFunction::new);
+    public static final Supplier<IStoryFunction> HAS_FLOW = REGISTRY.register("has_flow", HasFlowFunction::new);
+    public static final Supplier<IStoryFunction> IS_FLOW_ENDED = REGISTRY.register("is_flow_ended", IsFlowEndedFunction::new);
 
-    public static final Supplier<IStoryFunction> IS_ENDED = REGISTRY.register("is_ended", IsEndedFunction::new);
     public static final Supplier<IStoryFunction> PAUSE = REGISTRY.register("pause", PauseFunction::new);
     public static final Supplier<IStoryFunction> SET_LINE_TICKS = REGISTRY.register("set_line_ticks", SetLineTicksFunction::new);
     public static final Supplier<IStoryFunction> UNSET_LINE_TICKS = REGISTRY.register("unset_line_ticks", UnsetLineTicksFunction::new);

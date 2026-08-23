@@ -7,8 +7,31 @@ architectury {
     neoForge()
 }
 
+sourceSets {
+    gametest {
+        java.srcDir rootProject.file('src/gametest/java')
+        compileClasspath += sourceSets.main.output + sourceSets.main.compileClasspath
+        runtimeClasspath += sourceSets.main.runtimeClasspath
+        resources.srcDir rootProject.file('src/test/resources')
+    }
+}
+
 loom {
     runs {
+        gameTestServer {
+            server()
+            forgeTemplate = 'gameTestServer'
+            sourceSet = sourceSets.gametest.name
+            setRunDirectory file('run/server')
+
+            mods {
+                main {
+                    sourceSet sourceSets.main
+                    sourceSet sourceSets.gametest
+                }
+            }
+        }
+
         data {
             clientData()
             setRunDirectory file('run/data')
@@ -25,14 +48,19 @@ loom {
     }
 }
 
+tasks.named('check') {
+    dependsOn tasks.named('runGameTestServer')
+}
+
 dependencies {
     neoForge "net.neoforged:neoforge:${rootProject.neoforge_version}"
 
-    // We can't use adventure-platform-forge in dev env as runtime classpath for this time.
-    // Must download and put it to run/*/mods manually.
-    // Due to https://github.com/PaperMC/adventure-platform-mod/issues/255
-    compileOnly(include("net.kyori:adventure-platform-neoforge:${rootProject.adventure_platform_version}"))
-//    implementation(include("net.kyori:adventure-platform-neoforge:${rootProject.adventure_platform_version}"))
+    // A workaround in 26.1 for https://github.com/PaperMC/adventure-platform-mod/issues/255
+    // See https://github.com/PaperMC/adventure-platform-mod/pull/263#issuecomment-4994500220
+    implementation(include("net.kyori:adventure-platform-neoforge:${rootProject.adventure_platform_version}")) {
+        exclude group: 'net.kyori', module: 'adventure-platform-mod-shared'
+    }
+    compileOnly("net.kyori:adventure-platform-neoforge:${rootProject.adventure_platform_version}")
 
     common(project(':')) { transitive false }
     shadowBundle project(path: ':', configuration: 'transformProductionNeoForge')

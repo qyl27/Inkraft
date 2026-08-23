@@ -10,8 +10,15 @@ import net.minecraft.server.level.ServerPlayer;
 
 public class PlayerListeners {
     public static void onPlayerJoin(ServerPlayer player) {
+        onPlayerAvailable(player);
+    }
+
+    public static void onPlayerRespawn(ServerPlayer player) {
+        onPlayerAvailable(player);
+    }
+
+    private static void onPlayerAvailable(ServerPlayer player) {
         var story = EngineManager.getInstance().get(player);
-        story.loadStory();
 
         if (!story.isStoryEnded()) {
             var component = Component.translatable(ModConstants.Messages.STORY_RESUME).withStyle(ChatFormatting.YELLOW);

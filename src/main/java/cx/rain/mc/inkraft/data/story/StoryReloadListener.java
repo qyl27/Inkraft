@@ -2,10 +2,11 @@ package cx.rain.mc.inkraft.data.story;
 
 import cx.rain.mc.inkraft.Inkraft;
 import cx.rain.mc.inkraft.engine.EngineManager;
-import net.minecraft.core.MappedRegistry;
+import lombok.extern.slf4j.Slf4j;
 import net.minecraft.resources.FileToIdConverter;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
+import net.minecraft.server.packs.resources.ResourceManager;
 import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
@@ -15,6 +16,7 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 
+@Slf4j
 public class StoryReloadListener implements PreparableReloadListener {
     public static final Identifier INKRAFT_STORY_LOADER = Identifier.fromNamespaceAndPath(Inkraft.MODID, "story_loader");
 
@@ -35,19 +37,21 @@ public class StoryReloadListener implements PreparableReloadListener {
                                           PreparationBarrier preparationBarrier,
                                           Executor reloadExecutor) {
         return CompletableFuture
-                .supplyAsync(() -> prepare(currentReload.resourceManager()), taskExecutor)
-                .thenCompose(preparationBarrier::wait)
-                .thenAcceptAsync(this::apply, reloadExecutor);
+            .supplyAsync(() -> prepare(currentReload.resourceManager()), taskExecutor)
+            .thenCompose(preparationBarrier::wait)
+            .thenAcceptAsync(this::apply, reloadExecutor);
     }
 
-    private Map<Identifier, String> prepare(net.minecraft.server.packs.resources.ResourceManager resourceManager) {
+    private Map<Identifier, String> prepare(ResourceManager resourceManager) {
         var stories = new HashMap<Identifier, String>();
         FILE_TO_ID_CONVERTER.listMatchingResources(resourceManager).forEach((path, resource) -> {
-            try {
-                stories.put(FILE_TO_ID_CONVERTER.fileToId(path),
-                        IOUtils.toString(resource.open(), StandardCharsets.UTF_8));
+            var id = FILE_TO_ID_CONVERTER.fileToId(path);
+            try (var input = resource.open()) {
+                var content = IOUtils.toString(input, StandardCharsets.UTF_8);
+                stories.put(id, content);
             } catch (IOException ex) {
-                ex.printStackTrace();
+                log.error("Failed to load story {} from pack {}",
+                    id, resource.sourcePackId(), ex);
             }
         });
         return stories;

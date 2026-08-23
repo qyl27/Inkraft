@@ -4,22 +4,26 @@ import cx.rain.mc.inkraft.story.value.*;
 
 public class FunctionArgs {
     public static void requireCount(IStoryValue<?, ?>[] args, int expected) {
-        if (args.length != expected) {
-            throw new IllegalArgumentException("Expected " + expected + " arguments, got " + args.length + '.');
+        var actual = args.length;
+        if (actual != expected) {
+            throw new FunctionArgumentCountException("Expected " + expected + " arguments, got " + actual + '.');
         }
     }
 
     public static void requireMoreThan(IStoryValue<?, ?>[] args, int expected) {
-        if (args.length <= expected) {
-            throw new IllegalArgumentException("Expected more than " + expected + " arguments, got " + args.length + '.');
+        var actual = args.length;
+        if (actual <= expected) {
+            throw new FunctionArgumentCountException("Expected more than " + expected + " arguments, got " + actual + '.');
         }
     }
 
     public static void requireTyped(IStoryValue<?, ?>[] args, int index, Class<?> expected) {
         requireMoreThan(args, index);
+        var value = args[index];
 
-        if (!expected.isAssignableFrom(args[index].getValueType())) {
-            throw new IllegalArgumentException("Expected " + expected + " in the " + index + "th argument, got " + args[index].getClass() + '.');
+        if (!expected.isAssignableFrom(value.getValueType())) {
+            throw new FunctionArgumentTypeException("Expected " + expected.getSimpleName() + " at argument " + index
+                    + ", got " + getTypeName(value) + '.');
         }
     }
 
@@ -27,14 +31,14 @@ public class FunctionArgs {
         if (value instanceof StringifyStoryValue<?> stringify) {
             return stringify.getString();
         }
-        throw new UnsupportedOperationException();
+        throw unexpectedType(String.class, value);
     }
 
     public static int getInt(IStoryValue<?, ?> value) {
         if (value instanceof IntStoryValue(int i)) {
             return i;
         }
-        throw new UnsupportedOperationException();
+        throw unexpectedType(Integer.class, value);
     }
 
     public static int getIntOrDefault(IStoryValue<?, ?> value, int defaultValue) {
@@ -48,21 +52,34 @@ public class FunctionArgs {
         if (value instanceof FloatStoryValue(float f)) {
             return f;
         }
-        throw new UnsupportedOperationException();
+        throw unexpectedType(Float.class, value);
     }
 
     public static boolean getBool(IStoryValue<?, ?> value) {
         if (value instanceof BoolStoryValue b) {
             return b.value();
         }
-        throw new UnsupportedOperationException();
+        throw unexpectedType(Boolean.class, value);
+    }
+
+    public static int getNonNegativeInt(IStoryValue<?, ?> value) {
+        var result = getInt(value);
+        if (result < 0) {
+            throw new FunctionArgumentRangeException("Expected a non-negative integer, got " + result + '.');
+        }
+        return result;
     }
 
     public static int getIndex(IStoryValue<?, ?> value) {
-        var index = getInt(value);
-        if (index < 0) {
-            throw new IllegalArgumentException("Index is negative: " + index);
-        }
-        return index;
+        return getNonNegativeInt(value);
+    }
+
+    private static FunctionArgumentTypeException unexpectedType(Class<?> expected, IStoryValue<?, ?> actual) {
+        return new FunctionArgumentTypeException("Expected " + expected.getSimpleName() + ", got "
+                + getTypeName(actual) + '.');
+    }
+
+    private static String getTypeName(IStoryValue<?, ?> value) {
+        return value.getValueType().getSimpleName();
     }
 }

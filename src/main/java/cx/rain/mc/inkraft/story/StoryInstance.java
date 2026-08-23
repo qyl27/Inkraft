@@ -1,16 +1,16 @@
 package cx.rain.mc.inkraft.story;
 
-import com.bladecoder.ink.runtime.Choice;
 import com.bladecoder.ink.runtime.Story;
-import com.bladecoder.ink.runtime.StoryState;
 import cx.rain.mc.inkraft.ModConstants;
+import cx.rain.mc.inkraft.api.platform.storage.IInkPlayerData;
 import cx.rain.mc.inkraft.engine.EngineManager;
 import cx.rain.mc.inkraft.registry.InkraftRegistries;
+import cx.rain.mc.inkraft.story.function.FunctionSyntaxException;
 import cx.rain.mc.inkraft.story.value.IStoryValue;
 import cx.rain.mc.inkraft.story.value.IntStoryValue;
-import cx.rain.mc.inkraft.api.platform.storage.IInkPlayerData;
 import cx.rain.mc.inkraft.timer.cancellation.CancellableToken;
 import cx.rain.mc.inkraft.utility.TextStyleHelper;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.minecraft.ChatFormatting;
@@ -21,7 +21,13 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Deque;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 @Slf4j
 @Getter
@@ -31,138 +37,303 @@ public class StoryInstance {
     private final ServerPlayer player;
     private final IInkPlayerData data;
 
+    @Nullable
+    private StoryRuntime runtime;
+
+    @Getter(AccessLevel.NONE)
+    private final Deque<StoryTransaction> transactions = new ArrayDeque<>();
+
+    @Getter(AccessLevel.NONE)
+    private boolean disposed;
+
     public StoryInstance(EngineManager manager, ServerPlayer player, IInkPlayerData data) {
         this.manager = manager;
         this.player = player;
         this.data = data;
-
-        loadStory();
+        restoreRuntime();
     }
 
-    // region Dependencies
-
-    // endregion
+    public Optional<StoryRuntime> getRuntime() {
+        return Optional.ofNullable(runtime);
+    }
 
     // region Init
 
-    public void newStory(Identifier path) {
-        stop();
-        data.setStory(path);
-        data.setEnded(false);
+    public boolean requestNewStory(Identifier path) {
+        if (disposed) {
+            return false;
+        }
 
         try {
-            var registry = EngineManager.getInstance().getStoryRegistry();
-            if (!registry.has(path)) {
-                player.sendSystemMessage(Component.translatable(ModConstants.Messages.STORY_NOT_FOUND, path.toString()).withStyle(ChatFormatting.RED));
-                return;
+            var nextRuntime = createRuntime(path);
+            if (nextRuntime == null) {
+                return false;
             }
-            var str = registry.get(path);
-            story = new Story(str);
-            story.onError = StoryErrorHandler.INSTANCE;
-            bindStoryFunctions();
+            bindStoryFunctions(nextRuntime.getStory());
+
+            requestLifecycleTransaction(new StoryTransaction.Replace(path, nextRuntime));
+            return true;
         } catch (Exception ex) {
-            log.error("Error starting story", ex);
+            reportStoryFailure("start story", path, ex);
+            return false;
         }
     }
 
-    public void loadStory() {
+    private boolean restoreRuntime() {
         if (!data.hasData()) {
-            return;
+            return false;
         }
 
         var storyId = data.getStory();
         if (storyId == null) {
-            data.resetState();
-            return;
+            return false;
         }
 
-        if (!EngineManager.getInstance().getStoryRegistry().has(storyId)) {
-            data.resetState();
-            log.warn("Story {} is no longer exists.", storyId);
-            player.sendSystemMessage(Component.translatable(ModConstants.Messages.STORY_NOT_FOUND, storyId.toString()).withStyle(ChatFormatting.RED));
-            return;
-        }
-
-        newStory(storyId);
-
-        if (story == null) {
-            log.warn("No story to load.");
-            return;
+        var savedState = data.getState();
+        if (savedState == null) {
+            return false;
         }
 
         try {
-            story.getState().loadJson(data.getState());
+            var nextRuntime = createRuntime(storyId);
+            if (nextRuntime == null) {
+                log.warn("Cannot restore story {} because it is not currently available; persisted state was retained.",
+                        storyId);
+                return false;
+            }
+            nextRuntime.loadState(savedState);
+            bindStoryFunctions(nextRuntime.getStory());
+
+            data.setEnded(false);
+            data.setContinuousToken(null);
+            runtime = nextRuntime;
+            return true;
         } catch (Exception ex) {
-            log.warn("Failed to load state", ex);
+            reportStoryFailure("restore story", storyId, ex);
+            return false;
         }
     }
 
-    public void saveStory() {
-        if (story == null) {
-            log.warn("No story to save.");
-            return;
+    @Nullable
+    private StoryRuntime createRuntime(Identifier path) throws Exception {
+        var compiledJson = manager.getStoryRegistry().get(path);
+        if (compiledJson == null) {
+            player.sendSystemMessage(Component.translatable(ModConstants.Messages.STORY_NOT_FOUND, path.toString()).withStyle(ChatFormatting.RED));
+            return null;
         }
-        try {
-            var state = story.getState().toJson();
-            data.setState(state);
-        } catch (Exception ex) {
-            log.warn("Failed to save state", ex);
-        }
+
+        return new StoryRuntime(data, compiledJson);
     }
 
     // endregion
 
     // region Game control
 
+    public boolean requestResume() {
+        if (disposed) {
+            return false;
+        }
+        if (runtime == null) {
+            if (!transactions.isEmpty() || !restoreRuntime()) {
+                return false;
+            }
+        }
+
+        stop();
+        start();
+        return true;
+    }
+
+    public void requestPause() {
+        if (runtime != null && !data.isEnded() && !disposed) {
+            enqueueTransaction(StoryTransaction.Pause.INSTANCE);
+        }
+    }
+
+    public boolean requestNewFlow(String name, String knot) {
+        if (runtime == null || data.isEnded() || disposed) {
+            return false;
+        }
+
+        enqueueTransaction(new StoryTransaction.NewFlow(name, knot));
+        return true;
+    }
+
+    public boolean requestFlowTo(String name) {
+        if (runtime == null || data.isEnded() || disposed) {
+            return false;
+        }
+
+        enqueueTransaction(new StoryTransaction.FlowTo(name));
+        return true;
+    }
+
+    public boolean requestRemoveFlow(String name) {
+        if (runtime == null || data.isEnded() || disposed) {
+            return false;
+        }
+
+        enqueueTransaction(new StoryTransaction.RemoveFlow(name));
+        return true;
+    }
+
+    public void requestResetStory() {
+        if (!disposed) {
+            requestLifecycleTransaction(StoryTransaction.Reset.INSTANCE);
+        }
+    }
+
     public void start() {
-        if (isStoryEnded()) {
+        if (disposed || !transactions.isEmpty()) {
+            return;
+        }
+        if (runtime == null || data.isEnded()) {
             player.sendSystemMessage(Component.translatable(ModConstants.Messages.STORY_ALREADY_END).withStyle(ChatFormatting.RED));
             return;
         }
 
-        int pause = ModConstants.Values.DEFAULT_PAUSE_TICKS;
-        if (data.hasVariable(ModConstants.Variables.LINE_PAUSE_TICKS)) {
-            var v = data.getVariable(ModConstants.Variables.LINE_PAUSE_TICKS, IntStoryValue.class);
-            if (v != null) {
-                pause = v;
-            }
-        }
-
-        cancel();
-
-        data.setEnded(!hasNextLine());
-
-        cancellationToken = new CancellableToken();
-        var finalPause = pause;
-        manager.getTaskManager().run(() -> tickStory(finalPause), cancellationToken, 0, pause);
+        scheduleTick(0);
     }
 
-    private void tickStory(final int pause) {
-        if (!currentLine().isBlank()) {
-            showLine();
+    public void choose(int index) {
+        stop();
+
+        var runtime = this.runtime;
+        if (runtime == null) {
+            start();
+            return;
         }
 
-        if (hasChoice()) {
-            showChoices();
+        try {
+            runtime.choose(index);
+            start();
+        } catch (Exception ex) {
+            handlePlaybackFailure("choose story option", ex);
+        } catch (Error error) {
+            stopFailedPlayback();
+            throw error;
+        }
+    }
+
+    private void tickStorySafely() {
+        try {
+            tickStory();
+        } catch (Exception ex) {
+            handlePlaybackFailure("run story", ex);
+        } catch (Error error) {
+            stopFailedPlayback();
+            throw error;
+        }
+    }
+
+    private void tickStory() throws Exception {
+        if (disposed) {
+            cancel();
+            cancelTransactionTick();
+            return;
+        }
+
+        if (consumeTransactions()) {
+            return;
+        }
+
+        var runtime = this.runtime;
+        if (runtime == null || data.isEnded()) {
+            player.sendSystemMessage(Component.translatable(ModConstants.Messages.STORY_ALREADY_END).withStyle(ChatFormatting.RED));
             cancel();
             return;
         }
 
-        if (pause <= -1) {
+        if (runtime.hasPendingLine()) {
+            displayPendingLine();
+            finishCurrentLine();
+            return;
+        }
+
+        if (finishCurrentFlowBoundary()) {
+            return;
+        }
+
+        var continued = runtime.continueLine();
+
+        if (hasLifecycleTransaction()) {
+            return;
+        }
+
+        if (consumeTransactions()) {
+            return;
+        }
+
+        if (!continued) {
+            finishCurrentFlowBoundary();
+            return;
+        }
+
+        displayPendingLine();
+        finishCurrentLine();
+    }
+
+    private void displayPendingLine() throws Exception {
+        var runtime = this.runtime;
+        if (runtime == null) {
+            return;
+        }
+
+        var line = runtime.currentLine();
+        if (!line.isBlank()) {
+            showLine(line);
+        }
+        runtime.clearPendingLine();
+    }
+
+    private void finishCurrentLine() {
+        var runtime = this.runtime;
+        if (runtime == null || finishCurrentFlowBoundary()) {
+            return;
+        }
+
+        var pause = resolvePauseTicks();
+        if (pause == -1) {
             showClickToNext();
             cancel();
             return;
         }
 
-        if (!isCancelled()) {
-            if (hasNextLine()) {
-                nextLine();
-            } else {
-                showStoryEnd();
-                data.resetState();
-                cancel();
+        scheduleTick(pause);
+    }
+
+    private boolean finishCurrentFlowBoundary() {
+        var runtime = this.runtime;
+        if (runtime == null) {
+            return true;
+        }
+
+        if (runtime.hasChoice()) {
+            showChoices();
+            cancel();
+            return true;
+        }
+
+        if (runtime.isCurrentFlowEnded()) {
+            showStoryEnd();
+            data.resetState();
+            cancel();
+            this.runtime = null;
+            return true;
+        }
+
+        return false;
+    }
+
+    private int resolvePauseTicks() {
+        if (data.hasVariable(ModConstants.Variables.LINE_PAUSE_TICKS)) {
+            var v = data.getVariable(ModConstants.Variables.LINE_PAUSE_TICKS, IntStoryValue.class);
+            if (v != null && v >= -1) {
+                return v;
             }
         }
+
+        return ModConstants.Values.DEFAULT_PAUSE_TICKS;
     }
 
     public void stop(boolean showContinue) {
@@ -179,18 +350,35 @@ public class StoryInstance {
         stop(false);
     }
 
-    public boolean isStoryRunning() {
-        return story != null && !isCancelled();
+    public void dispose() {
+        disposed = true;
+        stop();
+        cancelTransactionTick();
+        transactions.clear();
+        runtime = null;
     }
 
-    private void showLine() {
-        player.sendSystemMessage(TextStyleHelper.parseStyle(currentLine().trim(), player.registryAccess()));
+    public boolean isStoryRunning() {
+        return runtime != null && cancellationToken != null && !cancellationToken.isCancelled();
+    }
+
+    public boolean isStoryEnded() {
+        return runtime == null || data.isEnded();
+    }
+
+    private void showLine(String line) {
+        player.sendSystemMessage(TextStyleHelper.parseStyle(line.trim(), player.registryAccess()));
     }
 
     private void showChoices() {
+        var runtime = this.runtime;
+        if (runtime == null) {
+            return;
+        }
+
         var token = UUID.randomUUID();
         data.setContinuousToken(token);
-        var choices = getChoices();
+        var choices = runtime.getChoices();
         for (int i = 0; i < choices.size(); i++) {
             var choice = choices.get(i);
             var component = Component.translatable(ModConstants.Messages.STORY_NEXT_CHOICE, TextStyleHelper.parseStyle(choice.getText().trim(), player.registryAccess())).withStyle(ChatFormatting.YELLOW);
@@ -210,8 +398,7 @@ public class StoryInstance {
     }
 
     private void showClickToCurrent() {
-        var token = UUID.randomUUID();
-        data.setContinuousToken(token);
+        data.setContinuousToken(null);
         var component = Component.translatable(ModConstants.Messages.STORY_NEXT).withStyle(ChatFormatting.YELLOW);
         component.setStyle(component.getStyle().withClickEvent(new ClickEvent.RunCommand("/inkraft current")));
         component.setStyle(component.getStyle().withHoverEvent(new HoverEvent.ShowText(Component.translatable(ModConstants.Messages.STORY_NEXT_HINT))));
@@ -225,193 +412,142 @@ public class StoryInstance {
 
     // endregion
 
-    // region Safe story
+    // region Internal
 
-    @Nullable
-    private Story story;
-
-    private boolean hasStory() {
-        return story != null;
+    private void requestLifecycleTransaction(StoryTransaction.Lifecycle transaction) {
+        stop();
+        data.setContinuousToken(null);
+        enqueueTransaction(transaction);
     }
 
-    public boolean isStoryEnded() {
-        return !hasStory() || data.isEnded();
+    private void enqueueTransaction(StoryTransaction transaction) {
+        transactions.addLast(transaction);
+        scheduleTransactionTick();
     }
 
-    public String currentLine() {
-        if (!hasStory()) {
-            log.warn("currentLine: Story ended. It shouldn't happen!");
-            return "";
+    private boolean hasLifecycleTransaction() {
+        for (var transaction : transactions) {
+            if (transaction instanceof StoryTransaction.Lifecycle) {
+                return true;
+            }
         }
-
-        try {
-            return story.getCurrentText();
-        } catch (Throwable ex) {
-            log.error("An error I can't handle!", ex);
-            return "";
-        }
+        return false;
     }
 
-    public boolean hasNextLine() {
-        return story != null && (story.canContinue() || hasChoice());
-    }
-
-    public void nextLine() {
-        if (!hasStory()) {
-            log.warn("nextLine: Story ended. It shouldn't happen!");
-            return;
-        }
-
-        try {
-            story.Continue();
-            saveStory();
-        } catch (Throwable ex) {
-            log.error("An error I can't handle!", ex);
-        }
-    }
-
-    public boolean hasChoice() {
-        return story != null && !story.getCurrentChoices().isEmpty();
-    }
-
-    public void choose(int index) {
-        if (!hasStory()) {
-            log.warn("choose: Story ended. It shouldn't happen!");
-            return;
-        }
-
-        try {
-            story.chooseChoiceIndex(index);
-            nextLine();
-        } catch (Throwable ex) {
-            log.error("An error I can't handle!", ex);
-        }
-    }
-
-    public List<Choice> getChoices() {
-        if (!hasStory()) {
-            log.warn("getChoices: Story ended. It shouldn't happen!");
-            return List.of();
-        }
-
-        return story.getCurrentChoices();
-    }
-
-    // endregion
-
-    // region Parallel flows.">
-
-    public boolean isDefaultFlow() {
-        if (!hasStory()) {
-            log.warn("isDefaultFlow: Story ended. It shouldn't happen!");
+    private boolean consumeTransactions() throws Exception {
+        if (transactions.isEmpty()) {
             return false;
         }
 
-        return story.currentFlowIsDefaultFlow();
+        cancelTransactionTick();
+        var batch = drainTransactions();
+        if (batch.lifecycle() instanceof StoryTransaction.Replace replace) {
+            applyReplaceTransaction(replace);
+            return true;
+        }
+        if (batch.lifecycle() instanceof StoryTransaction.Reset) {
+            applyResetTransaction();
+            return true;
+        }
+
+        var runtime = this.runtime;
+        var flowApplied = runtime != null && runtime.applyFlowTransactions(batch.flows());
+        if (flowApplied || batch.pauseRequested() && runtime != null && !data.isEnded()) {
+            showClickToNext();
+            cancel();
+            return true;
+        }
+        return false;
     }
 
-    public String getFlowName() {
-        if (!hasStory()) {
-            log.warn("getFlowName: Story ended. It shouldn't happen!");
-            return StoryState.kDefaultFlowName;
-        }
+    private TransactionBatch drainTransactions() {
+        StoryTransaction.Lifecycle lifecycle = null;
+        var flows = new ArrayList<StoryTransaction.Flow>();
+        var pauseRequested = false;
 
-        return story.getCurrentFlowName();
-    }
-
-    public void addFlow(String name, String knot) {
-        if (!hasStory()) {
-            log.warn("addFlow: Story ended. It shouldn't happen!");
-            return;
-        }
-
-        try {
-            story.switchFlow(name);
-            story.choosePathString(knot);
-        } catch (Throwable ex) {
-            log.error("An error I can't handle!", ex);
-        }
-    }
-
-    public void removeFlow(String name) {
-        if (!hasStory()) {
-            log.warn("removeFlow: Story ended. It shouldn't happen!");
-            return;
-        }
-
-        try {
-            story.removeFlow(name);
-        } catch (Throwable ex) {
-            log.error("An error I can't handle!", ex);
-        }
-    }
-
-    public void flowTo(String name) {
-        if (!hasStory()) {
-            log.warn("flowTo: Story ended. It shouldn't happen!");
-            return;
-        }
-
-        try {
-            story.switchFlow(name);
-        } catch (Throwable ex) {
-            log.error("An error I can't handle!", ex);
-        }
-    }
-
-    public void flowBackDefault() {
-        if (!hasStory()) {
-            log.warn("flowBackDefault: Story ended. It shouldn't happen!");
-            return;
-        }
-
-        try {
-            story.switchToDefaultFlow();
-        } catch (Throwable ex) {
-            log.error("An error I can't handle!", ex);
-        }
-    }
-
-    public List<String> getFlows() {
-        if (!hasStory()) {
-            log.warn("getFlows: Story ended. It shouldn't happen!");
-            return List.of();
-        }
-
-        return story.aliveFlowNames();
-    }
-
-    // endregion
-
-    // region Internal
-
-    private void bindStoryFunctions() {
-        assert story != null;
-        try {
-            var functions = player.registryAccess().lookupOrThrow(InkraftRegistries.STORY_FUNCTIONS);
-            for (var entry : functions.entrySet()) {
-                var func = entry.getValue();
-
-                story.bindExternalFunction(func.getName(), args -> {
-                    try {
-                        var functionArgs = new IStoryValue<?, ?>[args.length];
-                        for (int i = 0; i < args.length; i++) {
-                            functionArgs[i] = IStoryValue.fromObject(args[i]);
-                        }
-                        return func.apply(this, functionArgs).asObject();
-                    } catch (Throwable ex) {
-                        log.warn("Running function {}", func.getName());
-                        for (int i = 0; i < args.length; i++) {
-                            var a = args[i];
-                            log.warn("Arg {}: {}", i, a);
-                        }
-                        log.warn("Inner: ", ex);
-                    }
-                    return false;
-                }, func.isLookaheadSafe());
+        while (!transactions.isEmpty()) {
+            switch (transactions.removeFirst()) {
+                case StoryTransaction.Lifecycle transaction -> lifecycle = transaction;
+                case StoryTransaction.Flow transaction -> flows.add(transaction);
+                case StoryTransaction.Pause _ -> pauseRequested = true;
             }
-        } catch (Throwable ex) {
-            log.error("An error I can't handle!", ex);
+        }
+
+        if (lifecycle != null) {
+            return new TransactionBatch(lifecycle, List.of(), false);
+        }
+        return new TransactionBatch(null, List.copyOf(flows), pauseRequested);
+    }
+
+    private void applyReplaceTransaction(StoryTransaction.Replace transaction) {
+        stop();
+        data.setStory(transaction.storyId());
+        data.setState(null);
+        data.setEnded(false);
+        data.clearPendingLines();
+        data.setContinuousToken(null);
+        runtime = transaction.runtime();
+        start();
+    }
+
+    private void applyResetTransaction() {
+        stop();
+        data.clearData();
+        runtime = null;
+    }
+
+    private void bindStoryFunctions(Story story) throws Exception {
+        var functions = player.registryAccess().lookupOrThrow(InkraftRegistries.STORY_FUNCTIONS);
+        for (var entry : functions.entrySet()) {
+            var func = entry.getValue();
+
+            story.bindExternalFunction(func.getName(), args -> {
+                try {
+                    var functionArgs = new IStoryValue<?, ?>[args.length];
+                    for (int i = 0; i < args.length; i++) {
+                        functionArgs[i] = IStoryValue.fromObject(args[i]);
+                    }
+                    return func.apply(this, functionArgs).asObject();
+                } catch (FunctionSyntaxException ex) {
+                    var message = formatStoryFailure(
+                            "run Ink function " + func.getName() + " with args " + Arrays.toString(args),
+                            data.getStory(), ex);
+                    log.warn(message, ex);
+                    sendDebugFailure(message);
+                    return false;
+                }
+            }, func.isLookaheadSafe());
+        }
+    }
+
+    private void handlePlaybackFailure(String operation, Exception ex) {
+        stopFailedPlayback();
+        reportStoryFailure(operation, data.getStory(), ex);
+    }
+
+    private void stopFailedPlayback() {
+        cancel();
+        cancelTransactionTick();
+        transactions.clear();
+        data.setContinuousToken(null);
+    }
+
+    private void reportStoryFailure(String operation, @Nullable Identifier storyId, Exception ex) {
+        var message = formatStoryFailure(operation, storyId, ex);
+        log.error(message, ex);
+        sendDebugFailure(message);
+    }
+
+    private String formatStoryFailure(String operation, @Nullable Identifier storyId, Exception ex) {
+        var id = storyId == null ? "<none>" : storyId.toString();
+        return "Failed to " + operation
+                + " for player " + player.getName().getString() + "(" + player.getUUID() + ")"
+                + " in story " + id + ": " + ex;
+    }
+
+    private void sendDebugFailure(String message) {
+        if (manager.isDebug()) {
+            player.sendSystemMessage(Component.literal(message).withStyle(ChatFormatting.RED));
         }
     }
 
@@ -419,17 +555,46 @@ public class StoryInstance {
 
     // region Async Cancellation
 
+    private record TransactionBatch(@Nullable StoryTransaction.Lifecycle lifecycle,
+                                    List<StoryTransaction.Flow> flows,
+                                    boolean pauseRequested) {
+    }
+
     @Nullable
+    @Getter(AccessLevel.NONE)
     private CancellableToken cancellationToken;
+
+    @Nullable
+    @Getter(AccessLevel.NONE)
+    private CancellableToken transactionToken;
+
+    private void scheduleTick(int delay) {
+        cancel();
+        cancellationToken = new CancellableToken();
+        manager.getTaskManager().run(this::tickStorySafely, cancellationToken, delay, -1);
+    }
 
     private void cancel() {
         if (cancellationToken != null) {
             cancellationToken.cancel();
+            cancellationToken = null;
         }
     }
 
-    private boolean isCancelled() {
-        return cancellationToken != null && cancellationToken.isCancelled();
+    private void scheduleTransactionTick() {
+        if (disposed || transactionToken != null && !transactionToken.isCancelled()) {
+            return;
+        }
+
+        transactionToken = new CancellableToken();
+        manager.getTaskManager().run(this::tickStorySafely, transactionToken, 0, -1);
+    }
+
+    private void cancelTransactionTick() {
+        if (transactionToken != null) {
+            transactionToken.cancel();
+            transactionToken = null;
+        }
     }
 
     // endregion

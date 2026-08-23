@@ -7,6 +7,19 @@ architectury {
     fabric()
 }
 
+fabricApi {
+    configureTests {
+        createSourceSet = true
+        modId = "${rootProject.mod_id}-gametest"
+        enableClientGameTests = false
+    }
+}
+
+sourceSets.named('gametest') {
+    java.srcDir rootProject.file('src/gametest/java')
+    resources.srcDir rootProject.file('src/test/resources')
+}
+
 dependencies {
     minecraft "com.mojang:minecraft:${rootProject.minecraft_version}"
 

@@ -19,7 +19,6 @@ import cx.rain.mc.inkraft.story.function.system.LogFunction;
 import cx.rain.mc.inkraft.story.function.lang.ArrayFunctions;
 import cx.rain.mc.inkraft.story.function.lang.MapFunctions;
 import cx.rain.mc.inkraft.story.function.system.flow.*;
-import cx.rain.mc.inkraft.story.function.system.line.IsEndedFunction;
 import cx.rain.mc.inkraft.story.function.system.line.PauseFunction;
 import cx.rain.mc.inkraft.story.function.system.line.SetLineTicksFunction;
 import cx.rain.mc.inkraft.story.function.system.line.UnsetLineTicksFunction;
@@ -57,11 +56,10 @@ public class ModStoryFunctions {
         register(registry, "new_flow", NewFlowFunction::new);
         register(registry, "remove_flow", RemoveFlowFunction::new);
         register(registry, "flow_to", FlowToFunction::new);
-        register(registry, "flow_to_default", FlowToDefaultFunction::new);
         register(registry, "is_in_flow", IsInFlowFunction::new);
-        register(registry, "is_in_default_flow", IsInDefaultFlowFunction::new);
+        register(registry, "has_flow", HasFlowFunction::new);
+        register(registry, "is_flow_ended", IsFlowEndedFunction::new);
 
-        register(registry, "is_ended", IsEndedFunction::new);
         register(registry, "pause", PauseFunction::new);
         register(registry, "set_line_ticks", SetLineTicksFunction::new);
         register(registry, "unset_line_ticks", UnsetLineTicksFunction::new);

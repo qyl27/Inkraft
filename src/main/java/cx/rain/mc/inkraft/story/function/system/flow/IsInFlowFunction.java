@@ -18,6 +18,6 @@ public class IsInFlowFunction implements IStoryFunction {
         FunctionArgs.requireTyped(args, 0, String.class);
 
         var name = FunctionArgs.getString(args[0]);
-        return BoolStoryValue.from(instance.getFlowName().equals(name));
+        return BoolStoryValue.from(instance.getRuntime().orElseThrow().getFlowName().equals(name));
     }
 }
