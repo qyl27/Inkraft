@@ -1,4 +1,4 @@
-INCLUDE engine_functions_include.ink
+INCLUDE includes/engine_functions_include.ink
 
 你好 {getPlayerName()} ，
 

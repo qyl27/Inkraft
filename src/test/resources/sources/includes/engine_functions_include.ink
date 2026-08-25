@@ -1,7 +1,7 @@
 // title: engine_functions_include.ink
 // author: qyl27
 // license: CC0
-// version: 2026.07.02
+// version: 2026.07.12
 
 
 // System functions
@@ -9,13 +9,19 @@
 EXTERNAL isDebug()
 
 EXTERNAL isInFlow(name)
-EXTERNAL isInDefaultFlow()
+EXTERNAL hasFlow(name)
+EXTERNAL isFlowEnded(name)
 EXTERNAL flowTo(name)
-EXTERNAL flowToDefault()
-EXTERNAL newFlow(name, flow)
+EXTERNAL newFlow(name, knot)
 EXTERNAL removeFlow(name)
 
-EXTERNAL isEnded()
+=== function isInDefaultFlow() ===
+~ return isInFlow("DEFAULT_FLOW")
+
+=== function flowToDefault() ===
+~ return flowTo("DEFAULT_FLOW")
+
+
 EXTERNAL pause()
 EXTERNAL setLineTicks(ticks)
 EXTERNAL unsetLineTicks()

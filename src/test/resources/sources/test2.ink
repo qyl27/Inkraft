@@ -1,4 +1,4 @@
-INCLUDE engine_functions_include.ink
+INCLUDE includes/engine_functions_include.ink
 
 Inkraft 测试剧本二，系统函数：
 准备好了吗？
