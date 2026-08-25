@@ -6,7 +6,7 @@ plugins {
     id 'architectury-plugin' version "${architectury_plugin_version}"
     id 'dev.architectury.loom-no-remap' version "${architectury_loom_version}"
     id 'com.gradleup.shadow' version "${shadow_plugin_version}" apply false
-    id 'me.shedaniel.unified-publishing' version "${unified_publishing_version}" apply false
+    id 'me.modmuss50.mod-publish-plugin' version "${mod_publish_plugin_version}"
 }
 
 def ENV = System.getenv()
@@ -281,5 +281,61 @@ subprojects {
                 from components.java
             }
         }
+    }
+}
+
+publishMods {
+    changelog = providers.environmentVariable('MOD_CHANGELOG').orElse('')
+    type = STABLE
+    dryRun = providers.environmentVariable('MOD_PUBLISH_DRY_RUN').isPresent()
+
+    def curseforgeShared = curseforgeOptions {
+        accessToken = providers.environmentVariable('MOD_CURSEFORGE_TOKEN')
+        projectId = rootProject.curseforge_project_id
+        minecraftVersions.addAll(rootProject.game_versions.split(','))
+        client = true
+        server = true
+    }
+
+    def modrinthShared = modrinthOptions {
+        accessToken = providers.environmentVariable('MOD_MODRINTH_TOKEN')
+        projectId = rootProject.modrinth_project_id
+        minecraftVersions.addAll(rootProject.game_versions.split(','))
+    }
+
+    def fabricShared = publishOptions {
+        file = project(':fabric').shadowJar.archiveFile
+        displayName = "Inkraft Fabric ${rootProject.mod_version} (MC ${rootProject.minecraft_version})"
+        version = "${rootProject.version}-fabric"
+        modLoaders.add('fabric')
+    }
+
+    def neoForgeShared = publishOptions {
+        file = project(':neoforge').shadowJar.archiveFile
+        displayName = "Inkraft NeoForge ${rootProject.mod_version} (MC ${rootProject.minecraft_version})"
+        version = "${rootProject.version}-neoforge"
+        modLoaders.add('neoforge')
+    }
+
+    curseforge('curseforgeFabric') {
+        from(curseforgeShared, fabricShared)
+        requires('fabric-api')
+        optional('modmenu')
+    }
+
+    modrinth('modrinthFabric') {
+        from(modrinthShared, fabricShared)
+        requires('fabric-api')
+        optional('modmenu')
+        embeds('adventure-platform-mod')
+    }
+
+    curseforge('curseforgeNeoForge') {
+        from(curseforgeShared, neoForgeShared)
+    }
+
+    modrinth('modrinthNeoForge') {
+        from(modrinthShared, neoForgeShared)
+        embeds('adventure-platform-mod')
     }
 }

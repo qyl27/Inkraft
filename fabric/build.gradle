@@ -1,7 +1,3 @@
-plugins {
-    id 'me.shedaniel.unified-publishing'
-}
-
 architectury {
     platformSetupLoomIde()
     fabric()
@@ -31,42 +27,4 @@ dependencies {
 
     common(project(':')) { transitive false }
     shadowBundle project(path: ':', configuration: 'transformProductionFabric')
-}
-
-unifiedPublishing {
-    project {
-        displayName = "Inkraft Fabric ${rootProject.mod_version} (MC ${rootProject.minecraft_version})"
-        version = "${rootProject.version}-fabric"
-        gameVersions = rootProject.game_versions.split(',').toList()
-        gameLoaders = ['fabric']
-        releaseType = 'release'
-
-        mainPublication tasks.shadowJar
-
-        relations {
-            depends {
-                curseforge = 'fabric-api'
-                modrinth = 'fabric-api'
-            }
-
-            optional {
-                curseforge = 'modmenu'
-                modrinth = 'modmenu'
-            }
-
-            includes {
-                modrinth = 'adventure-platform-mod'
-            }
-        }
-
-        curseforge {
-            token = Objects.requireNonNullElse(System.getenv('MOD_CURSEFORGE_TOKEN'), "")
-            id = rootProject.curseforge_project_id
-        }
-
-        modrinth {
-            token = Objects.requireNonNullElse(System.getenv('MOD_MODRINTH_TOKEN'), "")
-            id = rootProject.modrinth_project_id
-        }
-    }
 }
