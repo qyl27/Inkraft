@@ -1,0 +1,18 @@
+{
+    "schemaVersion": 1,
+    "id": "inkraft-gametest",
+    "version": "1.0.0",
+    "name": "Inkraft Game Tests",
+    "environment": "*",
+    "entrypoints": {
+        "fabric-gametest": [
+            "cx.rain.mc.inkraft.fabric.gametest.InkraftFabricGameTests"
+        ]
+    },
+    "depends": {
+        "inkraft": "*",
+        "minecraft": "*",
+        "fabricloader": "*",
+        "fabric-api": "*"
+    }
+}

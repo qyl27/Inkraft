@@ -1,4 +1,4 @@
-INCLUDE engine_functions_include.ink
+INCLUDE includes/engine_functions_include.ink
 
 买吗？（2钻石换1苹果）
 * [是] -> buy

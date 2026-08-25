@@ -1,4 +1,4 @@
-INCLUDE engine_functions_include.ink
+INCLUDE includes/engine_functions_include.ink
 
 Inkraft 测试剧本六，JSON 数组和映射：
 
@@ -54,3 +54,7 @@ mapContains：{mapContains(map, "b")}    // Expected: false
 nesting mapSet：{map}   // Expected: {"a": "value", "c": "["wolf", "seikou!"]"}, order is not important
 nesting mapGet：{mapGet(map, "c")}  // Expected: "["wolf", "seikou!"]"
 
+invalid arrayGet：{arrayGet("invalid", 0)} // Expected: false
+invalid arraySet：{arraySet("[]", 1, 0)} // Expected: false
+invalid mapGet：{mapGet(map, "missing")} // Expected: false
+invalid mapRemove：{mapRemove("invalid", "missing")} // Expected: false
