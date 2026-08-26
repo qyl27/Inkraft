@@ -40,6 +40,7 @@ public final class StoryInstanceGameTests {
     private static final Identifier RUNTIME_FAILURE_DURING_CONTINUE =
             testStory("runtime_failure_during_continue");
     private static final Identifier SYSTEM_FUNCTION_CONTEXT = testStory("test4");
+    private static final Identifier PLAYER_STAT_FUNCTIONS = testStory("player_stats");
     private static final Identifier MISSING = testStory("missing");
 
     private StoryInstanceGameTests() {
@@ -703,6 +704,54 @@ public final class StoryInstanceGameTests {
                     helper.assertTrue(callChecked(() -> isFlowEnded.apply(context.instance(),
                                     new StringStoryValue(StoryState.kDefaultFlowName))) == BoolStoryValue.TRUE,
                             "isFlowEnded did not report the completed flow");
+                })
+                .thenExecute(context::close)
+                .thenSucceed();
+    }
+
+    public static void playerStatFunctionsUseCurrentPlayer(GameTestHelper helper) {
+        var context = startStory(helper, PLAYER_STAT_FUNCTIONS);
+
+        helper.startSequence()
+                .thenWaitUntil(() -> {
+                    var runtime = requireRuntime(helper, context);
+                    helper.assertTrue(runtime.hasChoice(),
+                            "The player-stat function story did not reach its verification choice");
+                })
+                .thenExecute(() -> {
+                    context.instance().stop();
+                })
+                .thenWaitUntil(() -> helper.assertTrue(context.player().connection.hasClientLoaded(),
+                        "The player-stat test player has not finished its simulated client load"))
+                .thenExecute(() -> {
+                    var runtime = requireRuntime(helper, context);
+                    helper.assertTrue(callChecked(() -> runtime.choose(0)),
+                            "Could not select the player-stat verification path");
+
+                    var line = "";
+                    while (line.isBlank() && runtime.canContinueLine()) {
+                        helper.assertTrue(callChecked(runtime::continueLine),
+                                "Could not evaluate the player-stat functions");
+                        line = callChecked(runtime::currentLine).trim();
+                        runtime.clearPendingLine();
+                    }
+                    helper.assertValueEqual(line, "PLAYER_STAT_WAIT_FOR_PICKUP",
+                            "player-stat pickup wait marker");
+                })
+                // The embedded GameTest connection does not tick its player, so run the vanilla pickup scan explicitly.
+                .thenExecute(context.player()::doTick)
+                .thenIdle(3)
+                .thenExecute(() -> {
+                    var runtime = requireRuntime(helper, context);
+                    var line = "";
+                    while (line.isBlank() && runtime.canContinueLine()) {
+                        helper.assertTrue(callChecked(runtime::continueLine),
+                                "Could not verify the changed player statistics");
+                        line = callChecked(runtime::currentLine).trim();
+                        runtime.clearPendingLine();
+                    }
+                    helper.assertValueEqual(line, "PLAYER_STAT_OK",
+                            "player-stat function result");
                 })
                 .thenExecute(context::close)
                 .thenSucceed();

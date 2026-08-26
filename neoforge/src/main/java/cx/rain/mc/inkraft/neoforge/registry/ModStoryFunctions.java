@@ -15,6 +15,7 @@ import cx.rain.mc.inkraft.story.function.game.inventory.GiveItemFunction;
 import cx.rain.mc.inkraft.story.function.game.inventory.HasItemFunction;
 import cx.rain.mc.inkraft.story.function.game.inventory.TakeItemFunction;
 import cx.rain.mc.inkraft.story.function.game.player.GetPlayerNameFunction;
+import cx.rain.mc.inkraft.story.function.game.player.PlayerStatFunctions;
 import cx.rain.mc.inkraft.story.function.system.IsDebugFunction;
 import cx.rain.mc.inkraft.story.function.system.LogFunction;
 import cx.rain.mc.inkraft.story.function.lang.ArrayFunctions;
@@ -96,6 +97,8 @@ public class ModStoryFunctions {
     // <editor-fold desc="Game functions.">
 
     public static final Supplier<IStoryFunction> GET_PLAYER_NAME = REGISTRY.register("get_player_name", GetPlayerNameFunction::new);
+    public static final Supplier<IStoryFunction> GET_PLAYER_STAT = REGISTRY.register("get_player_stat", PlayerStatFunctions::value);
+    public static final Supplier<IStoryFunction> GET_FORMATTED_PLAYER_STAT = REGISTRY.register("get_formatted_player_stat", PlayerStatFunctions::formatted);
     public static final Supplier<IStoryFunction> GET_WORLD_DAY_TIME = REGISTRY.register("get_world_day_time", () -> new WorldTimeFunction("getWorldDayTime", level -> (int)(level.getDefaultClockTime() % 24000L)));
     public static final Supplier<IStoryFunction> GET_WORLD_GAME_TIME = REGISTRY.register("get_world_game_time", () -> new WorldTimeFunction("getWorldGameTime", level -> (int)(level.getGameTime() % Integer.MAX_VALUE)));
     public static final Supplier<IStoryFunction> GET_WORLD_DAY = REGISTRY.register("get_world_day", () -> new WorldTimeFunction("getWorldDay", level -> (int)(level.getDefaultClockTime() / 24000L % Integer.MAX_VALUE)));

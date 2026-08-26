@@ -1,7 +1,7 @@
 // title: engine_functions_include.ink
 // author: qyl27
 // license: CC0
-// version: 2026.07.12
+// version: 2026.08.25
 
 
 // System functions
@@ -46,6 +46,8 @@ EXTERNAL toString(value)
 // Game functions
 
 EXTERNAL getPlayerName()
+EXTERNAL getPlayerStat(typeId, valueId)
+EXTERNAL getFormattedPlayerStat(typeId, valueId)
 EXTERNAL getWorldDayTime(worldId)
 EXTERNAL getWorldGameTime(worldId)
 EXTERNAL getWorldDay(worldId)

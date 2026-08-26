@@ -125,6 +125,25 @@ Print logs to the console.
 | getWorldDay(worldId)      | Gets the game day of a world.         | worldId: The world ID. Nullable, defaults to the player's current world. | int, game day.                                                                 |
 | getRealTime(pattern)      | Gets the real-world system time.      | pattern: The date-time output format. Nullable, defaults to ISO-8601.    | int32\|float32\|string, the date-time output formatted with the given pattern. |
 
+#### Player Statistics
+
+The player-stat functions accept a statistic type ID and a statistic value ID to read a statistic value for the player bound to the current story script.
+
+A statistic type ID is the ID of a `StatType`, such as `minecraft:custom` or `minecraft:mined`. A statistic value ID identifies an entry in the registry used by that `StatType`, such as `minecraft:bell_ring` for the Custom type. Tags are not supported as IDs here.
+
+See [Statistics - Minecraft Wiki](https://minecraft.wiki/w/Statistics).
+
+
+| Function signature                          | Description                          | Parameters                                                            | Return value                                                                                                                      |
+|---------------------------------------------|--------------------------------------|-----------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------|
+| getPlayerStat(typeId, valueId)              | Gets the raw statistic value.        | typeId: The statistic type ID.<br />valueId: The statistic value ID. | int, the statistic value.<br />false if an ID is malformed or the statistic type or value does not exist.                         |
+| getFormattedPlayerStat(typeId, valueId)     | Gets the formatted statistic string. | typeId: The statistic type ID.<br />valueId: The statistic value ID. | string, the value formatted by the statistic's `StatFormatter`.<br />false if an ID is malformed or the statistic type or value does not exist. |
+
+An invalid statistic type ID or statistic value ID returns `false`; a valid ID with no recorded statistic has a raw value of `0`.
+
+The formatting performed by `StatFormatter` is fixed, and the returned string is not localized.
+
+
 #### Running Commands
 
 | Function signature                 | Description                                                                                                               | Parameters                 | Return value                   |

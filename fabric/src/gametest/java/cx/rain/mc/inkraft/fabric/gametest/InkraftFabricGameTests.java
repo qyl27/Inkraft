@@ -86,6 +86,11 @@ public final class InkraftFabricGameTests {
     }
 
     @GameTest(maxTicks = 200)
+    public void playerStatFunctionsUseCurrentPlayer(GameTestHelper helper) {
+        StoryInstanceGameTests.playerStatFunctionsUseCurrentPlayer(helper);
+    }
+
+    @GameTest(maxTicks = 200)
     public void deathRespawnRebindsStoryInstance(GameTestHelper helper) {
         StoryInstanceGameTests.deathRespawnRebindsStoryInstance(helper);
     }

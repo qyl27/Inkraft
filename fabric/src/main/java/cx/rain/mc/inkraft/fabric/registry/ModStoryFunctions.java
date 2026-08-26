@@ -14,6 +14,7 @@ import cx.rain.mc.inkraft.story.function.game.inventory.GiveItemFunction;
 import cx.rain.mc.inkraft.story.function.game.inventory.HasItemFunction;
 import cx.rain.mc.inkraft.story.function.game.inventory.TakeItemFunction;
 import cx.rain.mc.inkraft.story.function.game.player.GetPlayerNameFunction;
+import cx.rain.mc.inkraft.story.function.game.player.PlayerStatFunctions;
 import cx.rain.mc.inkraft.story.function.system.IsDebugFunction;
 import cx.rain.mc.inkraft.story.function.system.LogFunction;
 import cx.rain.mc.inkraft.story.function.lang.ArrayFunctions;
@@ -102,6 +103,8 @@ public class ModStoryFunctions {
         // <editor-fold desc="Game functions.">
 
         register(registry, "get_player_name", GetPlayerNameFunction::new);
+        register(registry, "get_player_stat", PlayerStatFunctions::value);
+        register(registry, "get_formatted_player_stat", PlayerStatFunctions::formatted);
         register(registry, "get_world_day_time", () -> new WorldTimeFunction("getWorldDayTime", level -> (int)(level.getDefaultClockTime() % 24000L)));
         register(registry, "get_world_game_time", () -> new WorldTimeFunction("getWorldGameTime", level -> (int)(level.getGameTime() % Integer.MAX_VALUE)));
         register(registry, "get_world_day", () -> new WorldTimeFunction("getWorldDay", level -> (int)(level.getDefaultClockTime() / 24000L % Integer.MAX_VALUE)));

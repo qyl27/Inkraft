@@ -12,6 +12,7 @@ import cx.rain.mc.inkraft.story.function.game.inventory.GiveItemFunction;
 import cx.rain.mc.inkraft.story.function.game.inventory.HasItemFunction;
 import cx.rain.mc.inkraft.story.function.game.inventory.TakeItemFunction;
 import cx.rain.mc.inkraft.story.function.game.player.GetPlayerNameFunction;
+import cx.rain.mc.inkraft.story.function.game.player.PlayerStatFunctions;
 import cx.rain.mc.inkraft.story.function.system.IsDebugFunction;
 import cx.rain.mc.inkraft.story.function.system.LogFunction;
 import cx.rain.mc.inkraft.story.function.system.flow.FlowToFunction;
@@ -132,6 +133,8 @@ class StoryFunctionArgsTest {
             new Contract("toString", new ToStringFunction(), args(BoolStoryValue.TRUE),
                 indexes(), indexes(), indexes()),
             contract("getPlayerName", new GetPlayerNameFunction()),
+            strings("getPlayerStat", PlayerStatFunctions.value(), 2, 0, 1),
+            strings("getFormattedPlayerStat", PlayerStatFunctions.formatted(), 2, 0, 1),
             strings("worldTime", new WorldTimeFunction("worldTime", _ -> 0), 1, 0),
             strings("getRealTime", new RealTimeFunction(), 1, 0),
             strings("runCommand", new RunCommandFunction("runCommand", _ -> null), 1, 0),
