@@ -19,6 +19,7 @@ import cx.rain.mc.inkraft.story.function.system.IsDebugFunction;
 import cx.rain.mc.inkraft.story.function.system.LogFunction;
 import cx.rain.mc.inkraft.story.function.lang.ArrayFunctions;
 import cx.rain.mc.inkraft.story.function.lang.MapFunctions;
+import cx.rain.mc.inkraft.story.function.lang.UuidFunctions;
 import cx.rain.mc.inkraft.story.function.system.flow.*;
 import cx.rain.mc.inkraft.story.function.system.line.PauseFunction;
 import cx.rain.mc.inkraft.story.function.system.line.SetLineTicksFunction;
@@ -80,6 +81,9 @@ public class ModStoryFunctions {
         register(registry, "parse_int", ParseIntFunction::new);
         register(registry, "parse_float", ParseFloatFunction::new);
         register(registry, "to_string", ToStringFunction::new);
+
+        register(registry, "random_uuid", UuidFunctions::randomUuid);
+        register(registry, "is_uuid", UuidFunctions::isUuid);
 
         register(registry, "create_array", ArrayFunctions::create);
         register(registry, "is_array", ArrayFunctions::isArray);

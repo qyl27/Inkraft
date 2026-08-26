@@ -41,6 +41,7 @@ public final class StoryInstanceGameTests {
             testStory("runtime_failure_during_continue");
     private static final Identifier SYSTEM_FUNCTION_CONTEXT = testStory("test4");
     private static final Identifier PLAYER_STAT_FUNCTIONS = testStory("player_stats");
+    private static final Identifier UUID_FUNCTIONS = testStory("uuid_functions");
     private static final Identifier MISSING = testStory("missing");
 
     private StoryInstanceGameTests() {
@@ -752,6 +753,35 @@ public final class StoryInstanceGameTests {
                     }
                     helper.assertValueEqual(line, "PLAYER_STAT_OK",
                             "player-stat function result");
+                })
+                .thenExecute(context::close)
+                .thenSucceed();
+    }
+
+    public static void uuidFunctionsUseJavaUuidSemantics(GameTestHelper helper) {
+        var context = startStory(helper, UUID_FUNCTIONS);
+
+        helper.startSequence()
+                .thenWaitUntil(() -> {
+                    var runtime = requireRuntime(helper, context);
+                    helper.assertTrue(runtime.hasChoice(),
+                            "The UUID function story did not reach its verification choice");
+                })
+                .thenExecute(() -> {
+                    context.instance().stop();
+                    var runtime = requireRuntime(helper, context);
+                    helper.assertTrue(callChecked(() -> runtime.choose(0)),
+                            "Could not select the UUID verification path");
+
+                    var line = "";
+                    while (line.isBlank() && runtime.canContinueLine()) {
+                        helper.assertTrue(callChecked(runtime::continueLine),
+                                "Could not evaluate the UUID functions");
+                        line = callChecked(runtime::currentLine).trim();
+                        runtime.clearPendingLine();
+                    }
+                    helper.assertValueEqual(line, "UUID_FUNCTIONS_OK",
+                            "UUID function result");
                 })
                 .thenExecute(context::close)
                 .thenSucceed();

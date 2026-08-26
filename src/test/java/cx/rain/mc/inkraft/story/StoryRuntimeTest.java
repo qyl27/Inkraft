@@ -27,6 +27,7 @@ class StoryRuntimeTest {
         "getScoreboard", "setScoreboard", "addScoreboard", "subScoreboard", "multiplyScoreboard",
         "getStorage", "setStorage",
         "hasItem", "countItem", "giveItem", "takeItem",
+        "randomUuid", "isUuid",
         "createArray", "isArray", "arraySize", "arraySet", "arrayGet", "arrayAdd", "arrayRemove", "arrayContains",
         "createMap", "isMap", "mapSize", "mapSet", "mapGet", "mapRemove", "mapContains"
     );

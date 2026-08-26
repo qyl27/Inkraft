@@ -4,6 +4,19 @@ Other languages: [简体中文](../zh/语言增强.md)
 
 Inkraft extends the Ink language through external functions.
 
+A lookahead-safe function does not produce side effects even if the Ink engine evaluates it ahead of time. Unless otherwise noted, all language enhancement functions are lookahead-safe.
+
+
+## UUID
+
+| Function definition | Description                                     | Return value                                    |
+|---------------------|-------------------------------------------------|-------------------------------------------------|
+| randomUuid()        | Generates a random UUID v4 string.              | string, a lowercase, hyphenated UUID v4 string. |
+| isUuid(value)       | Checks whether a string can be parsed as a UUID. | bool; `false` if it cannot be parsed.           |
+
+`randomUuid()` is not lookahead-safe; each call generates a new UUID.
+
+
 ## Data Structures
 
 Inkraft uses JSON strings to emulate variable-length Array and dictionary-like Map data structures, such as `["element1", false, 12]` and `{"key1": "value1", "key2": 2.5}`.

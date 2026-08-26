@@ -24,7 +24,8 @@ class CollectionStoryTest {
         "runCommand", "runUnlimitedCommand", "runSilentUnlimitedCommand", "runServerCommand",
         "getScoreboard", "setScoreboard", "addScoreboard", "subScoreboard", "multiplyScoreboard",
         "getStorage", "setStorage",
-        "hasItem", "countItem", "giveItem", "takeItem"
+        "hasItem", "countItem", "giveItem", "takeItem",
+        "randomUuid", "isUuid"
     );
 
     @Test

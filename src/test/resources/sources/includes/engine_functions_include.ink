@@ -1,7 +1,7 @@
 // title: engine_functions_include.ink
 // author: qyl27
 // license: CC0
-// version: 2026.08.25
+// version: 2026.08.26
 
 
 // System functions
@@ -74,6 +74,9 @@ EXTERNAL takeItem(itemId, count, nbtPath, nbtValue)
 
 
 // Language enhancement functions
+
+EXTERNAL randomUuid()
+EXTERNAL isUuid(value)
 
 EXTERNAL createArray()
 EXTERNAL isArray(value)

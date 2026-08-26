@@ -90,6 +90,11 @@ public final class InkraftFabricGameTests {
         StoryInstanceGameTests.playerStatFunctionsUseCurrentPlayer(helper);
     }
 
+    @GameTest(maxTicks = 160)
+    public void uuidFunctionsUseJavaUuidSemantics(GameTestHelper helper) {
+        StoryInstanceGameTests.uuidFunctionsUseJavaUuidSemantics(helper);
+    }
+
     @GameTest(maxTicks = 200)
     public void deathRespawnRebindsStoryInstance(GameTestHelper helper) {
         StoryInstanceGameTests.deathRespawnRebindsStoryInstance(helper);

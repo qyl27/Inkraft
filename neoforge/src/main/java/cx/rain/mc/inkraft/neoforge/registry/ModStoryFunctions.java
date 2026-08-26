@@ -20,6 +20,7 @@ import cx.rain.mc.inkraft.story.function.system.IsDebugFunction;
 import cx.rain.mc.inkraft.story.function.system.LogFunction;
 import cx.rain.mc.inkraft.story.function.lang.ArrayFunctions;
 import cx.rain.mc.inkraft.story.function.lang.MapFunctions;
+import cx.rain.mc.inkraft.story.function.lang.UuidFunctions;
 import cx.rain.mc.inkraft.story.function.system.flow.*;
 import cx.rain.mc.inkraft.story.function.system.line.PauseFunction;
 import cx.rain.mc.inkraft.story.function.system.line.SetLineTicksFunction;
@@ -74,6 +75,9 @@ public class ModStoryFunctions {
     public static final Supplier<IStoryFunction> PARSE_INT = REGISTRY.register("parse_int", ParseIntFunction::new);
     public static final Supplier<IStoryFunction> PARSE_FLOAT = REGISTRY.register("parse_float", ParseFloatFunction::new);
     public static final Supplier<IStoryFunction> TO_STRING = REGISTRY.register("to_string", ToStringFunction::new);
+
+    public static final Supplier<IStoryFunction> RANDOM_UUID = REGISTRY.register("random_uuid", UuidFunctions::randomUuid);
+    public static final Supplier<IStoryFunction> IS_UUID = REGISTRY.register("is_uuid", UuidFunctions::isUuid);
 
     public static final Supplier<IStoryFunction> CREATE_ARRAY = REGISTRY.register("create_array", ArrayFunctions::create);
     public static final Supplier<IStoryFunction> IS_ARRAY = REGISTRY.register("is_array", ArrayFunctions::isArray);

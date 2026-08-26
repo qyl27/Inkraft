@@ -63,6 +63,8 @@ public final class InkraftNeoForgeGameTests {
                 StoryInstanceGameTests::systemFunctionsUseLiveStoryInstance);
         register(event, environment, "player_stat_functions_use_current_player", 200,
                 StoryInstanceGameTests::playerStatFunctionsUseCurrentPlayer);
+        register(event, environment, "uuid_functions_use_java_uuid_semantics", 160,
+                StoryInstanceGameTests::uuidFunctionsUseJavaUuidSemantics);
         register(event, environment, "death_respawn_rebinds_story_instance", 200,
                 StoryInstanceGameTests::deathRespawnRebindsStoryInstance);
         register(event, environment, "end_credits_respawn_rebinds_story_instance", 200,
