@@ -14,7 +14,7 @@ public class IsDebugFunction implements IStoryFunction {
 
     @Override
     public BoolStoryValue apply(StoryInstance instance, IStoryValue<?, ?>... args) {
-        FunctionArgs.requireCount(args, 0);
+        FunctionArgs.expectCount(args, 0);
 
         return BoolStoryValue.from(instance.getManager().isDebug());
     }

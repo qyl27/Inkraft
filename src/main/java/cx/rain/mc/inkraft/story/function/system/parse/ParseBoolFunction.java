@@ -14,10 +14,9 @@ public class ParseBoolFunction implements IStoryFunction {
 
     @Override
     public BoolStoryValue apply(StoryInstance instance, IStoryValue<?, ?>... args) {
-        FunctionArgs.requireCount(args, 1);
-        FunctionArgs.requireTyped(args, 0, String.class);
+        FunctionArgs.expectCount(args, 1);
+        var str = args[0].getString();
 
-        var str = FunctionArgs.getString(args[0]);
         if ("true".equalsIgnoreCase(str)) {
             return BoolStoryValue.TRUE;
         }

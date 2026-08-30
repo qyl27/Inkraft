@@ -27,10 +27,9 @@ public class LogFunction implements IStoryFunction {
 
     @Override
     public BoolStoryValue apply(StoryInstance instance, IStoryValue<?, ?>... args) {
-        FunctionArgs.requireCount(args, 1);
-        FunctionArgs.requireTyped(args, 0, String.class);
+        FunctionArgs.expectCount(args, 1);
 
-        var message = FunctionArgs.getString(args[0]);
+        var message = FunctionArgs.requireString(args[0]);
         consumer.accept(log, message);
         return BoolStoryValue.TRUE;
     }

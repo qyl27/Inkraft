@@ -14,10 +14,9 @@ public class SetVariableFunction implements IStoryFunction {
 
     @Override
     public BoolStoryValue apply(StoryInstance instance, IStoryValue<?, ?>... args) {
-        FunctionArgs.requireCount(args, 2);
-        FunctionArgs.requireTyped(args, 0, String.class);
+        FunctionArgs.expectCount(args, 2);
 
-        var name = FunctionArgs.getString(args[0]);
+        var name = FunctionArgs.requireString(args[0]);
         var value = args[1];
         instance.getData().setVariable(name, value);
         return BoolStoryValue.TRUE;

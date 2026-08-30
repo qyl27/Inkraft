@@ -14,7 +14,7 @@ public class GetPlayerNameFunction implements IStoryFunction {
 
     @Override
     public StringStoryValue apply(StoryInstance instance, IStoryValue<?, ?>... args) {
-        FunctionArgs.requireCount(args, 0);
+        FunctionArgs.expectCount(args, 0);
 
         return new StringStoryValue(instance.getPlayer().getName().getString());
     }

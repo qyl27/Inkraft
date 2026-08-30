@@ -28,10 +28,9 @@ public class WorldTimeFunction implements IStoryFunction {
 
     @Override
     public IStoryValue<?, ?> apply(StoryInstance instance, IStoryValue<?, ?>... args) {
-        FunctionArgs.requireCount(args, 1);
-        FunctionArgs.requireTyped(args, 0, String.class);
+        FunctionArgs.expectCount(args, 1);
 
-        var id = FunctionArgs.getString(args[0]);
+        var id = FunctionArgs.requireString(args[0]);
         var level = tryParseLevel(instance, id);
         var result = function.apply(level);
         return new IntStoryValue(result);

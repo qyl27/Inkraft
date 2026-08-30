@@ -16,11 +16,10 @@ public class RealTimeFunction implements IStoryFunction {
 
     @Override
     public IStoryValue<?, ?> apply(StoryInstance instance, IStoryValue<?, ?>... args) {
-        FunctionArgs.requireCount(args, 1);
-        FunctionArgs.requireTyped(args, 0, String.class);
+        FunctionArgs.expectCount(args, 1);
 
         var now = OffsetDateTime.now();
-        var pattern = FunctionArgs.getString(args[0]);
+        var pattern = FunctionArgs.requireString(args[0]);
         var result = pattern.isEmpty() ? now.toString() : now.format(DateTimeFormatter.ofPattern(pattern));
         return IStoryValue.fromString(result);
     }

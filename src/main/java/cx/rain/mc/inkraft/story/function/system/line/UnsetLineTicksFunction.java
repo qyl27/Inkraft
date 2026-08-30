@@ -15,7 +15,7 @@ public class UnsetLineTicksFunction implements IStoryFunction {
 
     @Override
     public BoolStoryValue apply(StoryInstance instance, IStoryValue<?, ?>... args) {
-        FunctionArgs.requireCount(args, 0);
+        FunctionArgs.expectCount(args, 0);
 
         instance.getData().unsetVariable(ModConstants.Variables.LINE_PAUSE_TICKS);
         return BoolStoryValue.TRUE;

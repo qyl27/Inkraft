@@ -14,12 +14,10 @@ public class NewFlowFunction implements IStoryFunction {
 
     @Override
     public BoolStoryValue apply(StoryInstance instance, IStoryValue<?, ?>... args) {
-        FunctionArgs.requireCount(args, 2);
-        FunctionArgs.requireTyped(args, 0, String.class);
-        FunctionArgs.requireTyped(args, 1, String.class);
+        FunctionArgs.expectCount(args, 2);
 
-        var name = FunctionArgs.getString(args[0]);
-        var knot = FunctionArgs.getString(args[1]);
+        var name = FunctionArgs.requireString(args[0]);
+        var knot = FunctionArgs.requireString(args[1]);
         return BoolStoryValue.from(instance.requestNewFlow(name, knot));
     }
 }

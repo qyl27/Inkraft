@@ -22,17 +22,17 @@ public class GetStorageFunction implements IStoryFunction {
 
     @Override
     public IStoryValue<?, ?> apply(StoryInstance instance, IStoryValue<?, ?>... args) {
-        FunctionArgs.requireCount(args, 2);
-        FunctionArgs.requireTyped(args, 0, String.class);
-        FunctionArgs.requireTyped(args, 1, String.class);
+        FunctionArgs.expectCount(args, 2);
+        var idArgument = FunctionArgs.requireString(args[0]);
+        var pathArgument = FunctionArgs.requireString(args[1]);
 
         var server = instance.getPlayer().level().getServer();
-        var id = StringArgumentParseHelper.parseId(FunctionArgs.getString(args[0]));
+        var id = StringArgumentParseHelper.parseId(idArgument);
         var storage = server.getCommandStorage();
         var tag = storage.get(id);
 
         try {
-            var path = StringArgumentParseHelper.parseNbtPath(FunctionArgs.getString(args[1]));
+            var path = StringArgumentParseHelper.parseNbtPath(pathArgument);
             var list = path.get(tag);
             if (list.size() == 1) {
                 var t = list.getFirst();

@@ -14,8 +14,8 @@ public class ToStringFunction implements IStoryFunction {
 
     @Override
     public StringStoryValue apply(StoryInstance instance, IStoryValue<?, ?>... args) {
-        FunctionArgs.requireCount(args, 1);
-
-        return new StringStoryValue(args[0].getString());
+        FunctionArgs.expectCount(args, 1);
+        var str = args[0].toString();
+        return new StringStoryValue(str);
     }
 }

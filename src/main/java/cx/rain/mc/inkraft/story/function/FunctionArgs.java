@@ -1,85 +1,101 @@
 package cx.rain.mc.inkraft.story.function;
 
-import cx.rain.mc.inkraft.story.value.*;
+import cx.rain.mc.inkraft.story.value.IStoryValue;
+
+import java.util.Objects;
+import java.util.Optional;
 
 public class FunctionArgs {
-    public static void requireCount(IStoryValue<?, ?>[] args, int expected) {
+
+    // region Args count assertion
+
+    public static void expectCount(IStoryValue<?, ?>[] args, int expected) {
         var actual = args.length;
         if (actual != expected) {
             throw new FunctionArgumentCountException("Expected " + expected + " arguments, got " + actual + '.');
         }
     }
 
-    public static void requireMoreThan(IStoryValue<?, ?>[] args, int expected) {
+    public static void expectMoreThan(IStoryValue<?, ?>[] args, int expected) {
         var actual = args.length;
         if (actual <= expected) {
             throw new FunctionArgumentCountException("Expected more than " + expected + " arguments, got " + actual + '.');
         }
     }
 
-    public static void requireTyped(IStoryValue<?, ?>[] args, int index, Class<?> expected) {
-        requireMoreThan(args, index);
-        var value = args[index];
+    // endregion
 
+    // region Primitive args
+
+    public static <T> Optional<T> getTyped(IStoryValue<?, ?> value, Class<T> expected) {
+        Objects.requireNonNull(value, "value");
+        Objects.requireNonNull(expected, "expected");
         if (!expected.isAssignableFrom(value.getValueType())) {
-            throw new FunctionArgumentTypeException("Expected " + expected.getSimpleName() + " at argument " + index
-                    + ", got " + getTypeName(value) + '.');
+            return Optional.empty();
         }
+        return Optional.of(expected.cast(value.toPrimitive()));
     }
 
-    public static String getString(IStoryValue<?, ?> value) {
-        if (value instanceof StringifyStoryValue<?> stringify) {
-            return stringify.getString();
-        }
-        throw unexpectedType(String.class, value);
+    public static <T> T requireTyped(IStoryValue<?, ?> value, Class<T> expected) {
+        return getTyped(value, expected)
+            .orElseThrow(() -> FunctionArgumentTypeException.unexpectedType(expected, value));
     }
 
-    public static int getInt(IStoryValue<?, ?> value) {
-        if (value instanceof IntStoryValue(int i)) {
-            return i;
-        }
-        throw unexpectedType(Integer.class, value);
+    public static Optional<String> getString(IStoryValue<?, ?> value) {
+        return getTyped(value, String.class);
     }
 
-    public static int getIntOrDefault(IStoryValue<?, ?> value, int defaultValue) {
-        if (value instanceof StringStoryValue string && string.getString().isEmpty()) {
-            return defaultValue;
-        }
-        return getInt(value);
+    public static String requireString(IStoryValue<?, ?> value) {
+        return requireTyped(value, String.class);
     }
 
-    public static float getFloat(IStoryValue<?, ?> value) {
-        if (value instanceof FloatStoryValue(float f)) {
-            return f;
-        }
-        throw unexpectedType(Float.class, value);
+    public static Optional<Integer> getInt(IStoryValue<?, ?> value) {
+        return getTyped(value, Integer.class);
     }
 
-    public static boolean getBool(IStoryValue<?, ?> value) {
-        if (value instanceof BoolStoryValue b) {
-            return b.value();
-        }
-        throw unexpectedType(Boolean.class, value);
+    public static int requireInt(IStoryValue<?, ?> value) {
+        return requireTyped(value, Integer.class);
     }
 
-    public static int getNonNegativeInt(IStoryValue<?, ?> value) {
-        var result = getInt(value);
+    public static Optional<Float> getFloat(IStoryValue<?, ?> value) {
+        return getTyped(value, Float.class);
+    }
+
+    public static float requireFloat(IStoryValue<?, ?> value) {
+        return requireTyped(value, Float.class);
+    }
+
+    public static Optional<Boolean> getBool(IStoryValue<?, ?> value) {
+        return getTyped(value, Boolean.class);
+    }
+
+    public static boolean requireBool(IStoryValue<?, ?> value) {
+        return requireTyped(value, Boolean.class);
+    }
+
+    // endregion
+
+    // region Extra args
+
+    public static Optional<Integer> getNonNegativeInt(IStoryValue<?, ?> value) {
+        return getInt(value).filter(result -> result >= 0);
+    }
+
+    public static int requireNonNegativeInt(IStoryValue<?, ?> value) {
+        var result = requireInt(value);
         if (result < 0) {
             throw new FunctionArgumentRangeException("Expected a non-negative integer, got " + result + '.');
         }
         return result;
     }
 
-    public static int getIndex(IStoryValue<?, ?> value) {
+    public static Optional<Integer> getIndex(IStoryValue<?, ?> value) {
         return getNonNegativeInt(value);
     }
 
-    private static FunctionArgumentTypeException unexpectedType(Class<?> expected, IStoryValue<?, ?> actual) {
-        return new FunctionArgumentTypeException("Expected " + expected.getSimpleName() + ", got "
-                + getTypeName(actual) + '.');
+    public static int requireIndex(IStoryValue<?, ?> value) {
+        return requireNonNegativeInt(value);
     }
 
-    private static String getTypeName(IStoryValue<?, ?> value) {
-        return value.getValueType().getSimpleName();
-    }
+    // endregion
 }

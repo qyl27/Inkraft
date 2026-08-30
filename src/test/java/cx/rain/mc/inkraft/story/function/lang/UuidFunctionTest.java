@@ -1,6 +1,8 @@
 package cx.rain.mc.inkraft.story.function.lang;
 
+import cx.rain.mc.inkraft.story.function.FunctionArgumentTypeException;
 import cx.rain.mc.inkraft.story.value.BoolStoryValue;
+import cx.rain.mc.inkraft.story.value.IntStoryValue;
 import cx.rain.mc.inkraft.story.value.StringStoryValue;
 import org.junit.jupiter.api.Test;
 
@@ -37,6 +39,14 @@ class UuidFunctionTest {
         assertFalse(apply(function, "{123e4567-e89b-12d3-a456-426614174000}"));
         assertFalse(apply(function, "not-a-uuid"));
         assertTrue(function.isLookaheadSafe());
+    }
+
+    @Test
+    void isUuidStillRejectsNonStringArguments() {
+        var function = UuidFunctions.isUuid();
+
+        assertThrows(FunctionArgumentTypeException.class,
+                () -> function.apply(null, new IntStoryValue(1)));
     }
 
     private static boolean apply(AbstractLangFunction function, String value) {

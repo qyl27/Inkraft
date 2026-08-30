@@ -13,7 +13,7 @@ public class MapFunctions {
             @Override
             public MapStoryValue apply(StoryInstance instance, IStoryValue<?, ?>... args) {
                 // createMap()
-                FunctionArgs.requireCount(args, 0);
+                FunctionArgs.expectCount(args, 0);
                 return MapStoryValue.empty();
             }
         };
@@ -24,10 +24,9 @@ public class MapFunctions {
             @Override
             public BoolStoryValue apply(StoryInstance instance, IStoryValue<?, ?>... args) {
                 // isMap(map)
-                FunctionArgs.requireCount(args, 1);
-                FunctionArgs.requireTyped(args, 0, String.class);
+                FunctionArgs.expectCount(args, 1);
 
-                var value = FunctionArgs.getString(args[0]);
+                var value = FunctionArgs.requireString(args[0]);
                 return BoolStoryValue.from(MapStoryValue.isValid(value));
             }
         };
@@ -38,10 +37,9 @@ public class MapFunctions {
             @Override
             public IntStoryValue apply(StoryInstance instance, IStoryValue<?, ?>... args) {
                 // mapSize(map)
-                FunctionArgs.requireCount(args, 1);
-                FunctionArgs.requireTyped(args, 0, String.class);
+                FunctionArgs.expectCount(args, 1);
 
-                var value = FunctionArgs.getString(args[0]);
+                var value = FunctionArgs.requireString(args[0]);
                 try {
                     return new IntStoryValue(MapStoryValue.parse(value).size());
                 } catch (IllegalArgumentException ignored) {
@@ -56,12 +54,10 @@ public class MapFunctions {
             @Override
             public IStoryValue<?, ?> apply(StoryInstance instance, IStoryValue<?, ?>... args) {
                 // mapSet(map, key, value)
-                FunctionArgs.requireCount(args, 3);
-                FunctionArgs.requireTyped(args, 0, String.class);
-                FunctionArgs.requireTyped(args, 1, String.class);
+                FunctionArgs.expectCount(args, 3);
 
-                var str = FunctionArgs.getString(args[0]);
-                var key = FunctionArgs.getString(args[1]);
+                var str = FunctionArgs.requireString(args[0]);
+                var key = FunctionArgs.requireString(args[1]);
                 return falseOnInvalidInput(() -> MapStoryValue.parse(str).set(key, args[2]));
             }
         };
@@ -72,12 +68,10 @@ public class MapFunctions {
             @Override
             public IStoryValue<?, ?> apply(StoryInstance instance, IStoryValue<?, ?>... args) {
                 // mapGet(map, key)
-                FunctionArgs.requireCount(args, 2);
-                FunctionArgs.requireTyped(args, 0, String.class);
-                FunctionArgs.requireTyped(args, 1, String.class);
+                FunctionArgs.expectCount(args, 2);
 
-                var str = FunctionArgs.getString(args[0]);
-                var key = FunctionArgs.getString(args[1]);
+                var str = FunctionArgs.requireString(args[0]);
+                var key = FunctionArgs.requireString(args[1]);
                 return falseOnInvalidInput(() -> MapStoryValue.parse(str).get(key));
             }
         };
@@ -88,12 +82,10 @@ public class MapFunctions {
             @Override
             public IStoryValue<?, ?> apply(StoryInstance instance, IStoryValue<?, ?>... args) {
                 // mapRemove(map, key)
-                FunctionArgs.requireCount(args, 2);
-                FunctionArgs.requireTyped(args, 0, String.class);
-                FunctionArgs.requireTyped(args, 1, String.class);
+                FunctionArgs.expectCount(args, 2);
 
-                var str = FunctionArgs.getString(args[0]);
-                var key = FunctionArgs.getString(args[1]);
+                var str = FunctionArgs.requireString(args[0]);
+                var key = FunctionArgs.requireString(args[1]);
                 return falseOnInvalidInput(() -> MapStoryValue.parse(str).remove(key));
             }
         };
@@ -104,12 +96,10 @@ public class MapFunctions {
             @Override
             public BoolStoryValue apply(StoryInstance instance, IStoryValue<?, ?>... args) {
                 // mapContains(map, key)
-                FunctionArgs.requireCount(args, 2);
-                FunctionArgs.requireTyped(args, 0, String.class);
-                FunctionArgs.requireTyped(args, 1, String.class);
+                FunctionArgs.expectCount(args, 2);
 
-                var str = FunctionArgs.getString(args[0]);
-                var key = FunctionArgs.getString(args[1]);
+                var str = FunctionArgs.requireString(args[0]);
+                var key = FunctionArgs.requireString(args[1]);
                 try {
                     var map = MapStoryValue.parse(str);
                     return BoolStoryValue.from(map.contains(key));

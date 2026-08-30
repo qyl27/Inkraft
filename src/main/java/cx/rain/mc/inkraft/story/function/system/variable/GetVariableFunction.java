@@ -14,10 +14,9 @@ public class GetVariableFunction implements IStoryFunction {
 
     @Override
     public IStoryValue<?, ?> apply(StoryInstance instance, IStoryValue<?, ?>... args) {
-        FunctionArgs.requireCount(args, 1);
-        FunctionArgs.requireTyped(args, 0, String.class);
+        FunctionArgs.expectCount(args, 1);
 
-        var name = FunctionArgs.getString(args[0]);
+        var name = FunctionArgs.requireString(args[0]);
         var v = instance.getData().getVariable(name);
         if (v == null) {
             return BoolStoryValue.FALSE;

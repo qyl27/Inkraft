@@ -41,12 +41,10 @@ public final class PlayerStatFunctions implements IStoryFunction {
 
     @Override
     public IStoryValue<?, ?> apply(StoryInstance instance, IStoryValue<?, ?>... args) {
-        FunctionArgs.requireCount(args, 2);
-        FunctionArgs.requireTyped(args, 0, String.class);
-        FunctionArgs.requireTyped(args, 1, String.class);
+        FunctionArgs.expectCount(args, 2);
 
-        var typeId = Identifier.tryParse(FunctionArgs.getString(args[0]));
-        var valueId = Identifier.tryParse(FunctionArgs.getString(args[1]));
+        var typeId = Identifier.tryParse(FunctionArgs.requireString(args[0]));
+        var valueId = Identifier.tryParse(FunctionArgs.requireString(args[1]));
         if (typeId == null || valueId == null) {
             return BoolStoryValue.FALSE;
         }

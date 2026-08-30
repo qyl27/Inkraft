@@ -15,18 +15,16 @@ public class GiveItemFunction implements IStoryFunction {
 
     @Override
     public IStoryValue<?, ?> apply(StoryInstance instance, IStoryValue<?, ?>... args) {
-        FunctionArgs.requireCount(args, 4);
-        FunctionArgs.requireTyped(args, 0, String.class);
-        FunctionArgs.requireTyped(args, 2, String.class);
-        FunctionArgs.requireTyped(args, 3, String.class);
-        var count = FunctionArgs.getIntOrDefault(args[1], 1);
+        FunctionArgs.expectCount(args, 4);
+        var item = FunctionArgs.requireString(args[0]);
+        var components = FunctionArgs.requireString(args[2]);
+        var nbt = FunctionArgs.requireString(args[3]);
+        var count = FunctionArgs.getInt(args[1]).orElse(1);
 
         var player = instance.getPlayer();
         var registries = player.registryAccess();
-        var item = ItemStackHelper.createItemStack(registries,
-                FunctionArgs.getString(args[0]), Integer.toString(count), FunctionArgs.getString(args[2]),
-                FunctionArgs.getString(args[3]));
-        var result = player.addItem(item);
+        var stack = ItemStackHelper.createItemStack(registries, item, Integer.toString(count), components, nbt);
+        var result = player.addItem(stack);
         return BoolStoryValue.from(result);
     }
 }

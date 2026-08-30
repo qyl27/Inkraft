@@ -29,10 +29,9 @@ public class RunCommandFunction implements IStoryFunction {
 
     @Override
     public IntStoryValue apply(StoryInstance instance, IStoryValue<?, ?>... args) {
-        FunctionArgs.requireCount(args, 1);
-        FunctionArgs.requireTyped(args, 0, String.class);
+        FunctionArgs.expectCount(args, 1);
 
-        var command = FunctionArgs.getString(args[0]);
+        var command = FunctionArgs.requireString(args[0]);
         var source = function.apply(instance.getPlayer());
         var server = instance.getPlayer().level().getServer();
         return new IntStoryValue(execute(command, server, source));

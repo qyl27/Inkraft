@@ -5,6 +5,7 @@ import cx.rain.mc.inkraft.story.function.FunctionArgs;
 import cx.rain.mc.inkraft.story.value.BoolStoryValue;
 import cx.rain.mc.inkraft.story.value.IStoryValue;
 import cx.rain.mc.inkraft.story.value.StringStoryValue;
+import cx.rain.mc.inkraft.utility.parser.UuidArgumentParser;
 
 import java.util.UUID;
 
@@ -14,7 +15,7 @@ public class UuidFunctions {
             @Override
             public StringStoryValue apply(StoryInstance instance, IStoryValue<?, ?>... args) {
                 // randomUuid()
-                FunctionArgs.requireCount(args, 0);
+                FunctionArgs.expectCount(args, 0);
                 return new StringStoryValue(UUID.randomUUID().toString());
             }
 
@@ -30,15 +31,10 @@ public class UuidFunctions {
             @Override
             public BoolStoryValue apply(StoryInstance instance, IStoryValue<?, ?>... args) {
                 // isUuid(str)
-                FunctionArgs.requireCount(args, 1);
-                FunctionArgs.requireTyped(args, 0, String.class);
+                FunctionArgs.expectCount(args, 1);
+                FunctionArgs.requireString(args[0]);
 
-                try {
-                    UUID.fromString(FunctionArgs.getString(args[0]));
-                    return BoolStoryValue.TRUE;
-                } catch (IllegalArgumentException ignored) {
-                    return BoolStoryValue.FALSE;
-                }
+                return BoolStoryValue.from(UuidArgumentParser.getUuid(args[0]).isPresent());
             }
         };
     }

@@ -26,18 +26,17 @@ public class ScoreboardValuedFunction implements IStoryFunction {
 
     @Override
     public IStoryValue<?, ?> apply(StoryInstance instance, IStoryValue<?, ?>... args) {
-        FunctionArgs.requireCount(args, 2);
-        FunctionArgs.requireTyped(args, 0, String.class);
-        FunctionArgs.requireTyped(args, 1, Integer.class);
+        FunctionArgs.expectCount(args, 2);
+        var objectiveName = FunctionArgs.requireString(args[0]);
+        var value = FunctionArgs.requireInt(args[1]);
 
         var player = instance.getPlayer();
         var scoreboard = player.level().getScoreboard();
-        var objective = scoreboard.getObjective(FunctionArgs.getString(args[0]));
+        var objective = scoreboard.getObjective(objectiveName);
         if (objective == null) {
             return BoolStoryValue.FALSE;
         }
 
-        var value = FunctionArgs.getInt(args[1]);
         var access = scoreboard.getOrCreatePlayerScore(player, objective);
         function.accept(access, value);
         return BoolStoryValue.TRUE;

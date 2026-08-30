@@ -14,7 +14,7 @@ public class PauseFunction implements IStoryFunction {
 
     @Override
     public BoolStoryValue apply(StoryInstance instance, IStoryValue<?, ?>... args) {
-        FunctionArgs.requireCount(args, 0);
+        FunctionArgs.expectCount(args, 0);
 
         instance.requestPause();
         return BoolStoryValue.TRUE;

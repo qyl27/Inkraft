@@ -46,35 +46,7 @@ public class StringArgumentParseHelper {
         }
     }
 
-    public static int parseCount(String count) {
-        return parseInt(count, 1);
-    }
-
     public static Identifier parseId(String id) {
         return Identifier.parse(id);
-    }
-
-    public static int parseInt(String str, int defaultValue) {
-        if (!str.isEmpty()) {
-            try {
-                return Integer.parseInt(str);
-            } catch (NumberFormatException ignored) {
-                log.warn("Bad int value: {}", str);
-                return defaultValue;
-            }
-        }
-        return defaultValue;
-    }
-
-    public static float parseFloat(String str, float defaultValue) {
-        if (!str.isEmpty()) {
-            try {
-                return Float.parseFloat(str);
-            } catch (NumberFormatException ignored) {
-                log.warn("Bad float value: {}", str);
-                return defaultValue;
-            }
-        }
-        return defaultValue;
     }
 }

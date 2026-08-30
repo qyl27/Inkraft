@@ -10,7 +10,7 @@ public class ArrayFunctions {
             @Override
             public ArrayStoryValue apply(StoryInstance instance, IStoryValue<?, ?>... args) {
                 // createArray()
-                FunctionArgs.requireCount(args, 0);
+                FunctionArgs.expectCount(args, 0);
                 return ArrayStoryValue.empty();
             }
         };
@@ -21,10 +21,9 @@ public class ArrayFunctions {
             @Override
             public BoolStoryValue apply(StoryInstance instance, IStoryValue<?, ?>... args) {
                 // isArray(array)
-                FunctionArgs.requireCount(args, 1);
-                FunctionArgs.requireTyped(args, 0, String.class);
+                FunctionArgs.expectCount(args, 1);
 
-                var value = FunctionArgs.getString(args[0]);
+                var value = FunctionArgs.requireString(args[0]);
                 return BoolStoryValue.from(ArrayStoryValue.isValid(value));
             }
         };
@@ -35,10 +34,9 @@ public class ArrayFunctions {
             @Override
             public IntStoryValue apply(StoryInstance instance, IStoryValue<?, ?>... args) {
                 // arraySize(array)
-                FunctionArgs.requireCount(args, 1);
-                FunctionArgs.requireTyped(args, 0, String.class);
+                FunctionArgs.expectCount(args, 1);
 
-                var value = FunctionArgs.getString(args[0]);
+                var value = FunctionArgs.requireString(args[0]);
                 try {
                     return new IntStoryValue(ArrayStoryValue.parse(value).size());
                 } catch (IllegalArgumentException ignored) {
@@ -53,13 +51,11 @@ public class ArrayFunctions {
             @Override
             public IStoryValue<?, ?> apply(StoryInstance instance, IStoryValue<?, ?>... args) {
                 // arraySet(array, index, value)
-                FunctionArgs.requireCount(args, 3);
-                FunctionArgs.requireTyped(args, 0, String.class);
-                FunctionArgs.requireTyped(args, 1, Integer.class);
+                FunctionArgs.expectCount(args, 3);
 
-                var str = FunctionArgs.getString(args[0]);
+                var str = FunctionArgs.requireString(args[0]);
                 return falseOnInvalidInput(() -> {
-                    var index = FunctionArgs.getInt(args[1]);
+                    var index = FunctionArgs.requireInt(args[1]);
                     return ArrayStoryValue.parse(str).set(index, args[2]);
                 });
             }
@@ -71,13 +67,11 @@ public class ArrayFunctions {
             @Override
             public IStoryValue<?, ?> apply(StoryInstance instance, IStoryValue<?, ?>... args) {
                 // arrayGet(array, index)
-                FunctionArgs.requireCount(args, 2);
-                FunctionArgs.requireTyped(args, 0, String.class);
-                FunctionArgs.requireTyped(args, 1, Integer.class);
+                FunctionArgs.expectCount(args, 2);
 
-                var str = FunctionArgs.getString(args[0]);
+                var str = FunctionArgs.requireString(args[0]);
                 return falseOnInvalidInput(() -> {
-                    var index = FunctionArgs.getInt(args[1]);
+                    var index = FunctionArgs.requireInt(args[1]);
                     return ArrayStoryValue.parse(str).get(index);
                 });
             }
@@ -89,10 +83,9 @@ public class ArrayFunctions {
             @Override
             public IStoryValue<?, ?> apply(StoryInstance instance, IStoryValue<?, ?>... args) {
                 // arrayAdd(array, value)
-                FunctionArgs.requireCount(args, 2);
-                FunctionArgs.requireTyped(args, 0, String.class);
+                FunctionArgs.expectCount(args, 2);
 
-                var str = FunctionArgs.getString(args[0]);
+                var str = FunctionArgs.requireString(args[0]);
                 return falseOnInvalidInput(() -> ArrayStoryValue.parse(str).add(args[1]));
             }
         };
@@ -103,13 +96,11 @@ public class ArrayFunctions {
             @Override
             public IStoryValue<?, ?> apply(StoryInstance instance, IStoryValue<?, ?>... args) {
                 // arrayRemove(array, index)
-                FunctionArgs.requireCount(args, 2);
-                FunctionArgs.requireTyped(args, 0, String.class);
-                FunctionArgs.requireTyped(args, 1, Integer.class);
+                FunctionArgs.expectCount(args, 2);
 
-                var str = FunctionArgs.getString(args[0]);
+                var str = FunctionArgs.requireString(args[0]);
                 return falseOnInvalidInput(() -> {
-                    var index = FunctionArgs.getInt(args[1]);
+                    var index = FunctionArgs.requireInt(args[1]);
                     return ArrayStoryValue.parse(str).remove(index);
                 });
             }
@@ -121,10 +112,9 @@ public class ArrayFunctions {
             @Override
             public BoolStoryValue apply(StoryInstance instance, IStoryValue<?, ?>... args) {
                 // arrayRemove(array, value)
-                FunctionArgs.requireCount(args, 2);
-                FunctionArgs.requireTyped(args, 0, String.class);
+                FunctionArgs.expectCount(args, 2);
 
-                var str = FunctionArgs.getString(args[0]);
+                var str = FunctionArgs.requireString(args[0]);
                 try {
                     var array = ArrayStoryValue.parse(str);
                     return BoolStoryValue.from(array.contains(args[1]));

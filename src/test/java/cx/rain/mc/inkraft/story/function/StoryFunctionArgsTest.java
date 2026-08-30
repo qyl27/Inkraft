@@ -34,6 +34,7 @@ import cx.rain.mc.inkraft.story.function.system.variable.GetVariableFunction;
 import cx.rain.mc.inkraft.story.function.system.variable.HasVariableFunction;
 import cx.rain.mc.inkraft.story.function.system.variable.SetVariableFunction;
 import cx.rain.mc.inkraft.story.function.system.variable.UnsetVariableFunction;
+import cx.rain.mc.inkraft.story.value.ArrayStoryValue;
 import cx.rain.mc.inkraft.story.value.BoolStoryValue;
 import cx.rain.mc.inkraft.story.value.FloatStoryValue;
 import cx.rain.mc.inkraft.story.value.IStoryValue;
@@ -81,9 +82,7 @@ class StoryFunctionArgsTest {
     Stream<DynamicTest> rejectsWrongArgumentTypes() {
         return contracts().flatMap(contract -> Stream.of(
             typedTests(contract, contract.stringArgs(), new IntStoryValue(1), FunctionArgumentTypeException.class),
-            typedTests(contract, contract.intArgs(), new StringStoryValue("1"), FunctionArgumentTypeException.class),
-            typedTests(contract, contract.optionalIntArgs(), BoolStoryValue.TRUE,
-                FunctionArgumentTypeException.class)
+            typedTests(contract, contract.intArgs(), new StringStoryValue("1"), FunctionArgumentTypeException.class)
         ).flatMap(stream -> stream));
     }
 
@@ -94,6 +93,30 @@ class StoryFunctionArgsTest {
         assertEquals("12", toString.apply(null, new IntStoryValue(12)).getValue());
         assertEquals("2.5", toString.apply(null, new FloatStoryValue(2.5F)).getValue());
         assertEquals("value", toString.apply(null, STRING).getValue());
+    }
+
+    @Test
+    void numericParseFunctionsUseValueTextAndFallbackToZero() {
+        var parseBool = new ParseBoolFunction();
+        assertEquals(true, parseBool.apply(null, BoolStoryValue.TRUE).getValue());
+        assertEquals(false, parseBool.apply(null, new IntStoryValue(0)).getValue());
+        assertEquals(true, parseBool.apply(null, new IntStoryValue(1)).getValue());
+
+        var parseInt = new ParseIntFunction();
+        assertEquals(12, parseInt.apply(null, new IntStoryValue(12)).getValue());
+        assertEquals(12, parseInt.apply(null, new StringStoryValue("12")).getValue());
+        assertEquals(0, parseInt.apply(null, BoolStoryValue.TRUE).getValue());
+        assertEquals(0, parseInt.apply(null, new StringStoryValue("invalid")).getValue());
+        assertEquals(0, parseInt.apply(null, new StringStoryValue("")).getValue());
+        assertEquals(0, parseInt.apply(null, ArrayStoryValue.empty()).getValue());
+
+        var parseFloat = new ParseFloatFunction();
+        assertEquals(12.0F, parseFloat.apply(null, new IntStoryValue(12)).getValue());
+        assertEquals(2.5F, parseFloat.apply(null, new StringStoryValue("2.5")).getValue());
+        assertEquals(0.0F, parseFloat.apply(null, BoolStoryValue.TRUE).getValue());
+        assertEquals(0.0F, parseFloat.apply(null, new StringStoryValue("invalid")).getValue());
+        assertEquals(0.0F, parseFloat.apply(null, new StringStoryValue("")).getValue());
+        assertEquals(0.0F, parseFloat.apply(null, ArrayStoryValue.empty()).getValue());
     }
 
     private static Stream<DynamicTest> typedTests(Contract contract, int[] indexes,
@@ -123,16 +146,16 @@ class StoryFunctionArgsTest {
             strings("hasVariable", new HasVariableFunction(), 1, 0),
             strings("getVariable", new GetVariableFunction(), 1, 0),
             new Contract("setVariable", new SetVariableFunction(), args(STRING, BoolStoryValue.TRUE),
-                indexes(0), indexes(), indexes()),
+                indexes(0), indexes()),
             strings("unsetVariable", new UnsetVariableFunction(), 1, 0),
             contract("clearVariables", new ClearVariableFunction()),
             strings("log", new LogFunction("log", (_, _) -> {
             }), 1, 0),
-            strings("parseBool", new ParseBoolFunction(), 1, 0),
-            strings("parseInt", new ParseIntFunction(), 1, 0),
-            strings("parseFloat", new ParseFloatFunction(), 1, 0),
+            new Contract("parseBool", new ParseBoolFunction(), args(STRING), indexes(), indexes()),
+            new Contract("parseInt", new ParseIntFunction(), args(STRING), indexes(), indexes()),
+            new Contract("parseFloat", new ParseFloatFunction(), args(STRING), indexes(), indexes()),
             new Contract("toString", new ToStringFunction(), args(BoolStoryValue.TRUE),
-                indexes(), indexes(), indexes()),
+                indexes(), indexes()),
             contract("randomUuid", UuidFunctions.randomUuid()),
             strings("isUuid", UuidFunctions.isUuid(), 1, 0),
             contract("getPlayerName", new GetPlayerNameFunction()),
@@ -145,37 +168,37 @@ class StoryFunctionArgsTest {
             new Contract("valuedScoreboard",
                 new ScoreboardValuedFunction("valuedScoreboard", (_, _) -> {
                 }), args(STRING, INT),
-                indexes(0), indexes(1), indexes()),
+                indexes(0), indexes(1)),
             strings("getStorage", new GetStorageFunction(), 2, 0, 1),
             strings("setStorage", new SetStorageFunction(), 3, 0, 1, 2),
             inventory("hasItem", new HasItemFunction()),
             new Contract("countItem", new CountItemFunction(),
                 args(STRING, STRING, STRING),
-                indexes(0, 1, 2), indexes(), indexes()),
+                indexes(0, 1, 2), indexes()),
             inventory("giveItem", new GiveItemFunction()),
             inventory("takeItem", new TakeItemFunction())
         );
     }
 
     private static Contract contract(String name, IStoryFunction function) {
-        return new Contract(name, function, args(), indexes(), indexes(), indexes());
+        return new Contract(name, function, args(), indexes(), indexes());
     }
 
     private static Contract strings(String name, IStoryFunction function, int count, int... stringArgs) {
         var args = new IStoryValue<?, ?>[count];
         Arrays.fill(args, STRING);
-        return new Contract(name, function, args, stringArgs, indexes(), indexes());
+        return new Contract(name, function, args, stringArgs, indexes());
     }
 
     private static Contract ints(String name, IStoryFunction function, int count, int... intArgs) {
         var args = new IStoryValue<?, ?>[count];
         Arrays.fill(args, INT);
-        return new Contract(name, function, args, indexes(), intArgs, indexes());
+        return new Contract(name, function, args, indexes(), intArgs);
     }
 
     private static Contract inventory(String name, IStoryFunction function) {
         return new Contract(name, function, args(STRING, INT, STRING, STRING),
-            indexes(0, 2, 3), indexes(), indexes(1));
+            indexes(0, 2, 3), indexes());
     }
 
     private static IStoryValue<?, ?>[] args(IStoryValue<?, ?>... values) {
@@ -187,6 +210,6 @@ class StoryFunctionArgsTest {
     }
 
     private record Contract(String name, IStoryFunction function, IStoryValue<?, ?>[] validArgs,
-                            int[] stringArgs, int[] intArgs, int[] optionalIntArgs) {
+                            int[] stringArgs, int[] intArgs) {
     }
 }

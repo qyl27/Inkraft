@@ -16,10 +16,9 @@ public class SetLineTicksFunction implements IStoryFunction {
 
     @Override
     public BoolStoryValue apply(StoryInstance instance, IStoryValue<?, ?>... args) {
-        FunctionArgs.requireCount(args, 1);
-        FunctionArgs.requireTyped(args, 0, Integer.class);
+        FunctionArgs.expectCount(args, 1);
 
-        var ticks = FunctionArgs.getInt(args[0]);
+        var ticks = FunctionArgs.requireInt(args[0]);
         if (ticks < -1) {
             return BoolStoryValue.FALSE;
         }
