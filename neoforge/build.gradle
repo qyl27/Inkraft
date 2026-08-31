@@ -18,7 +18,7 @@ loom {
             server()
             forgeTemplate = 'gameTestServer'
             sourceSet = sourceSets.gametest.name
-            setRunDirectory file('run/server')
+            setRunDirectory file('run/gametestserver')
 
             mods {
                 main {
