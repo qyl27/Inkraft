@@ -6,9 +6,13 @@ import cx.rain.mc.inkraft.story.value.FloatStoryValue;
 import cx.rain.mc.inkraft.story.value.IStoryValue;
 import cx.rain.mc.inkraft.story.value.IntStoryValue;
 import cx.rain.mc.inkraft.story.value.StringStoryValue;
+import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestFactory;
 
 import java.util.Optional;
+import java.util.function.Function;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -54,7 +58,7 @@ class FunctionArgsTest {
 
         assertEquals(Optional.empty(), FunctionArgs.getTyped(integer, String.class));
         var exception = assertThrows(FunctionArgumentTypeException.class,
-                () -> FunctionArgs.requireTyped(integer, String.class));
+            () -> FunctionArgs.requireTyped(integer, String.class));
         assertEquals("Expected String, got Integer.", exception.getMessage());
 
         assertThrows(NullPointerException.class, () -> FunctionArgs.getTyped(null, String.class));
@@ -84,62 +88,26 @@ class FunctionArgsTest {
         assertEquals("[]", FunctionArgs.requireTyped(array, String.class));
     }
 
-    @Test
-    void readsStringsWithOptionalAndRequiredForms() {
-        var value = new StringStoryValue("value");
-        var invalid = new IntStoryValue(1);
-
-        assertEquals(Optional.of("value"), FunctionArgs.getString(value));
-        assertEquals("value", FunctionArgs.requireString(value));
-        assertEquals("value", FunctionArgs.getString(value).orElse("fallback"));
-
-        assertEquals(Optional.empty(), FunctionArgs.getString(invalid));
-        assertThrows(FunctionArgumentTypeException.class, () -> FunctionArgs.requireString(invalid));
-        assertEquals("fallback", FunctionArgs.getString(invalid).orElse("fallback"));
-    }
-
-    @Test
-    void readsIntsWithOptionalAndRequiredForms() {
-        var value = new IntStoryValue(12);
-        var invalid = new StringStoryValue("12");
-
-        assertEquals(Optional.of(12), FunctionArgs.getInt(value));
-        assertEquals(12, FunctionArgs.requireInt(value));
-        assertEquals(12, FunctionArgs.getInt(value).orElse(3));
-
-        assertEquals(Optional.empty(), FunctionArgs.getInt(invalid));
-        assertThrows(FunctionArgumentTypeException.class, () -> FunctionArgs.requireInt(invalid));
-        assertEquals(3, FunctionArgs.getInt(invalid).orElse(3));
-        assertEquals(3, FunctionArgs.getInt(new StringStoryValue("")).orElse(3));
-        assertEquals(3, FunctionArgs.getInt(BoolStoryValue.TRUE).orElse(3));
-    }
-
-    @Test
-    void readsFloatsWithOptionalAndRequiredForms() {
-        var value = new FloatStoryValue(2.5F);
-        var invalid = new IntStoryValue(1);
-
-        assertEquals(Optional.of(2.5F), FunctionArgs.getFloat(value));
-        assertEquals(2.5F, FunctionArgs.requireFloat(value));
-        assertEquals(2.5F, FunctionArgs.getFloat(value).orElse(1.5F));
-
-        assertEquals(Optional.empty(), FunctionArgs.getFloat(invalid));
-        assertThrows(FunctionArgumentTypeException.class, () -> FunctionArgs.requireFloat(invalid));
-        assertEquals(1.5F, FunctionArgs.getFloat(invalid).orElse(1.5F));
-    }
-
-    @Test
-    void readsBoolsWithOptionalAndRequiredForms() {
-        var invalid = new IntStoryValue(1);
-
-        assertEquals(Optional.of(true), FunctionArgs.getBool(BoolStoryValue.TRUE));
-        assertEquals(Optional.of(false), FunctionArgs.getBool(BoolStoryValue.FALSE));
-        assertEquals(true, FunctionArgs.requireBool(BoolStoryValue.TRUE));
-        assertEquals(false, FunctionArgs.getBool(BoolStoryValue.FALSE).orElse(true));
-
-        assertEquals(Optional.empty(), FunctionArgs.getBool(invalid));
-        assertThrows(FunctionArgumentTypeException.class, () -> FunctionArgs.requireBool(invalid));
-        assertEquals(true, FunctionArgs.getBool(invalid).orElse(true));
+    @TestFactory
+    Stream<DynamicTest> readsPrimitiveValuesWithOptionalAndRequiredForms() {
+        return Stream.of(
+            access("string", new StringStoryValue("value"), "value",
+                FunctionArgs::getString, FunctionArgs::requireString, new IntStoryValue(1)),
+            access("int", new IntStoryValue(12), 12,
+                FunctionArgs::getInt, FunctionArgs::requireInt,
+                new StringStoryValue("12"), new StringStoryValue(""), BoolStoryValue.TRUE),
+            access("float", new FloatStoryValue(2.5F), 2.5F,
+                FunctionArgs::getFloat, FunctionArgs::requireFloat, new IntStoryValue(1)),
+            access("bool", BoolStoryValue.FALSE, false,
+                FunctionArgs::getBool, FunctionArgs::requireBool, new IntStoryValue(1))
+        ).map(access -> DynamicTest.dynamicTest(access.name(), () -> {
+            assertEquals(Optional.of(access.expected()), access.optional().apply(access.valid()));
+            assertEquals(access.expected(), access.required().apply(access.valid()));
+            for (var invalid : access.invalid()) {
+                assertEquals(Optional.empty(), access.optional().apply(invalid));
+                assertThrows(FunctionArgumentTypeException.class, () -> access.required().apply(invalid));
+            }
+        }));
     }
 
     @Test
@@ -152,28 +120,21 @@ class FunctionArgsTest {
         assertEquals(Optional.of(0), FunctionArgs.getNonNegativeInt(zero));
         assertEquals(Optional.of(3), FunctionArgs.getNonNegativeInt(positive));
         assertEquals(3, FunctionArgs.requireNonNegativeInt(positive));
-        assertEquals(3, FunctionArgs.getNonNegativeInt(positive).orElse(8));
         assertEquals(Optional.empty(), FunctionArgs.getNonNegativeInt(negative));
         assertEquals(Optional.empty(), FunctionArgs.getNonNegativeInt(wrongType));
         assertThrows(FunctionArgumentRangeException.class, () -> FunctionArgs.requireNonNegativeInt(negative));
         assertThrows(FunctionArgumentTypeException.class, () -> FunctionArgs.requireNonNegativeInt(wrongType));
-        assertEquals(-4, FunctionArgs.getNonNegativeInt(negative).orElse(-4));
-        assertEquals(8, FunctionArgs.getNonNegativeInt(wrongType).orElse(8));
 
         var rangeException = assertThrows(FunctionArgumentRangeException.class,
-                () -> FunctionArgs.requireNonNegativeInt(negative));
+            () -> FunctionArgs.requireNonNegativeInt(negative));
         assertInstanceOf(FunctionArgumentIllegalException.class, rangeException);
         assertInstanceOf(FunctionSyntaxException.class, rangeException);
 
-        assertEquals(Optional.of(0), FunctionArgs.getIndex(zero));
+        assertEquals(FunctionArgs.getNonNegativeInt(zero), FunctionArgs.getIndex(zero));
+        assertEquals(FunctionArgs.getNonNegativeInt(negative), FunctionArgs.getIndex(negative));
         assertEquals(3, FunctionArgs.requireIndex(positive));
-        assertEquals(3, FunctionArgs.getIndex(positive).orElse(8));
-        assertEquals(Optional.empty(), FunctionArgs.getIndex(negative));
-        assertEquals(Optional.empty(), FunctionArgs.getIndex(wrongType));
         assertThrows(FunctionArgumentRangeException.class, () -> FunctionArgs.requireIndex(negative));
         assertThrows(FunctionArgumentTypeException.class, () -> FunctionArgs.requireIndex(wrongType));
-        assertEquals(-4, FunctionArgs.getIndex(negative).orElse(-4));
-        assertEquals(8, FunctionArgs.getIndex(wrongType).orElse(8));
     }
 
     @Test
@@ -189,7 +150,7 @@ class FunctionArgsTest {
     @Test
     void keepsRuntimeExceptionHierarchyMessagesAndCauses() {
         var exception = assertThrows(FunctionArgumentTypeException.class,
-                () -> FunctionArgs.requireInt(new StringStoryValue("1")));
+            () -> FunctionArgs.requireInt(new StringStoryValue("1")));
         assertInstanceOf(FunctionSyntaxException.class, exception);
         assertInstanceOf(RuntimeException.class, exception);
 
@@ -202,6 +163,19 @@ class FunctionArgsTest {
         assertInstanceOf(RuntimeException.class, illegal);
         assertEquals("Illegal argument", illegal.getMessage());
         assertSame(cause, illegal.getCause());
+    }
+
+    private static Access access(String name, IStoryValue<?, ?> valid, Object expected,
+                                 Function<IStoryValue<?, ?>, Optional<?>> optional,
+                                 Function<IStoryValue<?, ?>, Object> required,
+                                 IStoryValue<?, ?>... invalid) {
+        return new Access(name, valid, expected, optional, required, invalid);
+    }
+
+    private record Access(String name, IStoryValue<?, ?> valid, Object expected,
+                          Function<IStoryValue<?, ?>, Optional<?>> optional,
+                          Function<IStoryValue<?, ?>, Object> required,
+                          IStoryValue<?, ?>[] invalid) {
     }
 
 }

@@ -24,36 +24,36 @@ class CollectionFunctionTest {
         var size = ArrayFunctions.size();
         var contains = ArrayFunctions.contains();
 
-        var empty = assertInstanceOf(ArrayStoryValue.class, apply(create)).toPrimitive();
-        var withInt = assertInstanceOf(ArrayStoryValue.class, apply(add, empty, 1)).toPrimitive();
-        var withFloat = assertInstanceOf(ArrayStoryValue.class, apply(add, withInt, 2.0F)).toPrimitive();
-        var withBool = assertInstanceOf(ArrayStoryValue.class, apply(add, withFloat, true)).toPrimitive();
-        var complete = assertInstanceOf(ArrayStoryValue.class, apply(add, withBool, "1")).toPrimitive();
+        var empty = array(create);
+        var withInt = array(add, empty, 1);
+        var withFloat = array(add, withInt, 2.0F);
+        var withBool = array(add, withFloat, true);
+        var complete = array(add, withBool, "1");
 
         assertEquals("[]", empty);
         assertEquals("[1,2.0,true,\"1\"]", complete);
-        assertEquals(4, assertInstanceOf(IntStoryValue.class, apply(size, complete)).value());
-        assertEquals(1, assertInstanceOf(IntStoryValue.class, apply(get, complete, 0)).value());
-        assertEquals(2.0F, assertInstanceOf(FloatStoryValue.class, apply(get, complete, 1)).value());
-        assertTrue(assertInstanceOf(BoolStoryValue.class, apply(get, complete, 2)).value());
-        assertEquals("1", assertInstanceOf(StringStoryValue.class, apply(get, complete, 3)).getValue());
-        assertTrue(assertInstanceOf(BoolStoryValue.class, apply(contains, complete, 1)).value());
-        assertTrue(assertInstanceOf(BoolStoryValue.class, apply(contains, complete, 2.0F)).value());
-        assertTrue(assertInstanceOf(BoolStoryValue.class, apply(contains, complete, "1")).value());
-        assertFalse(assertInstanceOf(BoolStoryValue.class, apply(contains, complete, 1.0F)).value());
+        assertEquals(4, integer(size, complete));
+        assertEquals(1, integer(get, complete, 0));
+        assertEquals(2.0F, floating(get, complete, 1));
+        assertTrue(bool(get, complete, 2));
+        assertEquals("1", string(get, complete, 3));
+        assertTrue(bool(contains, complete, 1));
+        assertTrue(bool(contains, complete, 2.0F));
+        assertTrue(bool(contains, complete, "1"));
+        assertFalse(bool(contains, complete, 1.0F));
 
-        var replaced = assertInstanceOf(ArrayStoryValue.class, apply(set, complete, 0, "first")).toPrimitive();
+        var replaced = array(set, complete, 0, "first");
         assertEquals("[\"first\",2.0,true,\"1\"]", replaced);
         assertEquals("[1,2.0,true,\"1\"]", complete);
 
-        var removed = assertInstanceOf(ArrayStoryValue.class, apply(remove, replaced, 1)).toPrimitive();
+        var removed = array(remove, replaced, 1);
         assertEquals("[\"first\",true,\"1\"]", removed);
-        assertFalse(assertInstanceOf(BoolStoryValue.class, apply(get, removed, 3)).value());
-        assertFalse(assertInstanceOf(BoolStoryValue.class, apply(set, removed, 3, 0)).value());
-        assertFalse(assertInstanceOf(BoolStoryValue.class, apply(remove, removed, 3)).value());
-        assertFalse(assertInstanceOf(BoolStoryValue.class, apply(get, removed, -1)).value());
-        assertFalse(assertInstanceOf(BoolStoryValue.class, apply(set, removed, -1, 0)).value());
-        assertFalse(assertInstanceOf(BoolStoryValue.class, apply(remove, removed, -1)).value());
+        assertFalse(bool(get, removed, 3));
+        assertFalse(bool(set, removed, 3, 0));
+        assertFalse(bool(remove, removed, 3));
+        assertFalse(bool(get, removed, -1));
+        assertFalse(bool(set, removed, -1, 0));
+        assertFalse(bool(remove, removed, -1));
     }
 
     @Test
@@ -63,16 +63,16 @@ class CollectionFunctionTest {
         var is = ArrayFunctions.isArray();
         var contains = ArrayFunctions.contains();
 
-        var outer = assertInstanceOf(ArrayStoryValue.class, apply(add, "[]", "[1]")).toPrimitive();
-        var inner = assertInstanceOf(StringStoryValue.class, apply(get, outer, 0)).getValue();
-        var nestedJsonInner = assertInstanceOf(StringStoryValue.class, apply(get, "[[1]]", 0)).getValue();
+        var outer = array(add, "[]", "[1]");
+        var inner = string(get, outer, 0);
+        var nestedJsonInner = string(get, "[[1]]", 0);
 
         assertEquals("[\"[1]\"]", outer);
         assertEquals("[1]", inner);
         assertEquals(inner, nestedJsonInner);
-        assertTrue(assertInstanceOf(BoolStoryValue.class, apply(is, inner)).value());
-        assertTrue(assertInstanceOf(BoolStoryValue.class, apply(contains, outer, "[1]")).value());
-        assertTrue(assertInstanceOf(BoolStoryValue.class, apply(contains, "[[1]]", "[1]")).value());
+        assertTrue(bool(is, inner));
+        assertTrue(bool(contains, outer, "[1]"));
+        assertTrue(bool(contains, "[[1]]", "[1]"));
     }
 
     @Test
@@ -85,16 +85,16 @@ class CollectionFunctionTest {
         var remove = ArrayFunctions.remove();
         var contains = ArrayFunctions.contains();
 
-        assertFalse(assertInstanceOf(BoolStoryValue.class, apply(is, "invalid")).value());
-        assertEquals(-1, assertInstanceOf(IntStoryValue.class, apply(size, "invalid")).value());
-        assertFalse(assertInstanceOf(BoolStoryValue.class, apply(set, "invalid", 0, 1)).value());
-        assertFalse(assertInstanceOf(BoolStoryValue.class, apply(get, "invalid", 0)).value());
-        assertFalse(assertInstanceOf(BoolStoryValue.class, apply(add, "invalid", 1)).value());
-        assertFalse(assertInstanceOf(BoolStoryValue.class, apply(remove, "invalid", 0)).value());
-        assertTrue(assertInstanceOf(BoolStoryValue.class, apply(is, "[null]")).value());
-        assertEquals(1, assertInstanceOf(IntStoryValue.class, apply(size, "[null]")).value());
-        assertFalse(assertInstanceOf(BoolStoryValue.class, apply(get, "[null]", 0)).value());
-        assertTrue(assertInstanceOf(BoolStoryValue.class, apply(contains, "[null]", false)).value());
+        assertFalse(bool(is, "invalid"));
+        assertEquals(-1, integer(size, "invalid"));
+        assertFalse(bool(set, "invalid", 0, 1));
+        assertFalse(bool(get, "invalid", 0));
+        assertFalse(bool(add, "invalid", 1));
+        assertFalse(bool(remove, "invalid", 0));
+        assertTrue(bool(is, "[null]"));
+        assertEquals(1, integer(size, "[null]"));
+        assertFalse(bool(get, "[null]", 0));
+        assertTrue(bool(contains, "[null]", false));
         assertTrue(is.isLookaheadSafe());
     }
 
@@ -103,14 +103,10 @@ class CollectionFunctionTest {
         var add = ArrayFunctions.add();
         var set = ArrayFunctions.set();
 
-        var withNaN = assertInstanceOf(ArrayStoryValue.class,
-            apply(add, "[]", Float.NaN)).toPrimitive();
-        var withPositiveInfinity = assertInstanceOf(ArrayStoryValue.class,
-            apply(add, withNaN, Float.POSITIVE_INFINITY)).toPrimitive();
-        var complete = assertInstanceOf(ArrayStoryValue.class,
-            apply(add, withPositiveInfinity, Float.NEGATIVE_INFINITY)).toPrimitive();
-        var replaced = assertInstanceOf(ArrayStoryValue.class,
-            apply(set, complete, 1, Float.NaN)).toPrimitive();
+        var withNaN = array(add, "[]", Float.NaN);
+        var withPositiveInfinity = array(add, withNaN, Float.POSITIVE_INFINITY);
+        var complete = array(add, withPositiveInfinity, Float.NEGATIVE_INFINITY);
+        var replaced = array(set, complete, 1, Float.NaN);
 
         assertEquals("[0.0,3.4E38,-3.4E38]", complete);
         assertEquals("[0.0,0.0,-3.4E38]", replaced);
@@ -124,27 +120,23 @@ class CollectionFunctionTest {
         var contains = MapFunctions.contains();
         var size = MapFunctions.size();
 
-        var withB = assertInstanceOf(MapStoryValue.class, apply(set, "{}", "b", 2.0F)).toPrimitive();
-        var complete = assertInstanceOf(MapStoryValue.class, apply(set, withB, "a", "value")).toPrimitive();
+        var withB = map(set, "{}", "b", 2.0F);
+        var complete = map(set, withB, "a", "value");
 
         assertEquals("{\"a\":\"value\",\"b\":2.0}", complete);
-        assertEquals(2, assertInstanceOf(IntStoryValue.class, apply(size, complete)).value());
-        assertEquals("value", assertInstanceOf(StringStoryValue.class, apply(get, complete, "a")).getValue());
-        assertTrue(assertInstanceOf(BoolStoryValue.class, apply(contains, complete, "b")).value());
-        assertFalse(assertInstanceOf(BoolStoryValue.class, apply(contains, complete, "missing")).value());
-        assertEquals("[1]", assertInstanceOf(StringStoryValue.class,
-            apply(get, "{\"items\":[1]}", "items")).getValue());
-        assertTrue(assertInstanceOf(BoolStoryValue.class,
-            apply(contains, "{\"missing\":null}", "missing")).value());
-        assertFalse(assertInstanceOf(BoolStoryValue.class,
-            apply(get, "{\"missing\":null}", "missing")).value());
-        assertEquals(2, assertInstanceOf(IntStoryValue.class,
-            apply(get, "{\"a\":1,\"a\":2}", "a")).value());
+        assertEquals(2, integer(size, complete));
+        assertEquals("value", string(get, complete, "a"));
+        assertTrue(bool(contains, complete, "b"));
+        assertFalse(bool(contains, complete, "missing"));
+        assertEquals("[1]", string(get, "{\"items\":[1]}", "items"));
+        assertTrue(bool(contains, "{\"missing\":null}", "missing"));
+        assertFalse(bool(get, "{\"missing\":null}", "missing"));
+        assertEquals(2, integer(get, "{\"a\":1,\"a\":2}", "a"));
 
-        var removed = assertInstanceOf(MapStoryValue.class, apply(remove, complete, "a")).toPrimitive();
+        var removed = map(remove, complete, "a");
         assertEquals("{\"b\":2.0}", removed);
-        assertFalse(assertInstanceOf(BoolStoryValue.class, apply(get, complete, "missing")).value());
-        assertFalse(assertInstanceOf(BoolStoryValue.class, apply(remove, complete, "missing")).value());
+        assertFalse(bool(get, complete, "missing"));
+        assertFalse(bool(remove, complete, "missing"));
         assertThrows(FunctionArgumentTypeException.class, () -> apply(set, complete, 1, "value"));
     }
 
@@ -157,13 +149,37 @@ class CollectionFunctionTest {
         var remove = MapFunctions.remove();
         var contains = MapFunctions.contains();
 
-        assertFalse(assertInstanceOf(BoolStoryValue.class, apply(is, "invalid")).value());
-        assertEquals(-1, assertInstanceOf(IntStoryValue.class, apply(size, "invalid")).value());
-        assertFalse(assertInstanceOf(BoolStoryValue.class, apply(set, "invalid", "key", 1)).value());
-        assertFalse(assertInstanceOf(BoolStoryValue.class, apply(get, "invalid", "key")).value());
-        assertFalse(assertInstanceOf(BoolStoryValue.class, apply(remove, "invalid", "key")).value());
-        assertFalse(assertInstanceOf(BoolStoryValue.class, apply(contains, "invalid", "key")).value());
+        assertFalse(bool(is, "invalid"));
+        assertEquals(-1, integer(size, "invalid"));
+        assertFalse(bool(set, "invalid", "key", 1));
+        assertFalse(bool(get, "invalid", "key"));
+        assertFalse(bool(remove, "invalid", "key"));
+        assertFalse(bool(contains, "invalid", "key"));
         assertTrue(is.isLookaheadSafe());
+    }
+
+    private static String array(IStoryFunction function, Object... args) {
+        return assertInstanceOf(ArrayStoryValue.class, apply(function, args)).toPrimitive();
+    }
+
+    private static String map(IStoryFunction function, Object... args) {
+        return assertInstanceOf(MapStoryValue.class, apply(function, args)).toPrimitive();
+    }
+
+    private static boolean bool(IStoryFunction function, Object... args) {
+        return assertInstanceOf(BoolStoryValue.class, apply(function, args)).value();
+    }
+
+    private static int integer(IStoryFunction function, Object... args) {
+        return assertInstanceOf(IntStoryValue.class, apply(function, args)).value();
+    }
+
+    private static float floating(IStoryFunction function, Object... args) {
+        return assertInstanceOf(FloatStoryValue.class, apply(function, args)).value();
+    }
+
+    private static String string(IStoryFunction function, Object... args) {
+        return assertInstanceOf(StringStoryValue.class, apply(function, args)).getValue();
     }
 
     private static IStoryValue<?, ?> apply(IStoryFunction function, Object... args) {

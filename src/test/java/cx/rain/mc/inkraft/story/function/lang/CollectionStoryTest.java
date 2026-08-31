@@ -1,36 +1,17 @@
 package cx.rain.mc.inkraft.story.function.lang;
 
 import com.bladecoder.ink.runtime.Story;
-import cx.rain.mc.inkraft.story.function.IStoryFunction;
-import cx.rain.mc.inkraft.story.value.IStoryValue;
+import cx.rain.mc.inkraft.story.StoryTestSupport;
 import org.junit.jupiter.api.Test;
 
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class CollectionStoryTest {
-    private static final List<String> OTHER_EXTERNALS = List.of(
-        "isDebug",
-        "isInFlow", "flowTo", "newFlow", "removeFlow",
-        "hasFlow", "isFlowEnded", "pause", "setLineTicks", "unsetLineTicks",
-        "hasVariable", "getVariable", "setVariable", "unsetVariable", "clearVariables",
-        "logDebug", "logInfo", "logWarn", "logError",
-        "parseBool", "parseInt", "parseFloat", "toString",
-        "getPlayerName", "getPlayerStat", "getFormattedPlayerStat",
-        "getWorldDayTime", "getWorldGameTime", "getWorldDay", "getRealTime",
-        "runCommand", "runUnlimitedCommand", "runSilentUnlimitedCommand", "runServerCommand",
-        "getScoreboard", "setScoreboard", "addScoreboard", "subScoreboard", "multiplyScoreboard",
-        "getStorage", "setStorage",
-        "hasItem", "countItem", "giveItem", "takeItem",
-        "randomUuid", "isUuid"
-    );
-
     @Test
     void compiledStoryRunsAcrossStateSaveAndRestore() throws Exception {
-        var json = readStory();
+        var json = StoryTestSupport.readStory("test6");
         var story = createStory(json);
 
         var firstLine = story.Continue();
@@ -72,50 +53,22 @@ class CollectionStoryTest {
             "invalid mapGet：false",
             "invalid mapRemove：false"
         );
-        for (var expected : expectedLines) {
-            assertTrue(output.contains(expected), () -> "Missing output: " + expected + '\n' + output);
-        }
+        var actualLines = output.lines()
+            .map(String::trim)
+            .filter(line -> !line.isBlank())
+            .toList();
+        assertEquals(expectedLines, actualLines);
     }
 
     private static Story createStory(String json) throws Exception {
         var story = new Story(json);
-
-        for (var function : List.of(
+        StoryTestSupport.bindFunctions(story,
             ArrayFunctions.create(), ArrayFunctions.isArray(), ArrayFunctions.size(), ArrayFunctions.set(),
-            ArrayFunctions.get(), ArrayFunctions.add(), ArrayFunctions.remove(), ArrayFunctions.contains())) {
-            bind(story, function);
-        }
-        for (var function : List.of(
+            ArrayFunctions.get(), ArrayFunctions.add(), ArrayFunctions.remove(), ArrayFunctions.contains(),
             MapFunctions.create(), MapFunctions.isMap(), MapFunctions.size(), MapFunctions.set(),
-            MapFunctions.get(), MapFunctions.remove(), MapFunctions.contains())) {
-            bind(story, function);
-        }
-        for (var name : OTHER_EXTERNALS) {
-            story.bindExternalFunction(name, args -> false, false);
-        }
+            MapFunctions.get(), MapFunctions.remove(), MapFunctions.contains());
+        StoryTestSupport.bindExternals(story, json);
 
         return story;
-    }
-
-    private static void bind(Story story, IStoryFunction function)
-        throws Exception {
-        story.bindExternalFunction(
-            function.getName(),
-            args -> {
-                var variables = new IStoryValue<?, ?>[args.length];
-                for (int i = 0; i < args.length; i++) {
-                    variables[i] = IStoryValue.fromObject(args[i]);
-                }
-                return function.apply(null, variables).asObject();
-            },
-            function.isLookaheadSafe());
-    }
-
-    private static String readStory() throws IOException {
-        try (var stream = CollectionStoryTest.class.getResourceAsStream(
-            "/data/testmod/inkraft_story/test6.ink.json")) {
-            assertNotNull(stream);
-            return new String(stream.readAllBytes(), StandardCharsets.UTF_8);
-        }
     }
 }

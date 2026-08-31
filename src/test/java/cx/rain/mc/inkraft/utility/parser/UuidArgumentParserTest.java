@@ -50,7 +50,7 @@ class UuidArgumentParserTest {
     private static void assertInvalidUuid(IStoryValue<?, ?> value, UUID fallback) {
         assertEquals(Optional.empty(), UuidArgumentParser.getUuid(value));
         var exception = assertThrows(FunctionArgumentIllegalException.class,
-                () -> UuidArgumentParser.requireUuid(value));
+            () -> UuidArgumentParser.requireUuid(value));
         assertInstanceOf(IllegalArgumentException.class, exception.getCause());
         assertSame(fallback, UuidArgumentParser.getUuid(value).orElse(fallback));
     }

@@ -62,7 +62,7 @@ class StoryFunctionArgsTest {
             var args = contract.validArgs();
             var tooMany = Arrays.copyOf(args, args.length + 1);
             tooMany[args.length] = STRING;
-            var extra = dynamicTest(contract.name() + " rejects an extra argument",
+            var extra = dynamicTest(contract.function().getName() + " rejects an extra argument",
                 () -> assertThrows(FunctionArgumentCountException.class,
                     () -> contract.function().apply(null, tooMany)));
 
@@ -71,7 +71,7 @@ class StoryFunctionArgsTest {
             }
 
             var tooFew = Arrays.copyOf(args, args.length - 1);
-            var missing = dynamicTest(contract.name() + " rejects a missing argument",
+            var missing = dynamicTest(contract.function().getName() + " rejects a missing argument",
                 () -> assertThrows(FunctionArgumentCountException.class,
                     () -> contract.function().apply(null, tooFew)));
             return Stream.of(missing, extra);
@@ -80,10 +80,7 @@ class StoryFunctionArgsTest {
 
     @TestFactory
     Stream<DynamicTest> rejectsWrongArgumentTypes() {
-        return contracts().flatMap(contract -> Stream.of(
-            typedTests(contract, contract.stringArgs(), new IntStoryValue(1), FunctionArgumentTypeException.class),
-            typedTests(contract, contract.intArgs(), new StringStoryValue("1"), FunctionArgumentTypeException.class)
-        ).flatMap(stream -> stream));
+        return contracts().flatMap(StoryFunctionArgsTest::typedTests);
     }
 
     @Test
@@ -119,86 +116,74 @@ class StoryFunctionArgsTest {
         assertEquals(0.0F, parseFloat.apply(null, ArrayStoryValue.empty()).getValue());
     }
 
-    private static Stream<DynamicTest> typedTests(Contract contract, int[] indexes,
-                                                  IStoryValue<?, ?> replacement,
-                                                  Class<? extends Throwable> expected) {
-        return IntStream.of(indexes).mapToObj(index -> dynamicTest(
-            contract.name() + " rejects argument " + index + " with " + replacement.getValueType().getSimpleName(),
-            () -> {
+    private static Stream<DynamicTest> typedTests(Contract contract) {
+        return IntStream.of(contract.typedArgs()).mapToObj(index -> {
+            var replacement = contract.validArgs()[index] instanceof StringStoryValue ? INT : STRING;
+            return dynamicTest(contract.function().getName() + " rejects argument " + index
+                + " with " + replacement.getValueType().getSimpleName(), () -> {
                 var args = contract.validArgs().clone();
                 args[index] = replacement;
-                assertThrows(expected, () -> contract.function().apply(null, args));
-            }));
+                assertThrows(FunctionArgumentTypeException.class,
+                    () -> contract.function().apply(null, args));
+            });
+        });
     }
 
     private static Stream<Contract> contracts() {
         return Stream.of(
-            contract("isDebug", new IsDebugFunction()),
-            strings("isInFlow", new IsInFlowFunction(), 1, 0),
-            strings("flowTo", new FlowToFunction(), 1, 0),
-            strings("newFlow", new NewFlowFunction(), 2, 0, 1),
-            strings("removeFlow", new RemoveFlowFunction(), 1, 0),
-            strings("hasFlow", new HasFlowFunction(), 1, 0),
-            strings("isFlowEnded", new IsFlowEndedFunction(), 1, 0),
-            contract("pause", new PauseFunction()),
-            ints("setLineTicks", new SetLineTicksFunction(), 1, 0),
-            contract("unsetLineTicks", new UnsetLineTicksFunction()),
-            strings("hasVariable", new HasVariableFunction(), 1, 0),
-            strings("getVariable", new GetVariableFunction(), 1, 0),
-            new Contract("setVariable", new SetVariableFunction(), args(STRING, BoolStoryValue.TRUE),
-                indexes(0), indexes()),
-            strings("unsetVariable", new UnsetVariableFunction(), 1, 0),
-            contract("clearVariables", new ClearVariableFunction()),
-            strings("log", new LogFunction("log", (_, _) -> {
+            contract(new IsDebugFunction()),
+            strings(new IsInFlowFunction(), 1, 0),
+            strings(new FlowToFunction(), 1, 0),
+            strings(new NewFlowFunction(), 2, 0, 1),
+            strings(new RemoveFlowFunction(), 1, 0),
+            strings(new HasFlowFunction(), 1, 0),
+            strings(new IsFlowEndedFunction(), 1, 0),
+            contract(new PauseFunction()),
+            new Contract(new SetLineTicksFunction(), args(INT), indexes(0)),
+            contract(new UnsetLineTicksFunction()),
+            strings(new HasVariableFunction(), 1, 0),
+            strings(new GetVariableFunction(), 1, 0),
+            new Contract(new SetVariableFunction(), args(STRING, BoolStoryValue.TRUE), indexes(0)),
+            strings(new UnsetVariableFunction(), 1, 0),
+            contract(new ClearVariableFunction()),
+            strings(new LogFunction("log", (_, _) -> {
             }), 1, 0),
-            new Contract("parseBool", new ParseBoolFunction(), args(STRING), indexes(), indexes()),
-            new Contract("parseInt", new ParseIntFunction(), args(STRING), indexes(), indexes()),
-            new Contract("parseFloat", new ParseFloatFunction(), args(STRING), indexes(), indexes()),
-            new Contract("toString", new ToStringFunction(), args(BoolStoryValue.TRUE),
-                indexes(), indexes()),
-            contract("randomUuid", UuidFunctions.randomUuid()),
-            strings("isUuid", UuidFunctions.isUuid(), 1, 0),
-            contract("getPlayerName", new GetPlayerNameFunction()),
-            strings("getPlayerStat", PlayerStatFunctions.value(), 2, 0, 1),
-            strings("getFormattedPlayerStat", PlayerStatFunctions.formatted(), 2, 0, 1),
-            strings("worldTime", new WorldTimeFunction("worldTime", _ -> 0), 1, 0),
-            strings("getRealTime", new RealTimeFunction(), 1, 0),
-            strings("runCommand", new RunCommandFunction("runCommand", _ -> null), 1, 0),
-            strings("getScoreboard", new ScoreboardFunction("getScoreboard", _ -> 0), 1, 0),
-            new Contract("valuedScoreboard",
-                new ScoreboardValuedFunction("valuedScoreboard", (_, _) -> {
-                }), args(STRING, INT),
-                indexes(0), indexes(1)),
-            strings("getStorage", new GetStorageFunction(), 2, 0, 1),
-            strings("setStorage", new SetStorageFunction(), 3, 0, 1, 2),
-            inventory("hasItem", new HasItemFunction()),
-            new Contract("countItem", new CountItemFunction(),
-                args(STRING, STRING, STRING),
-                indexes(0, 1, 2), indexes()),
-            inventory("giveItem", new GiveItemFunction()),
-            inventory("takeItem", new TakeItemFunction())
+            new Contract(new ParseBoolFunction(), args(STRING), indexes()),
+            new Contract(new ParseIntFunction(), args(STRING), indexes()),
+            new Contract(new ParseFloatFunction(), args(STRING), indexes()),
+            new Contract(new ToStringFunction(), args(BoolStoryValue.TRUE), indexes()),
+            contract(UuidFunctions.randomUuid()),
+            strings(UuidFunctions.isUuid(), 1, 0),
+            contract(new GetPlayerNameFunction()),
+            strings(PlayerStatFunctions.value(), 2, 0, 1),
+            strings(PlayerStatFunctions.formatted(), 2, 0, 1),
+            strings(new WorldTimeFunction("worldTime", _ -> 0), 1, 0),
+            strings(new RealTimeFunction(), 1, 0),
+            strings(new RunCommandFunction("runCommand", _ -> null), 1, 0),
+            strings(new ScoreboardFunction("getScoreboard", _ -> 0), 1, 0),
+            new Contract(new ScoreboardValuedFunction("valuedScoreboard", (_, _) -> {
+            }), args(STRING, INT), indexes(0, 1)),
+            strings(new GetStorageFunction(), 2, 0, 1),
+            strings(new SetStorageFunction(), 3, 0, 1, 2),
+            inventory(new HasItemFunction()),
+            new Contract(new CountItemFunction(), args(STRING, STRING, STRING), indexes(0, 1, 2)),
+            inventory(new GiveItemFunction()),
+            inventory(new TakeItemFunction())
         );
     }
 
-    private static Contract contract(String name, IStoryFunction function) {
-        return new Contract(name, function, args(), indexes(), indexes());
+    private static Contract contract(IStoryFunction function) {
+        return new Contract(function, args(), indexes());
     }
 
-    private static Contract strings(String name, IStoryFunction function, int count, int... stringArgs) {
+    private static Contract strings(IStoryFunction function, int count, int... typedArgs) {
         var args = new IStoryValue<?, ?>[count];
         Arrays.fill(args, STRING);
-        return new Contract(name, function, args, stringArgs, indexes());
+        return new Contract(function, args, typedArgs);
     }
 
-    private static Contract ints(String name, IStoryFunction function, int count, int... intArgs) {
-        var args = new IStoryValue<?, ?>[count];
-        Arrays.fill(args, INT);
-        return new Contract(name, function, args, indexes(), intArgs);
-    }
-
-    private static Contract inventory(String name, IStoryFunction function) {
-        return new Contract(name, function, args(STRING, INT, STRING, STRING),
-            indexes(0, 2, 3), indexes());
+    private static Contract inventory(IStoryFunction function) {
+        return new Contract(function, args(STRING, INT, STRING, STRING), indexes(0, 2, 3));
     }
 
     private static IStoryValue<?, ?>[] args(IStoryValue<?, ?>... values) {
@@ -209,7 +194,6 @@ class StoryFunctionArgsTest {
         return values;
     }
 
-    private record Contract(String name, IStoryFunction function, IStoryValue<?, ?>[] validArgs,
-                            int[] stringArgs, int[] intArgs) {
+    private record Contract(IStoryFunction function, IStoryValue<?, ?>[] validArgs, int[] typedArgs) {
     }
 }

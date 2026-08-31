@@ -22,6 +22,7 @@ import cx.rain.mc.inkraft.story.value.IntStoryValue;
 import cx.rain.mc.inkraft.story.value.StringStoryValue;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.gametest.framework.GameTestHelper;
+import net.minecraft.gametest.framework.GameTestSequence;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
@@ -34,6 +35,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 public final class StoryInstanceGameTests {
+    private static final int MAX_STORY_STEPS = 100;
     private static final Identifier TRANSACTION_BASE = testStory("transaction_base");
     private static final Identifier TRANSACTION_REPLACEMENT = testStory("transaction_replacement");
     private static final Identifier RESET_DURING_CONTINUE = testStory("reset_during_continue");
@@ -50,7 +52,7 @@ public final class StoryInstanceGameTests {
     public static void flowBatchIsFifoAndBeatsPause(GameTestHelper helper) {
         var context = startStory(helper, TRANSACTION_BASE);
 
-        helper.startSequence()
+        context.complete(helper.startSequence()
                 .thenWaitUntil(() -> requireRuntime(helper, context))
                 .thenExecute(() -> {
                     context.instance().stop();
@@ -87,15 +89,14 @@ public final class StoryInstanceGameTests {
                     helper.assertFalse(context.instance().isStoryRunning(),
                             "A successful flow batch must stop automatic playback");
                 })
-                .thenExecute(context::close)
-                .thenSucceed();
+        );
     }
 
     public static void lifecycleLastWriteWins(GameTestHelper helper) {
         var context = startStory(helper, TRANSACTION_BASE);
         var oldRuntime = new AtomicReference<StoryRuntime>();
 
-        helper.startSequence()
+        context.complete(helper.startSequence()
                 .thenWaitUntil(() -> requireRuntime(helper, context))
                 .thenExecute(() -> {
                     context.instance().stop();
@@ -111,30 +112,29 @@ public final class StoryInstanceGameTests {
 
                     helper.assertTrue(context.instance().getRuntime().orElse(null) == oldRuntime.get(),
                             "A replacement must not publish inside the requesting tick");
-                    helper.assertValueEqual(context.data().getStory(), TRANSACTION_BASE,
+                    assertNullableEqual(helper, context.data().getStory(), TRANSACTION_BASE,
                             "story id before replacement commit");
                 })
                 .thenWaitUntil(() -> {
                     var runtime = requireRuntime(helper, context);
                     helper.assertTrue(runtime != oldRuntime.get(), "The replacement did not publish a new runtime");
-                    helper.assertValueEqual(context.data().getStory(), TRANSACTION_REPLACEMENT,
+                    assertNullableEqual(helper, context.data().getStory(), TRANSACTION_REPLACEMENT,
                             "story id after replacement commit");
                     helper.assertFalse(oldRuntime.get().hasFlow("discarded"),
                             "A lifecycle transaction must discard older flow transactions");
                     helper.assertFalse(runtime.hasFlow("discarded"),
                             "Discarded flow state leaked into the replacement runtime");
-                    helper.assertValueEqual(context.data().getVariable("kept", IntStoryValue.class), 7,
+                    assertNullableEqual(helper, context.data().getVariable("kept", IntStoryValue.class), 7,
                             "persistent script variable");
                 })
-                .thenExecute(context::close)
-                .thenSucceed();
+        );
     }
 
     public static void resetIsDeferredAndFailedReplacementDoesNotDisplaceIt(GameTestHelper helper) {
         var context = startStory(helper, TRANSACTION_BASE);
         var oldRuntime = new AtomicReference<StoryRuntime>();
 
-        helper.startSequence()
+        context.complete(helper.startSequence()
                 .thenWaitUntil(() -> requireRuntime(helper, context))
                 .thenExecute(() -> {
                     context.instance().stop();
@@ -149,9 +149,9 @@ public final class StoryInstanceGameTests {
 
                     helper.assertTrue(context.instance().getRuntime().orElse(null) == oldRuntime.get(),
                             "Reset must not release the runtime in the requesting tick");
-                    helper.assertValueEqual(context.data().getStory(), TRANSACTION_BASE,
+                    assertNullableEqual(helper, context.data().getStory(), TRANSACTION_BASE,
                             "story id before reset commit");
-                    helper.assertValueEqual(context.data().getState(), "state-before-reset",
+                    assertNullableEqual(helper, context.data().getState(), "state-before-reset",
                             "story state before reset commit");
                     helper.assertTrue(context.data().hasPendingLine("pending-before-reset"),
                             "Reset cleared pending lines before commit");
@@ -176,14 +176,13 @@ public final class StoryInstanceGameTests {
                     helper.assertFalse(context.data().hasVariable("removed"),
                             "Reset did not clear script variables");
                 })
-                .thenExecute(context::close)
-                .thenSucceed();
+        );
     }
 
     public static void stopPreservesQueuedTransactions(GameTestHelper helper) {
         var context = startStory(helper, TRANSACTION_BASE);
 
-        helper.startSequence()
+        context.complete(helper.startSequence()
                 .thenWaitUntil(() -> requireRuntime(helper, context))
                 .thenExecute(() -> {
                     context.instance().stop();
@@ -195,8 +194,7 @@ public final class StoryInstanceGameTests {
                     var runtime = requireRuntime(helper, context);
                     helper.assertTrue(runtime.hasFlow("kept"), "stop() discarded a queued transaction");
                 })
-                .thenExecute(context::close)
-                .thenSucceed();
+        );
     }
 
     public static void disposeDropsQueuedTransactionsWithoutClearingData(GameTestHelper helper) {
@@ -204,7 +202,7 @@ public final class StoryInstanceGameTests {
         var oldRuntime = new AtomicReference<StoryRuntime>();
         var oldState = new AtomicReference<String>();
 
-        helper.startSequence()
+        context.complete(helper.startSequence()
                 .thenWaitUntil(() -> requireRuntime(helper, context))
                 .thenExecute(() -> {
                     context.instance().stop();
@@ -217,28 +215,27 @@ public final class StoryInstanceGameTests {
 
                     helper.assertTrue(context.instance().getRuntime().isEmpty(),
                             "dispose() must release the runtime immediately");
-                    helper.assertValueEqual(context.data().getStory(), TRANSACTION_BASE,
+                    assertNullableEqual(helper, context.data().getStory(), TRANSACTION_BASE,
                             "story id after dispose");
-                    helper.assertTrue(Objects.equals(context.data().getState(), oldState.get()),
+                    assertNullableEqual(helper, context.data().getState(), oldState.get(),
                             "dispose() modified persisted Ink state");
                 })
                 .thenIdle(3)
                 .thenExecute(() -> {
                     helper.assertFalse(oldRuntime.get().hasFlow("dropped"),
                             "dispose() allowed a queued transaction to run");
-                    helper.assertValueEqual(context.data().getStory(), TRANSACTION_BASE,
+                    assertNullableEqual(helper, context.data().getStory(), TRANSACTION_BASE,
                             "story id after the disposed transaction wake-up");
-                    helper.assertTrue(Objects.equals(context.data().getState(), oldState.get()),
+                    assertNullableEqual(helper, context.data().getState(), oldState.get(),
                             "The disposed transaction wake-up modified persisted Ink state");
                 })
-                .thenExecute(context::close)
-                .thenSucceed();
+        );
     }
 
     public static void restoreRuntimeNormalizesPersistedEndedFlag(GameTestHelper helper) {
         var context = startStory(helper, TRANSACTION_BASE);
 
-        helper.startSequence()
+        context.complete(helper.startSequence()
                 .thenWaitUntil(() -> {
                     var runtime = requireRuntime(helper, context);
                     helper.assertTrue(context.data().getState() != null,
@@ -262,7 +259,7 @@ public final class StoryInstanceGameTests {
                             "A restored runtime retained the persisted ended flag");
                     helper.assertFalse(restored.isStoryEnded(),
                             "The restored runtime is still reported as ended");
-                    helper.assertTrue(Objects.equals(context.data().getState(), savedState),
+                    assertNullableEqual(helper, context.data().getState(), savedState,
                             "Restoring the runtime modified the saved Ink state");
                     helper.assertTrue(context.data().hasPendingLine(StoryState.kDefaultFlowName),
                             "Restoring the runtime discarded its pending line");
@@ -271,8 +268,7 @@ public final class StoryInstanceGameTests {
                     helper.assertTrue(restored.isStoryRunning(),
                             "The normalized runtime could not resume playback");
                 })
-                .thenExecute(context::close)
-                .thenSucceed();
+        );
     }
 
     public static void restoreMissingStoryPreservesPersistedState(GameTestHelper helper) {
@@ -289,25 +285,24 @@ public final class StoryInstanceGameTests {
         data.setContinuousToken(continuousToken);
 
         var instance = new StoryInstance(manager, player, data);
-        var context = new TestStory(manager, player, data, instance);
+        var context = new TestStory(manager, player, data, instance, false);
 
-        helper.startSequence()
+        context.complete(helper.startSequence()
                 .thenExecute(() -> {
                     helper.assertTrue(instance.getRuntime().isEmpty(),
                             "A missing story unexpectedly created a runtime");
-                    helper.assertValueEqual(data.getStory(), MISSING,
+                    assertNullableEqual(helper, data.getStory(), MISSING,
                             "story id after failed restore");
-                    helper.assertValueEqual(data.getState(), savedState,
+                    assertNullableEqual(helper, data.getState(), savedState,
                             "story state after failed restore");
                     helper.assertFalse(data.isEnded(),
                             "A failed restore marked the persisted story as ended");
                     helper.assertTrue(data.hasPendingLine(StoryState.kDefaultFlowName),
                             "A failed restore cleared the pending line");
-                    helper.assertValueEqual(data.getContinuousToken(), continuousToken,
+                    assertNullableEqual(helper, data.getContinuousToken(), continuousToken,
                             "continuous token after failed restore");
                 })
-                .thenExecute(context::close)
-                .thenSucceed();
+        );
     }
 
     public static void currentRecoversMissingRuntimeAndPreservesHealthyRuntime(GameTestHelper helper) {
@@ -316,7 +311,7 @@ public final class StoryInstanceGameTests {
         var savedState = new AtomicReference<String>();
         var originalRuntime = new AtomicReference<StoryRuntime>();
 
-        helper.startSequence()
+        context.complete(helper.startSequence()
                 .thenWaitUntil(() -> {
                     var runtime = requireRuntime(helper, context);
                     helper.assertTrue(context.data().getState() != null,
@@ -352,7 +347,7 @@ public final class StoryInstanceGameTests {
                             savedState.get(), token, "failed missing-story recovery");
 
                     context.manager().getStoryRegistry().add(recoveryStoryId,
-                            requireCompiledStory(TRANSACTION_BASE));
+                            transactionStoryJson());
                     helper.assertTrue(missingRuntimeInstance.requestResume(),
                             "current did not recover the story after it reappeared");
                     var recoveredRuntime = missingRuntimeInstance.getRuntime().orElse(null);
@@ -366,13 +361,12 @@ public final class StoryInstanceGameTests {
                             "Successful current recovery retained a stale continuous token");
                     helper.assertFalse(context.data().isEnded(),
                             "Successful current recovery retained an ended flag");
-                    helper.assertValueEqual(context.data().getState(), savedState.get(),
+                    assertNullableEqual(helper, context.data().getState(), savedState.get(),
                             "story state after successful current recovery");
                     helper.assertTrue(context.data().hasPendingLine(StoryState.kDefaultFlowName),
                             "Successful current recovery discarded its pending line");
                 })
-                .thenExecute(context::close)
-                .thenSucceed();
+        );
     }
 
     public static void currentRejectsInvalidSavedStateWithoutPublishingRuntime(GameTestHelper helper) {
@@ -390,9 +384,9 @@ public final class StoryInstanceGameTests {
         data.setVariable("kept", new IntStoryValue(7));
 
         var instance = new StoryInstance(manager, player, data);
-        var context = new TestStory(manager, player, data, instance);
+        var context = new TestStory(manager, player, data, instance, false);
 
-        helper.startSequence()
+        context.complete(helper.startSequence()
                 .thenExecute(() -> {
                     helper.assertTrue(instance.getRuntime().isEmpty(),
                             "An invalid state unexpectedly published a runtime during construction");
@@ -402,13 +396,12 @@ public final class StoryInstanceGameTests {
                             "Failed current recovery published a partial runtime");
                     assertPersistedSession(helper, data, TRANSACTION_BASE, invalidState,
                             continuousToken, "failed invalid-state recovery");
-                    helper.assertValueEqual(data.getVariable("kept", IntStoryValue.class), 7,
+                    assertNullableEqual(helper, data.getVariable("kept", IntStoryValue.class), 7,
                             "persistent variable after failed invalid-state recovery");
                     helper.assertFalse(instance.isStoryRunning(),
                             "Failed current recovery started playback");
                 })
-                .thenExecute(context::close)
-                .thenSucceed();
+        );
     }
 
     public static void currentCommandsReturnResumeResult(GameTestHelper helper) {
@@ -425,7 +418,7 @@ public final class StoryInstanceGameTests {
         var recoveryStoryId = uniqueTestStory("current_command_recovery");
         var targetTag = "inkraft_current_" + UUID.randomUUID().toString().replace("-", "");
         target.addTag(targetTag);
-        manager.getStoryRegistry().add(recoveryStoryId, requireCompiledStory(TRANSACTION_BASE));
+        manager.getStoryRegistry().add(recoveryStoryId, transactionStoryJson());
 
         helper.startSequence()
                 .thenExecute(() -> {
@@ -467,7 +460,7 @@ public final class StoryInstanceGameTests {
     public static void pauseDuringContinuePreservesPendingLine(GameTestHelper helper) {
         var context = startStory(helper, TRANSACTION_BASE);
 
-        helper.startSequence()
+        context.complete(helper.startSequence()
                 .thenWaitUntil(() -> {
                     var runtime = requireRuntime(helper, context);
                     helper.assertTrue(context.data().getContinuousToken() != null,
@@ -479,8 +472,7 @@ public final class StoryInstanceGameTests {
                     helper.assertFalse(context.instance().isStoryRunning(),
                             "pause() did not stop automatic playback");
                 })
-                .thenExecute(context::close)
-                .thenSucceed();
+        );
     }
 
     public static void resetRequestedDuringContinueCommitsOnNextTick(GameTestHelper helper) {
@@ -488,7 +480,7 @@ public final class StoryInstanceGameTests {
         var oldRuntime = new AtomicReference<StoryRuntime>();
         var resetRuntime = new AtomicReference<StoryRuntime>();
 
-        helper.startSequence()
+        context.complete(helper.startSequence()
                 .thenWaitUntil(() -> requireRuntime(helper, context))
                 .thenExecute(() -> {
                     context.instance().stop();
@@ -500,7 +492,7 @@ public final class StoryInstanceGameTests {
                     var runtime = requireRuntime(helper, context);
                     helper.assertTrue(runtime != oldRuntime.get(),
                             "The reset-during-Continue runtime has not been published yet");
-                    helper.assertValueEqual(context.data().getStory(), RESET_DURING_CONTINUE,
+                    assertNullableEqual(helper, context.data().getStory(), RESET_DURING_CONTINUE,
                             "story id before the external reset");
                     if (resetRuntime.compareAndSet(null, runtime)) {
                         bindExternalAction(runtime, "resetStoryForTest",
@@ -515,8 +507,7 @@ public final class StoryInstanceGameTests {
                     helper.assertTrue(context.data().getState() == null,
                             "Reset requested during Continue did not clear the saved state");
                 })
-                .thenExecute(context::close)
-                .thenSucceed();
+        );
     }
 
     public static void runtimeFailureStopsPlaybackAndPreservesSession(GameTestHelper helper) {
@@ -525,7 +516,7 @@ public final class StoryInstanceGameTests {
         var attempts = new AtomicInteger();
         var continuousToken = UUID.randomUUID();
 
-        helper.startSequence()
+        context.complete(helper.startSequence()
                 .thenWaitUntil(() -> {
                     var runtime = requireRuntime(helper, context);
                     if (failedRuntime.compareAndSet(null, runtime)) {
@@ -549,15 +540,15 @@ public final class StoryInstanceGameTests {
                             "A runtime failure did not stop automatic playback");
                     helper.assertTrue(context.instance().getRuntime().orElse(null) == failedRuntime.get(),
                             "A runtime failure released the live runtime");
-                    helper.assertValueEqual(context.data().getStory(), RUNTIME_FAILURE_DURING_CONTINUE,
+                    assertNullableEqual(helper, context.data().getStory(), RUNTIME_FAILURE_DURING_CONTINUE,
                             "story id after runtime failure");
-                    helper.assertValueEqual(context.data().getState(), "state-before-failure",
+                    assertNullableEqual(helper, context.data().getState(), "state-before-failure",
                             "saved state after runtime failure");
                     helper.assertFalse(context.data().isEnded(),
                             "A runtime failure marked the story as ended");
                     helper.assertTrue(context.data().hasPendingLine("pending-before-failure"),
                             "A runtime failure cleared pending-line data");
-                    helper.assertValueEqual(context.data().getVariable("kept", IntStoryValue.class), 7,
+                    assertNullableEqual(helper, context.data().getVariable("kept", IntStoryValue.class), 7,
                             "persistent variable after runtime failure");
                     helper.assertTrue(context.data().getContinuousToken() == null,
                             "A runtime failure did not clear the continuous token");
@@ -571,14 +562,13 @@ public final class StoryInstanceGameTests {
                             "Manual start was blocked by a transaction left behind by the failure");
                     context.instance().stop();
                 })
-                .thenExecute(context::close)
-                .thenSucceed();
+        );
     }
 
     public static void storyInstanceChoiceRestartsAfterNormalResults(GameTestHelper helper) {
         var context = startStory(helper, SYSTEM_FUNCTION_CONTEXT);
 
-        helper.startSequence()
+        context.complete(helper.startSequence()
                 .thenWaitUntil(() -> requireRuntime(helper, context))
                 .thenExecute(() -> {
                     context.instance().stop();
@@ -598,17 +588,16 @@ public final class StoryInstanceGameTests {
                 })
                 .thenWaitUntil(() -> helper.assertTrue(context.instance().getRuntime().isEmpty(),
                         "The selected terminating choice did not finish the story"))
-                .thenExecute(context::close)
-                .thenSucceed();
+        );
     }
 
     public static void storyInstanceChoiceFailureDoesNotRestart(GameTestHelper helper) {
         var data = new FailingStateData();
-        var context = startStoryWithData(helper, SYSTEM_FUNCTION_CONTEXT, data);
+        var context = startSystemStoryWithData(helper, data);
         var failedRuntime = new AtomicReference<StoryRuntime>();
         var savedState = new AtomicReference<String>();
 
-        helper.startSequence()
+        context.complete(helper.startSequence()
                 .thenWaitUntil(() -> requireRuntime(helper, context))
                 .thenExecute(() -> {
                     context.instance().stop();
@@ -625,7 +614,7 @@ public final class StoryInstanceGameTests {
                             "A failed choice restarted playback");
                     helper.assertTrue(context.instance().getRuntime().orElse(null) == runtime,
                             "A failed choice released the runtime");
-                    helper.assertTrue(Objects.equals(data.getState(), savedState.get()),
+                    assertNullableEqual(helper, data.getState(), savedState.get(),
                             "A failed choice replaced the saved state");
                     helper.assertFalse(data.isEnded(),
                             "A failed choice marked the story as ended");
@@ -639,14 +628,13 @@ public final class StoryInstanceGameTests {
                     helper.assertTrue(context.instance().getRuntime().orElse(null) == failedRuntime.get(),
                             "The scheduler released the failed choice runtime");
                 })
-                .thenExecute(context::close)
-                .thenSucceed();
+        );
     }
 
     public static void systemFunctionsUseLiveStoryInstance(GameTestHelper helper) {
         var context = startStory(helper, SYSTEM_FUNCTION_CONTEXT);
 
-        helper.startSequence()
+        context.complete(helper.startSequence()
                 .thenWaitUntil(() -> requireRuntime(helper, context))
                 .thenExecute(() -> {
                     context.instance().stop();
@@ -668,7 +656,7 @@ public final class StoryInstanceGameTests {
                     helper.assertTrue(setLineTicks.apply(context.instance(),
                                     new IntStoryValue(-1)) == BoolStoryValue.TRUE,
                             "setLineTicks must accept the manual-continuation sentinel");
-                    helper.assertValueEqual(
+                    assertNullableEqual(helper,
                             context.data().getVariable(ModConstants.Variables.LINE_PAUSE_TICKS,
                                     IntStoryValue.class),
                             -1, "line pause ticks");
@@ -680,48 +668,37 @@ public final class StoryInstanceGameTests {
                                     new StringStoryValue("mood"), new InkListStoryValue(list))
                                     == BoolStoryValue.TRUE,
                             "setVariable rejected an Ink list");
-                    helper.assertTrue(Objects.equals(context.data().getVariable("mood"),
-                                    new StringStoryValue("happy")),
+                    assertNullableEqual(helper, context.data().getVariable("mood"),
+                            new StringStoryValue("happy"),
                             "setVariable did not normalize an Ink list immediately");
-                    helper.assertTrue(Objects.equals(new GetVariableFunction().apply(context.instance(),
-                                            new StringStoryValue("mood")),
-                                    new StringStoryValue("happy")),
+                    assertNullableEqual(helper, new GetVariableFunction().apply(context.instance(),
+                                    new StringStoryValue("mood")),
+                            new StringStoryValue("happy"),
                             "getVariable did not expose the normalized Ink-list value");
 
-                    while (runtime.canContinueLine()) {
-                        helper.assertTrue(callChecked(runtime::continueLine),
-                                "Could not advance the system-function test story to its choice");
-                        runtime.clearPendingLine();
-                    }
+                    advanceToChoices(helper, runtime);
                     helper.assertTrue(runtime.hasChoice(),
                             "The system-function test story did not reach its choice");
                     helper.assertTrue(callChecked(() -> runtime.choose(1)),
                             "Could not select the terminating choice");
-                    while (runtime.canContinueLine()) {
-                        helper.assertTrue(callChecked(runtime::continueLine),
-                                "Could not finish the system-function test story");
-                        runtime.clearPendingLine();
-                    }
+                    continueToEnd(helper, runtime);
                     helper.assertTrue(callChecked(() -> isFlowEnded.apply(context.instance(),
                                     new StringStoryValue(StoryState.kDefaultFlowName))) == BoolStoryValue.TRUE,
                             "isFlowEnded did not report the completed flow");
                 })
-                .thenExecute(context::close)
-                .thenSucceed();
+        );
     }
 
     public static void playerStatFunctionsUseCurrentPlayer(GameTestHelper helper) {
         var context = startStory(helper, PLAYER_STAT_FUNCTIONS);
 
-        helper.startSequence()
+        context.complete(helper.startSequence()
                 .thenWaitUntil(() -> {
                     var runtime = requireRuntime(helper, context);
                     helper.assertTrue(runtime.hasChoice(),
                             "The player-stat function story did not reach its verification choice");
                 })
-                .thenExecute(() -> {
-                    context.instance().stop();
-                })
+                .thenExecute(context.instance()::stop)
                 .thenWaitUntil(() -> helper.assertTrue(context.player().connection.hasClientLoaded(),
                         "The player-stat test player has not finished its simulated client load"))
                 .thenExecute(() -> {
@@ -729,13 +706,7 @@ public final class StoryInstanceGameTests {
                     helper.assertTrue(callChecked(() -> runtime.choose(0)),
                             "Could not select the player-stat verification path");
 
-                    var line = "";
-                    while (line.isBlank() && runtime.canContinueLine()) {
-                        helper.assertTrue(callChecked(runtime::continueLine),
-                                "Could not evaluate the player-stat functions");
-                        line = callChecked(runtime::currentLine).trim();
-                        runtime.clearPendingLine();
-                    }
+                    var line = continueToLine(helper, runtime, "evaluate the player-stat functions");
                     helper.assertValueEqual(line, "PLAYER_STAT_WAIT_FOR_PICKUP",
                             "player-stat pickup wait marker");
                 })
@@ -744,24 +715,17 @@ public final class StoryInstanceGameTests {
                 .thenIdle(3)
                 .thenExecute(() -> {
                     var runtime = requireRuntime(helper, context);
-                    var line = "";
-                    while (line.isBlank() && runtime.canContinueLine()) {
-                        helper.assertTrue(callChecked(runtime::continueLine),
-                                "Could not verify the changed player statistics");
-                        line = callChecked(runtime::currentLine).trim();
-                        runtime.clearPendingLine();
-                    }
+                    var line = continueToLine(helper, runtime, "verify the changed player statistics");
                     helper.assertValueEqual(line, "PLAYER_STAT_OK",
                             "player-stat function result");
                 })
-                .thenExecute(context::close)
-                .thenSucceed();
+        );
     }
 
     public static void uuidFunctionsUseJavaUuidSemantics(GameTestHelper helper) {
         var context = startStory(helper, UUID_FUNCTIONS);
 
-        helper.startSequence()
+        context.complete(helper.startSequence()
                 .thenWaitUntil(() -> {
                     var runtime = requireRuntime(helper, context);
                     helper.assertTrue(runtime.hasChoice(),
@@ -773,18 +737,11 @@ public final class StoryInstanceGameTests {
                     helper.assertTrue(callChecked(() -> runtime.choose(0)),
                             "Could not select the UUID verification path");
 
-                    var line = "";
-                    while (line.isBlank() && runtime.canContinueLine()) {
-                        helper.assertTrue(callChecked(runtime::continueLine),
-                                "Could not evaluate the UUID functions");
-                        line = callChecked(runtime::currentLine).trim();
-                        runtime.clearPendingLine();
-                    }
+                    var line = continueToLine(helper, runtime, "evaluate the UUID functions");
                     helper.assertValueEqual(line, "UUID_FUNCTIONS_OK",
                             "UUID function result");
                 })
-                .thenExecute(context::close)
-                .thenSucceed();
+        );
     }
 
     public static void deathRespawnRebindsStoryInstance(GameTestHelper helper) {
@@ -805,7 +762,7 @@ public final class StoryInstanceGameTests {
         var pendingFlow = "respawn_pending";
         var discardedFlow = "discarded_on_respawn";
 
-        helper.startSequence()
+        context.complete(helper.startSequence()
                 .thenWaitUntil(() -> {
                     requireRuntime(helper, context);
                     helper.assertTrue(context.data().getState() != null,
@@ -831,14 +788,14 @@ public final class StoryInstanceGameTests {
                             "The old StoryInstance was not disposed during respawn");
 
                     var newData = InkraftPlatform.getPlayerData(newPlayer);
-                    helper.assertValueEqual(newData.getStory(), TRANSACTION_BASE,
+                    assertNullableEqual(helper, newData.getStory(), TRANSACTION_BASE,
                             "story id after respawn");
-                    helper.assertValueEqual(newData.getState(), savedState.get(),
+                    assertNullableEqual(helper, newData.getState(), savedState.get(),
                             "story state after respawn");
                     helper.assertFalse(newData.isEnded(), "Respawn marked the restored story as ended");
                     helper.assertTrue(newData.hasPendingLine(pendingFlow),
                             "Respawn dropped a persisted pending line");
-                    helper.assertValueEqual(newData.getVariable("respawn_variable", IntStoryValue.class), 17,
+                    assertNullableEqual(helper, newData.getVariable("respawn_variable", IntStoryValue.class), 17,
                             "story variable after respawn");
                     helper.assertTrue(newData.getContinuousToken() == null,
                             "Respawn copied a transient continuous token");
@@ -867,8 +824,7 @@ public final class StoryInstanceGameTests {
                     helper.assertFalse(newInstance.isStoryRunning(),
                             "The restored story started after the respawn tick");
                 })
-                .thenExecute(context::close)
-                .thenSucceed();
+        );
     }
 
     private static TestStory startStory(GameTestHelper helper, Identifier storyId) {
@@ -878,17 +834,17 @@ public final class StoryInstanceGameTests {
         var data = InkraftPlatform.getPlayerData(player);
         var instance = manager.get(player);
         helper.assertTrue(instance.requestNewStory(storyId), "Could not enqueue story " + storyId);
-        return new TestStory(manager, player, data, instance);
+        return new TestStory(manager, player, data, instance, true);
     }
 
-    private static TestStory startStoryWithData(GameTestHelper helper, Identifier storyId,
-                                                IInkPlayerData data) {
+    private static TestStory startSystemStoryWithData(GameTestHelper helper, IInkPlayerData data) {
         @SuppressWarnings("removal")
         var player = helper.makeMockServerPlayerInLevel();
         var manager = EngineManager.getInstance();
         var instance = new StoryInstance(manager, player, data);
-        helper.assertTrue(instance.requestNewStory(storyId), "Could not enqueue story " + storyId);
-        return new TestStory(manager, player, data, instance);
+        helper.assertTrue(instance.requestNewStory(SYSTEM_FUNCTION_CONTEXT),
+                "Could not enqueue story " + SYSTEM_FUNCTION_CONTEXT);
+        return new TestStory(manager, player, data, instance, false);
     }
 
     private static StoryRuntime requireRuntime(GameTestHelper helper, TestStory context) {
@@ -900,36 +856,72 @@ public final class StoryInstanceGameTests {
     }
 
     private static void advanceToChoices(GameTestHelper helper, StoryRuntime runtime) {
-        while (!runtime.hasChoice()) {
+        for (int steps = 0; !runtime.hasChoice(); steps++) {
+            assertStoryStep(helper, runtime, steps, "advance the story to its choices");
             helper.assertTrue(callChecked(runtime::continueLine),
                     "Could not advance the story to its choices");
             runtime.clearPendingLine();
         }
     }
 
+    private static void continueToEnd(GameTestHelper helper, StoryRuntime runtime) {
+        for (int steps = 0; runtime.canContinueLine(); steps++) {
+            assertStoryStep(helper, runtime, steps, "finish the system-function test story");
+            helper.assertTrue(callChecked(runtime::continueLine),
+                    "Could not finish the system-function test story");
+            runtime.clearPendingLine();
+        }
+    }
+
+    private static String continueToLine(GameTestHelper helper, StoryRuntime runtime, String operation) {
+        var line = "";
+        for (int steps = 0; line.isBlank() && runtime.canContinueLine(); steps++) {
+            assertStoryStep(helper, runtime, steps, operation);
+            helper.assertTrue(callChecked(runtime::continueLine), "Could not " + operation);
+            line = callChecked(runtime::currentLine).trim();
+            runtime.clearPendingLine();
+        }
+        return line;
+    }
+
+    private static void assertStoryStep(GameTestHelper helper, StoryRuntime runtime,
+                                        int steps, String operation) {
+        helper.assertTrue(steps < MAX_STORY_STEPS, "Could not " + operation + " within "
+                + MAX_STORY_STEPS + " steps: flow=" + runtime.getFlowName()
+                + ", pendingLine=" + runtime.hasPendingLine()
+                + ", choices=" + runtime.getChoices().size()
+                + ", canContinue=" + runtime.canContinueLine());
+    }
+
+    private static void assertNullableEqual(GameTestHelper helper, Object actual,
+                                            Object expected, String message) {
+        helper.assertTrue(Objects.equals(actual, expected), message
+                + ": expected " + expected + ", got " + actual);
+    }
+
     private static void assertPersistedSession(GameTestHelper helper, IInkPlayerData data,
                                                Identifier storyId, String savedState,
                                                UUID continuousToken, String operation) {
-        helper.assertValueEqual(data.getStory(), storyId, "story id after " + operation);
-        helper.assertValueEqual(data.getState(), savedState, "story state after " + operation);
+        assertNullableEqual(helper, data.getStory(), storyId, "story id after " + operation);
+        assertNullableEqual(helper, data.getState(), savedState, "story state after " + operation);
         helper.assertFalse(data.isEnded(), operation + " marked the story as ended");
         helper.assertTrue(data.hasPendingLine(StoryState.kDefaultFlowName),
                 operation + " cleared the pending line");
-        helper.assertValueEqual(data.getContinuousToken(), continuousToken,
+        assertNullableEqual(helper, data.getContinuousToken(), continuousToken,
                 "continuous token after " + operation);
     }
 
-    private static String requireCompiledStory(Identifier storyId) {
-        var compiledStory = EngineManager.getInstance().getStoryRegistry().get(storyId);
+    private static String transactionStoryJson() {
+        var compiledStory = EngineManager.getInstance().getStoryRegistry().get(TRANSACTION_BASE);
         if (compiledStory == null) {
-            throw new IllegalStateException("Missing compiled GameTest story " + storyId);
+            throw new IllegalStateException("Missing compiled GameTest story " + TRANSACTION_BASE);
         }
         return compiledStory;
     }
 
     private static void createRestorableState(IInkPlayerData data, Identifier storyId) {
         try {
-            var runtime = new StoryRuntime(data, requireCompiledStory(TRANSACTION_BASE));
+            var runtime = new StoryRuntime(data, transactionStoryJson());
             runtime.saveState();
             data.setStory(storyId);
             data.setEnded(false);
@@ -961,7 +953,7 @@ public final class StoryInstanceGameTests {
             // Keep the production accessor package-private; this bridge only exists in the GameTest source set.
             accessor.setAccessible(true);
             var story = (Story) accessor.invoke(runtime);
-            story.bindExternalFunction(name, args -> {
+            story.bindExternalFunction(name, _ -> {
                 action.run();
                 return false;
             }, false);
@@ -1007,11 +999,17 @@ public final class StoryInstanceGameTests {
     }
 
     private record TestStory(EngineManager manager, ServerPlayer player, IInkPlayerData data,
-                             StoryInstance instance) implements AutoCloseable {
-        @Override
-        public void close() {
-            instance.dispose();
-            manager.remove(player);
+                             StoryInstance instance, boolean managed) {
+        private void complete(GameTestSequence sequence) {
+            sequence.thenExecute(this::close).thenSucceed();
+        }
+
+        private void close() {
+            if (managed) {
+                manager.remove(player);
+            } else {
+                instance.dispose();
+            }
             if (player.connection != null) {
                 player.connection.disconnect(Component.literal("Inkraft GameTest complete"));
             }

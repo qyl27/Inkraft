@@ -5,8 +5,6 @@ import com.bladecoder.ink.runtime.StoryState;
 import cx.rain.mc.inkraft.storage.InkPlayerData;
 import org.junit.jupiter.api.Test;
 
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -14,23 +12,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import static org.junit.jupiter.api.Assertions.*;
 
 class StoryRuntimeTest {
-    static final List<String> ENGINE_EXTERNALS = List.of(
-        "isDebug",
-        "isInFlow", "flowTo", "newFlow", "removeFlow",
-        "hasFlow", "isFlowEnded", "pause", "setLineTicks", "unsetLineTicks",
-        "hasVariable", "getVariable", "setVariable", "unsetVariable", "clearVariables",
-        "logDebug", "logInfo", "logWarn", "logError",
-        "parseBool", "parseInt", "parseFloat", "toString",
-        "getPlayerName", "getPlayerStat", "getFormattedPlayerStat",
-        "getWorldDayTime", "getWorldGameTime", "getWorldDay", "getRealTime",
-        "runCommand", "runUnlimitedCommand", "runSilentUnlimitedCommand", "runServerCommand",
-        "getScoreboard", "setScoreboard", "addScoreboard", "subScoreboard", "multiplyScoreboard",
-        "getStorage", "setStorage",
-        "hasItem", "countItem", "giveItem", "takeItem",
-        "randomUuid", "isUuid",
-        "createArray", "isArray", "arraySize", "arraySet", "arrayGet", "arrayAdd", "arrayRemove", "arrayContains",
-        "createMap", "isMap", "mapSize", "mapSet", "mapGet", "mapRemove", "mapContains"
-    );
+    private static final int MAX_STORY_STEPS = 100;
 
     @Test
     void continueLineCreatesPendingCurrentLineUntilMarkedDisplayed() throws Exception {
@@ -67,7 +49,8 @@ class StoryRuntimeTest {
         var data = new InkPlayerData();
         var runtime = runtimeWithStory(data, "test3");
 
-        while (runtime.canContinueLine()) {
+        for (int steps = 0; runtime.canContinueLine(); steps++) {
+            assertWithinStepLimit(runtime, steps);
             assertTrue(runtime.continueLine());
             if (runtime.canContinueLine()) {
                 runtime.clearPendingLine();
@@ -84,10 +67,7 @@ class StoryRuntimeTest {
         var data = new InkPlayerData();
         var runtime = runtimeWithStory(data, "test4");
 
-        while (!runtime.hasChoice()) {
-            assertTrue(runtime.continueLine());
-            runtime.clearPendingLine();
-        }
+        advanceToChoice(runtime);
         assertFalse(runtime.canContinueLine());
 
         assertFalse(runtime.choose(-1));
@@ -113,10 +93,7 @@ class StoryRuntimeTest {
         };
         var runtime = runtimeWithStory(data, "test4");
 
-        while (!runtime.hasChoice()) {
-            assertTrue(runtime.continueLine());
-            runtime.clearPendingLine();
-        }
+        advanceToChoice(runtime);
 
         failSaves.set(true);
         assertSame(failure, assertThrows(IllegalStateException.class, () -> runtime.choose(1)));
@@ -125,23 +102,16 @@ class StoryRuntimeTest {
     @Test
     void externalFunctionFailurePropagatesThroughContinueLine() throws Exception {
         var data = new InkPlayerData();
-        var runtime = new StoryRuntime(data, readStory("test4"));
-        var story = runtime.getStory();
+        var json = StoryTestSupport.readStory("test4");
+        var runtime = new StoryRuntime(data, json);
         var failure = new Exception("expected external function failure");
 
-        for (var name : ENGINE_EXTERNALS) {
-            story.bindExternalFunction(name, args -> {
-                if ("hasItem".equals(name)) {
-                    throw failure;
-                }
-                return false;
-            }, false);
-        }
+        StoryTestSupport.bindExternals(runtime.getStory(), json,
+            StoryTestSupport.override("hasItem", _ -> {
+                throw failure;
+            }));
 
-        while (!runtime.hasChoice()) {
-            assertTrue(runtime.continueLine());
-            runtime.clearPendingLine();
-        }
+        advanceToChoice(runtime);
         assertTrue(runtime.choose(0));
 
         assertSame(failure, assertThrows(Exception.class, runtime::continueLine));
@@ -204,10 +174,11 @@ class StoryRuntimeTest {
     @Test
     void defaultFlowHelpersAreImplementedInInkUsingGenericExternals() throws Exception {
         var data = new InkPlayerData();
-        var runtime = new StoryRuntime(data, readStory("test4"));
+        var json = StoryTestSupport.readStory("test4");
+        var runtime = new StoryRuntime(data, json);
         var story = runtime.getStory();
         var transactions = new ArrayList<StoryTransaction.Flow>();
-        bindEngineExternals(story, runtime, transactions);
+        bindEngineExternals(story, runtime, json, transactions);
 
         assertNotNull(story);
         assertTrue(story.hasFunction("isInDefaultFlow"));
@@ -260,7 +231,8 @@ class StoryRuntimeTest {
         assertTrue(runtime.applyFlowTransactions(List.of(new StoryTransaction.NewFlow("side", "buy"))));
         assertEquals("side", runtime.getFlowName());
 
-        while (runtime.canContinueLine()) {
+        for (int steps = 0; runtime.canContinueLine(); steps++) {
+            assertWithinStepLimit(runtime, steps);
             assertTrue(runtime.continueLine());
             runtime.clearPendingLine();
         }
@@ -334,34 +306,38 @@ class StoryRuntimeTest {
     }
 
     private static StoryRuntime runtimeWithStory(InkPlayerData data, String name) throws Exception {
-        var runtime = new StoryRuntime(data, readStory(name));
+        var json = StoryTestSupport.readStory(name);
+        var runtime = new StoryRuntime(data, json);
         var story = runtime.getStory();
-        bindEngineExternals(story, runtime, new ArrayList<>());
+        bindEngineExternals(story, runtime, json, new ArrayList<>());
         return runtime;
     }
 
     private static void bindEngineExternals(Story story, StoryRuntime runtime,
+                                            String json,
                                             List<StoryTransaction.Flow> transactions) throws Exception {
-        for (var name : ENGINE_EXTERNALS) {
-            story.bindExternalFunction(name, args -> {
-                if ("isInFlow".equals(name)) {
-                    return runtime.getFlowName().equals(String.valueOf(args[0]));
-                }
-                if ("flowTo".equals(name)) {
-                    var flowName = String.valueOf(args[0]);
-                    transactions.add(new StoryTransaction.FlowTo(flowName));
-                    return true;
-                }
-                return false;
-            }, false);
+        StoryTestSupport.bindExternals(story, json,
+            StoryTestSupport.override("isInFlow",
+                args -> runtime.getFlowName().equals(String.valueOf(args[0]))),
+            StoryTestSupport.override("flowTo", args -> {
+                transactions.add(new StoryTransaction.FlowTo(String.valueOf(args[0])));
+                return true;
+            }));
+    }
+
+    private static void advanceToChoice(StoryRuntime runtime) throws Exception {
+        for (int steps = 0; !runtime.hasChoice(); steps++) {
+            assertWithinStepLimit(runtime, steps);
+            assertTrue(runtime.continueLine());
+            runtime.clearPendingLine();
         }
     }
 
-    static String readStory(String name) throws IOException {
-        try (var stream = StoryRuntimeTest.class.getResourceAsStream(
-            "/data/testmod/inkraft_story/" + name + ".ink.json")) {
-            assertNotNull(stream);
-            return new String(stream.readAllBytes(), StandardCharsets.UTF_8);
-        }
+    private static void assertWithinStepLimit(StoryRuntime runtime, int steps) {
+        assertTrue(steps < MAX_STORY_STEPS, () -> "Story did not settle within "
+            + MAX_STORY_STEPS + " steps: flow=" + runtime.getFlowName()
+            + ", pendingLine=" + runtime.hasPendingLine()
+            + ", choices=" + runtime.getChoices().size()
+            + ", canContinue=" + runtime.canContinueLine());
     }
 }

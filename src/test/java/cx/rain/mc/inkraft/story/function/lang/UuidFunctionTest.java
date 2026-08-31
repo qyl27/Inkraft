@@ -46,11 +46,11 @@ class UuidFunctionTest {
         var function = UuidFunctions.isUuid();
 
         assertThrows(FunctionArgumentTypeException.class,
-                () -> function.apply(null, new IntStoryValue(1)));
+            () -> function.apply(null, new IntStoryValue(1)));
     }
 
     private static boolean apply(AbstractLangFunction function, String value) {
         return assertInstanceOf(BoolStoryValue.class,
-                function.apply(null, new StringStoryValue(value))).value();
+            function.apply(null, new StringStoryValue(value))).value();
     }
 }
